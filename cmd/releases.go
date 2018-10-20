@@ -59,8 +59,8 @@ func runReleases(ctx *cli.Context) error {
 
 var CmdReleaseCreate = cli.Command{
 	Name:        "create",
-	Usage:       "Create a release on repository",
-	Description: `Create a release on repository`,
+	Usage:       "Create a release in repository",
+	Description: `Create a release in repository`,
 	Action:      runReleaseCreate,
 	Flags: []cli.Flag{
 		cli.StringFlag{
