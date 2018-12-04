@@ -7,6 +7,8 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"path/filepath"
+	"os"
 
 	"code.gitea.io/sdk/gitea"
 
@@ -87,6 +89,10 @@ var CmdReleaseCreate = cli.Command{
 			Name:  "prerelease, p",
 			Usage: "the release is a prerelease",
 		},
+		cli.StringSliceFlag{
+			Name:  "asset, a",
+			Usage: "a list of files to attach to the release",
+		},
 	},
 }
 
@@ -104,6 +110,23 @@ func runReleaseCreate(ctx *cli.Context) error {
 
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	for _, asset := range ctx.StringSlice("asset") {
+		var file *os.File
+		file, err = os.Open(asset)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		filePath := filepath.Base(asset)
+
+		_, err = login.Client().CreateReleaseAttachment(owner, repo, release.ID, file, filePath)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	return nil

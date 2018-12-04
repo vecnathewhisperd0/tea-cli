@@ -158,7 +158,7 @@ func initCommand(ctx *cli.Context) (*Login, string, string) {
 	return login, owner, repo
 }
 
-func getGlobalFlag(ctx *cli.Context, flag string) (string) {
+func getGlobalFlag(ctx *cli.Context, flag string) string {
 	var val = ctx.String(flag)
 	if val == "" {
 		return ctx.GlobalString(flag)
