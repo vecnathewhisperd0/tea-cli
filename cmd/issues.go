@@ -129,10 +129,7 @@ func initCommand(ctx *cli.Context) (*Login, string, string) {
 		log.Fatal("load config file failed", yamlConfigPath)
 	}
 
-	// log.Print(loginFlag)
-	// log.Print(ctx.GlobalString("repo"))
-
-	var loginFlag = getGlobalFlag(ctx, "login")
+	loginFlag := getGlobalFlag(ctx, "login")
 	var login *Login
 	if loginFlag == "" {
 		login, err = getActiveLogin()
@@ -146,7 +143,7 @@ func initCommand(ctx *cli.Context) (*Login, string, string) {
 		}
 	}
 
-	var repoPath = getGlobalFlag(ctx, "repo")
+	repoPath := getGlobalFlag(ctx, "repo")
 	if repoPath == "" {
 		login, repoPath, err = curGitRepoPath()
 		if err != nil {

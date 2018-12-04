@@ -7,8 +7,8 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"path/filepath"
 	"os"
+	"path/filepath"
 
 	"code.gitea.io/sdk/gitea"
 
