@@ -99,7 +99,7 @@ var CmdReleaseCreate = cli.Command{
 func runReleaseCreate(ctx *cli.Context) error {
 	login, owner, repo := initCommand(ctx)
 
-	_, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
+	release, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
 		TagName:      ctx.String("tag"),
 		Target:       ctx.String("target"),
 		Title:        ctx.String("title"),
@@ -114,17 +114,14 @@ func runReleaseCreate(ctx *cli.Context) error {
 
 	for _, asset := range ctx.StringSlice("asset") {
 		var file *os.File
-		file, err = os.Open(asset)
 
-		if err != nil {
+		if file, err = os.Open(asset); err != nil {
 			log.Fatal(err)
 		}
 
 		filePath := filepath.Base(asset)
 
-		_, err = login.Client().CreateReleaseAttachment(owner, repo, release.ID, file, filePath)
-
-		if err != nil {
+		if _, err = login.Client().CreateReleaseAttachment(owner, repo, release.ID, file, filePath); err != nil {
 			log.Fatal(err)
 		}
 	}

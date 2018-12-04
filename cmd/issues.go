@@ -129,9 +129,8 @@ func initCommand(ctx *cli.Context) (*Login, string, string) {
 		log.Fatal("load config file failed", yamlConfigPath)
 	}
 
-	loginFlag := getGlobalFlag(ctx, "login")
 	var login *Login
-	if loginFlag == "" {
+	if loginFlag := getGlobalFlag(ctx, "login"); loginFlag == "" {
 		login, err = getActiveLogin()
 		if err != nil {
 			log.Fatal(err)
