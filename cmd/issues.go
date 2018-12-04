@@ -137,12 +137,12 @@ func initCommand(ctx *cli.Context) (*Login, string, string) {
 	if loginFlag == "" {
 		login, err = getActiveLogin()
 		if err != nil {
-			log.Fatal("get active login failed")
+			log.Fatal(err)
 		}
 	} else {
 		login = getLoginByName(loginFlag)
 		if login == nil {
-			log.Fatal("indicated login name", loginFlag, "is not exist")
+			log.Fatal("indicated login name", loginFlag, "does not exist")
 		}
 	}
 
