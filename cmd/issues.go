@@ -129,31 +129,41 @@ func initCommand(ctx *cli.Context) (*Login, string, string) {
 		log.Fatal("load config file failed", yamlConfigPath)
 	}
 
+	// log.Print(loginFlag)
+	// log.Print(ctx.GlobalString("repo"))
+
+	var loginFlag = getGlobalFlag(ctx, "login")
 	var login *Login
-	if ctx.IsSet("login") {
-		login = getLoginByName(ctx.String("login"))
-		if login == nil {
-			log.Fatal("indicated login name", ctx.String("login"), "is not exist")
-		}
-	} else {
+	if loginFlag == "" {
 		login, err = getActiveLogin()
 		if err != nil {
 			log.Fatal("get active login failed")
 		}
+	} else {
+		login = getLoginByName(loginFlag)
+		if login == nil {
+			log.Fatal("indicated login name", loginFlag, "is not exist")
+		}
 	}
 
-	var repoPath string
-	if !ctx.IsSet("repo") {
+	var repoPath = getGlobalFlag(ctx, "repo")
+	if repoPath == "" {
 		login, repoPath, err = curGitRepoPath()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-	} else {
-		repoPath = ctx.String("repo")
 	}
 
 	owner, repo := splitRepo(repoPath)
 	return login, owner, repo
+}
+
+func getGlobalFlag(ctx *cli.Context, flag string) (string) {
+	var val = ctx.String(flag)
+	if val == "" {
+		return ctx.GlobalString(flag)
+	}
+	return val
 }
 
 func runIssuesCreate(ctx *cli.Context) error {
