@@ -126,6 +126,7 @@ func runReleaseCreate(ctx *cli.Context) error {
 		filePath := filepath.Base(asset)
 
 		if _, err = login.Client().CreateReleaseAttachment(owner, repo, release.ID, file, filePath); err != nil {
+			file.Close()
 			log.Fatal(err)
 		}
 
