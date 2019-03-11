@@ -109,6 +109,10 @@ func runReleaseCreate(ctx *cli.Context) error {
 	})
 
 	if err != nil {
+		if err.Error() == "409 Conflict" {
+			log.Fatal("error: There already is a release for this tag")
+		}
+
 		log.Fatal(err)
 	}
 
