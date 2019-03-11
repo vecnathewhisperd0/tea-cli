@@ -118,6 +118,7 @@ func runReleaseCreate(ctx *cli.Context) error {
 		if file, err = os.Open(asset); err != nil {
 			log.Fatal(err)
 		}
+		defer file.Close()
 
 		filePath := filepath.Base(asset)
 
