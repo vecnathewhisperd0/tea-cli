@@ -94,6 +94,14 @@ var CmdReleaseCreate = cli.Command{
 			Name:  "asset, a",
 			Usage: "a list of files to attach to the release",
 		},
+		cli.StringFlag{
+			Name:  "login, l",
+			Usage: "Indicate one login, optional when inside a gitea repository",
+		},
+		cli.StringFlag{
+			Name:  "repo, r",
+			Usage: "Indicate one repository, optional when inside a gitea repository",
+		},
 	},
 }
 
