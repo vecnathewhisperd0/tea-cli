@@ -22,10 +22,6 @@ var CmdRepos = cli.Command{
 			Name:  "login, l",
 			Usage: "Indicate one login, optional when inside a gitea repository",
 		},
-		cli.BoolFlag{
-			Name:  "noheader",
-			Usage: "Skip header on output.",
-		},
 	},
 }
 
@@ -43,9 +39,7 @@ func runRepos(ctx *cli.Context) error {
 		return nil
 	}
 
-	if noheader := getGlobalFlag(ctx, "noheader"); noheader != "true" {
-		fmt.Printf("Name\tType/Mode\tSSH-URL\tOwner\n")
-	}
+	fmt.Println("Name | Type/Mode | SSH-URL | Owner")
 	for _, rp := range rps {
 		var mode = "source"
 		if rp.Fork {
@@ -54,7 +48,7 @@ func runRepos(ctx *cli.Context) error {
 		if rp.Mirror {
 			mode = "mirror"
 		}
-		fmt.Printf("%s\t%s\t%s\t%s\n", rp.FullName, mode, rp.SSHURL, rp.Owner.UserName)
+		fmt.Printf("%s | %s | %s | %s\n", rp.FullName, mode, rp.SSHURL, rp.Owner.UserName)
 	}
 
 	return nil
