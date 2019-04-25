@@ -73,7 +73,7 @@ pipeline:
       branch: [ master ]
 
   static:
-    image: golang:1.12
+    image: techknowlogick/xgo:latest
     pull: true
     commands:
       - export PATH=$PATH:$GOPATH/bin
