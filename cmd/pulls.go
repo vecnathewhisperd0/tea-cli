@@ -9,30 +9,33 @@ import (
 	"log"
 
 	"code.gitea.io/sdk/gitea"
-
-	"github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
-// CmdPulls represents to login a gitea server.
-var CmdPulls = cli.Command{
-	Name:        "pulls",
-	Usage:       "Operate with pulls of the repository",
-	Description: `Operate with pulls of the repository`,
-	Action:      runPulls,
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
-	},
+var loginName string
+var repoPath string
+
+func init() {
+	rootCmd.AddCommand(pullCmd)
+	rootCmd.PersistentFlags().StringVarP(&loginName, "login", "l", "", "Indicate one login, optional when inside a gitea repository")
+	rootCmd.PersistentFlags().StringVarP(&repoPath, "repo", "r", "", "Indicate one repository, optional when inside a gitea repository")
 }
 
-func runPulls(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+// pullCmd represents the pull command
+var pullCmd = &cobra.Command{
+	Use:   "pulls",
+	Short: "Operate with pulls of the repository",
+	Long:  `Operate with pulls of the repository`,
+	Run:   runPulls,
+}
+
+func runPulls(cmd *cobra.Command, args []string) {
+	login := getLoginByName(loginName)
+	if login == nil {
+		Errorf("Login '%s' not found in config\n", loginName)
+		return
+	}
+	owner, repo := getOwnerRepo()
 
 	prs, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
 		Page:  0,
@@ -45,7 +48,6 @@ func runPulls(ctx *cli.Context) error {
 
 	if len(prs) == 0 {
 		fmt.Println("No pull requests left")
-		return nil
 	}
 
 	for _, pr := range prs {
@@ -58,6 +60,4 @@ func runPulls(ctx *cli.Context) error {
 		}
 		fmt.Printf("#%d\t%s\t%s\t%s\n", pr.Index, name, pr.Updated.Format("2006-01-02 15:04:05"), pr.Title)
 	}
-
-	return nil
 }

@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -15,6 +16,7 @@ import (
 )
 
 var cfgFile string
+var debug bool
 
 // Version holds the current Gitea version
 var Version = "0.1.0-dev"
@@ -46,7 +48,8 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tea/tea.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.tea/tea.yaml)")
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "config file (default is $HOME/.tea/tea.yaml)")
 	if len(Tags) > 0 {
 		Version += " built with: " + strings.Replace(Tags, " ", ", ", -1)
 	}
@@ -75,6 +78,22 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		if debug {
+			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		}
 	}
+}
+
+func getOwnerRepo() (string, string) {
+	var err error
+	repoPath := rootCmd.PersistentFlags().Lookup("repo").Value.String()
+	if repoPath == "" {
+		_, repoPath, err = curGitRepoPath()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+
+	owner, repo := splitRepo(repoPath)
+	return owner, repo
 }

@@ -23,6 +23,7 @@ import (
 	git_config "gopkg.in/src-d/go-git.v4/config"
 
 	"github.com/go-gitea/yaml"
+	"github.com/spf13/viper"
 )
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
@@ -112,6 +113,10 @@ func getActiveLogin() (*Login, error) {
 }
 
 func getLoginByName(name string) *Login {
+	err := viper.Unmarshal(&config)
+	if err != nil {
+		return nil
+	}
 	for _, l := range config.Logins {
 		if l.Name == name {
 			return &l
