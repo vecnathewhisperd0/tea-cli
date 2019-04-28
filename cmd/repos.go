@@ -54,7 +54,7 @@ func runRepos(ctx *cli.Context) error {
 	return nil
 }
 
-func initCommandLoginOnly(ctx *cli.Context) (*Login) {
+func initCommandLoginOnly(ctx *cli.Context) *Login {
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
 		log.Fatal("load config file failed", yamlConfigPath)
