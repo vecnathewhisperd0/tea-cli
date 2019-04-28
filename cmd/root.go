@@ -7,6 +7,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -14,6 +15,12 @@ import (
 )
 
 var cfgFile string
+
+// Version holds the current Gitea version
+var Version = "0.1.0-dev"
+
+// Tags holds the build tags used
+var Tags = ""
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -40,6 +47,10 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tea/tea.yaml)")
+	if len(Tags) > 0 {
+		Version += " built with: " + strings.Replace(Tags, " ", ", ", -1)
+	}
+	rootCmd.Version = Version
 }
 
 // initConfig reads in config file and ENV variables if set.
