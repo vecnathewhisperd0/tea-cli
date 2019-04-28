@@ -67,7 +67,7 @@ func OutputDsv(headers []string, values [][]string, delimiterOpt ...string) {
 	if len(delimiterOpt) > 0 {
 		delimiter = delimiterOpt[0]
 	}
-	fmt.Println("\""+strings.Join(headers, "\""+delimiter+"\"")+"\"")
+	fmt.Println("\"" + strings.Join(headers, "\""+delimiter+"\"") + "\"")
 	for _, value := range values {
 		fmt.Printf("\"")
 		fmt.Printf(strings.Join(value, "\""+delimiter+"\""))
