@@ -39,7 +39,9 @@ var OutputFlag = cli.StringFlag{
 }
 
 // DefaultFlags defines flags that should be available
-// for all subcommands
+// for all subcommands and appended to the flags of the
+// subcommand to work around issue:
+// https://github.com/urfave/cli/issues/585
 var DefaultFlags = []cli.Flag{
 	LoginFlag,
 	OutputFlag,
@@ -47,6 +49,8 @@ var DefaultFlags = []cli.Flag{
 
 // RepoDefaultFlags defines flags that should be available
 // for all subcommands working with dedicated repositories
+// to work around issue:
+// https://github.com/urfave/cli/issues/585
 var RepoDefaultFlags = append([]cli.Flag{
 	RepoFlag,
 }, DefaultFlags...)
