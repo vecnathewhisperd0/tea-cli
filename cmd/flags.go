@@ -5,8 +5,9 @@
 package cmd
 
 import (
-	"github.com/urfave/cli"
 	"log"
+
+	"github.com/urfave/cli"
 )
 
 // create global variables for global Flags to simplify
