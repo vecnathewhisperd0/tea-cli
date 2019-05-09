@@ -35,7 +35,7 @@ var RepoFlag = cli.StringFlag{
 // OutputFlag provides flag to specify output type
 var OutputFlag = cli.StringFlag{
 	Name:        "output, o",
-	Usage:       "Indicate one repository, optional when inside a gitea repository",
+	Usage:       "Specify output format. (csv, simple, table, tsv, yaml)",
 	Destination: &outputValue,
 }
 
@@ -60,7 +60,7 @@ var RepoDefaultFlags = append([]cli.Flag{
 func initCommand() (*Login, string, string) {
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
-		log.Fatal("load config file failed", yamlConfigPath)
+		log.Fatal("load config file failed ", yamlConfigPath)
 	}
 
 	var login *Login
