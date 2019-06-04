@@ -165,7 +165,7 @@ steps:
 
 - name: github
   pull: always
-  image: plugins/github-release:1
+  image: plugins/gitea-releases:1
   settings:
     files:
     - "dist/release/*"
@@ -192,5 +192,3 @@ steps:
     status:
     - changed
     - failure
-
-...
