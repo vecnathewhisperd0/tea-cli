@@ -98,6 +98,27 @@ var CmdLabelCreate = cli.Command{
 	},
 }
 
+func splitLabelLine(line string) (string, string, string) {
+	fields := strings.SplitN(line, ";", 2)
+	var color, name, description string
+	if len(fields) < 1 {
+		return "", "", ""
+	} else if len(fields) >= 2 {
+		description = strings.TrimSpace(fields[1])
+	}
+	fields = strings.Fields(fields[0])
+	if len(fields) <= 0 {
+		return "", "", ""
+	}
+	color = fields[0]
+	if len(fields) == 2 {
+		name = fields[1]
+	} else if len(fields) > 2 {
+		name = strings.Join(fields[1:], " ")
+	}
+	return color, name, description
+}
+
 func runLabelCreate(ctx *cli.Context) error {
 	login, owner, repo := initCommand(ctx)
 
@@ -120,15 +141,16 @@ func runLabelCreate(ctx *cli.Context) error {
 		// FIXME: if Gitea's API support create multiple labels once, we should move to that API.
 		for scanner.Scan() {
 			line := scanner.Text()
-			fields := strings.Fields(line)
-			if len(fields) >= 2 {
-				_, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
-					Name:  fields[1],
-					Color: fields[0],
-				})
-			} else {
+			color, name, _ := splitLabelLine(line)
+			if color == "" || name == "" {
 				log.Printf("Line %d ignored because lack of enough fields: %s\n", i, line)
+			} else {
+				_, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
+					Name:  name,
+					Color: color,
+				})
 			}
+
 			i++
 		}
 	}
