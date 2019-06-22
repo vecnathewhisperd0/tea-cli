@@ -19,7 +19,7 @@ var CmdPulls = cli.Command{
 	Usage:       "Operate with pulls of the repository",
 	Description: `Operate with pulls of the repository`,
 	Action:      runPulls,
-	Flags:       append([]cli.Flag{}, RepoDefaultFlags...),
+	Flags:       RepoDefaultFlags,
 }
 
 func runPulls(ctx *cli.Context) error {
