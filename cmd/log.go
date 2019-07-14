@@ -41,8 +41,8 @@ func Errorf(format string, a ...interface{}) {
 	fmt.Printf(format, a...)
 }
 
-// OutputTable prints structured data as table
-func OutputTable(headers []string, values [][]string) {
+// outputtable prints structured data as table
+func outputtable(headers []string, values [][]string) {
 	table := tablewriter.NewWriter(os.Stdout)
 	if len(headers) > 0 {
 		table.SetHeader(headers)
@@ -53,16 +53,16 @@ func OutputTable(headers []string, values [][]string) {
 	table.Render()
 }
 
-// OutputSimple prints structured data as space delimited value
-func OutputSimple(headers []string, values [][]string) {
+// outputsimple prints structured data as space delimited value
+func outputsimple(headers []string, values [][]string) {
 	for _, value := range values {
 		fmt.Printf(strings.Join(value, " "))
 		fmt.Printf("\n")
 	}
 }
 
-// OutputDsv prints structured data as delimiter separated value format
-func OutputDsv(headers []string, values [][]string, delimiterOpt ...string) {
+// outputdsv prints structured data as delimiter separated value format
+func outputdsv(headers []string, values [][]string, delimiterOpt ...string) {
 	delimiter := ","
 	if len(delimiterOpt) > 0 {
 		delimiter = delimiterOpt[0]
@@ -76,8 +76,8 @@ func OutputDsv(headers []string, values [][]string, delimiterOpt ...string) {
 	}
 }
 
-// OutputYaml prints structured data as yaml
-func OutputYaml(headers []string, values [][]string) {
+// outputyaml prints structured data as yaml
+func outputyaml(headers []string, values [][]string) {
 	for _, value := range values {
 		fmt.Println("-")
 		for j, val := range value {
@@ -96,15 +96,15 @@ func OutputYaml(headers []string, values [][]string) {
 func Output(output string, headers []string, values [][]string) {
 	switch {
 	case output == "" || output == "table":
-		OutputTable(headers, values)
+		outputtable(headers, values)
 	case output == "csv":
-		OutputDsv(headers, values, ",")
+		outputdsv(headers, values, ",")
 	case output == "simple":
-		OutputSimple(headers, values)
+		outputsimple(headers, values)
 	case output == "tsv":
-		OutputDsv(headers, values, "\t")
+		outputdsv(headers, values, "\t")
 	case output == "yaml":
-		OutputYaml(headers, values)
+		outputyaml(headers, values)
 	default:
 		Errorf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
 	}
