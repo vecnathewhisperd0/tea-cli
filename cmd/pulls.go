@@ -73,7 +73,7 @@ var CmdPullsCreate = cli.Command{
 	Action:      runCreatePullRequest,
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "head, h",
+			Name:  "head",
 			Usage: "pull-request head",
 		},
 		cli.StringFlag{
