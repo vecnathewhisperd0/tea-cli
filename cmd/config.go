@@ -188,10 +188,29 @@ func saveConfig(ymlPath string) error {
 
 func curGitRepoPath() (*Login, string, error) {
 	gitConfig := git_config.NewConfig()
-	bs, err := ioutil.ReadFile(filepath.Join(filepath.Dir(os.Args[0]), ".git", "config"))
+
+	currDir, err := filepath.Abs(os.Args[0])
 	if err != nil {
 		return nil, "", err
 	}
+
+	// We try to find the .git/config file from our working directory
+	// till the / of the filesystem, if we can't find any, we abandon
+	var bs []byte
+	for {
+		bs, err = ioutil.ReadFile(filepath.Join(currDir, ".git", "config"))
+		if err != nil {
+			// We can't find any .git/config up to the root
+			if filepath.ToSlash(currDir) == "/" {
+				return nil, "", err
+			}
+			// We go up one level in the filepath
+			currDir = filepath.Dir(currDir)
+			continue
+		}
+		break
+	}
+
 	if err := gitConfig.Unmarshal(bs); err != nil {
 		return nil, "", err
 	}
