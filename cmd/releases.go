@@ -49,10 +49,10 @@ func runReleases(ctx *cli.Context) error {
 	}
 
 	headers := []string{
-		string("Tag-Name"),
-		string("Title"),
-		string("Published At"),
-		string("Tar URL"),
+		"Tag-Name",
+		"Title",
+		"Published At",
+		"Tar URL",
 	}
 
 	var values [][]string

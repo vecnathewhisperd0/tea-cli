@@ -97,10 +97,10 @@ func runIssuesList(ctx *cli.Context) error {
 	}
 
 	headers := []string{
-		string("Index"),
-		string("Name"),
-		string("Updated"),
-		string("Title"),
+		"Index",
+		"Name",
+		"Updated",
+		"Title",
 	}
 
 	var values [][]string
