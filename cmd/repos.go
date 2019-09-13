@@ -43,15 +43,15 @@ var CmdReposList = cli.Command{
 		},
 		cli.StringFlag{
 			Name:  "mode",
-			Usage: "Indicate one login, optional when inside a gitea repository",
+			Usage: "Filter listed repositories based on mode, optional - fork, mirror, source",
 		},
 		cli.StringFlag{
 			Name:  "org",
-			Usage: "Indicate one login, optional when inside a gitea repository",
+			Usage: "Filter listed repositories based on organization, optional",
 		},
 		cli.StringFlag{
 			Name:  "user",
-			Usage: "Indicate one login, optional when inside a gitea repository",
+			Usage: "Filter listed repositories absed on user, optional",
 		},
 	},
 }
