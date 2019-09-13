@@ -32,7 +32,7 @@ var CmdPulls = cli.Command{
 		},
 		cli.StringFlag{
 			Name:        "output, o",
-			Usage:       "Specify output format. (table)",
+			Usage:       outputUsage,
 			Destination: &output,
 		},
 	},
