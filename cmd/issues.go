@@ -26,7 +26,10 @@ var CmdIssues = cli.Command{
 		CmdIssuesList,
 		CmdIssuesCreate,
 	},
-	Flags: RepoDefaultFlags,
+	Flags: []cli.Flag{
+		LoginFlag,
+		RepoFlag,
+	},
 }
 
 // CmdIssuesList represents a sub command of issues to list issues
