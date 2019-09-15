@@ -39,22 +39,31 @@ var OutputFlag = cli.StringFlag{
 	Destination: &outputValue,
 }
 
-// DefaultFlags defines flags that should be available
-// for all subcommands and appended to the flags of the
-// subcommand to work around issue:
+// LoginOutputFlags defines login and output flags that should
+// added to all subcommands and appended to the flags of the
+// subcommand to work around issue and provide --login and --output:
 // https://github.com/urfave/cli/issues/585
-var DefaultFlags = []cli.Flag{
+var LoginOutputFlags = []cli.Flag{
 	LoginFlag,
 	OutputFlag,
 }
 
-// RepoDefaultFlags defines flags that should be available
-// for all subcommands working with dedicated repositories
-// to work around issue:
+// LoginRepoFlags defines login and repo flags that should
+// be used for all subcommands and appended to the flags of
+// the subcommand to work around issue and provide --login and --repo:
 // https://github.com/urfave/cli/issues/585
-var RepoDefaultFlags = append([]cli.Flag{
+var LoginRepoFlags = []cli.Flag{
+	LoginFlag,
 	RepoFlag,
-}, DefaultFlags...)
+}
+
+// AllDefaultFlags defines flags that should be available
+// for all subcommands working with dedicated repositories
+// to work around issue and provide --login, --repo and --output:
+// https://github.com/urfave/cli/issues/585
+var AllDefaultFlags = append([]cli.Flag{
+	RepoFlag,
+}, LoginOutputFlags...)
 
 // initCommand returns repository and *Login based on flags
 func initCommand() (*Login, string, string) {

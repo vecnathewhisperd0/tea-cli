@@ -26,10 +26,7 @@ var CmdIssues = cli.Command{
 		CmdIssuesList,
 		CmdIssuesCreate,
 	},
-	Flags: []cli.Flag{
-		LoginFlag,
-		RepoFlag,
-	},
+	Flags: AllDefaultFlags,
 }
 
 // CmdIssuesList represents a sub command of issues to list issues
@@ -38,6 +35,7 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      runIssuesList,
+	Flags:       AllDefaultFlags,
 }
 
 func runIssues(ctx *cli.Context) error {
@@ -85,8 +83,17 @@ func runIssuesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
+	headers := []string{
+		"Index",
+		"Name",
+		"Updated",
+		"Title",
+	}
+
+	var values [][]string
+
 	if len(issues) == 0 {
-		fmt.Println("No issues left")
+		Output(output, headers, values)
 		return nil
 	}
 
@@ -95,8 +102,17 @@ func runIssuesList(ctx *cli.Context) error {
 		if len(name) == 0 {
 			name = issue.Poster.UserName
 		}
-		fmt.Printf("#%d\t%s\t%s\t%s\n", issue.Index, name, issue.Updated.Format("2006-01-02 15:04:05"), issue.Title)
+		values = append(
+			values,
+			[]string{
+				strconv.FormatInt(issue.Index, 10),
+				name,
+				issue.Updated.Format("2006-01-02 15:04:05"),
+				issue.Title,
+			},
+		)
 	}
+	Output(output, headers, values)
 
 	return nil
 }
@@ -116,7 +132,7 @@ var CmdIssuesCreate = cli.Command{
 			Name:  "body, b",
 			Usage: "issue body to create",
 		},
-	}, RepoDefaultFlags...),
+	}, LoginRepoFlags...),
 }
 
 func runIssuesCreate(ctx *cli.Context) error {
