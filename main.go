@@ -40,6 +40,7 @@ func main() {
 		cmd.CmdPulls,
 		cmd.CmdReleases,
 	}
+	app.Flags = cmd.LoginRepoFlags
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
 	if err != nil {
