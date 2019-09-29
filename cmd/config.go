@@ -188,7 +188,11 @@ func saveConfig(ymlPath string) error {
 
 func curGitRepoPath() (*Login, string, error) {
 	gitConfig := git_config.NewConfig()
-	bs, err := ioutil.ReadFile(filepath.Join(filepath.Dir(os.Args[0]), ".git", "config"))
+	gitDir, err := resolveGitDir()
+	if err != nil {
+		return nil, "", err
+	}
+	bs, err := ioutil.ReadFile(filepath.Join(gitDir, "config"))
 	if err != nil {
 		return nil, "", err
 	}
@@ -221,4 +225,31 @@ func curGitRepoPath() (*Login, string, error) {
 	}
 
 	return nil, "", errors.New("No Gitea login found")
+}
+
+type dotGitFile struct {
+	GitDir string `yaml:"gitdir"`
+}
+
+func resolveGitDir() (string, error) {
+	gitPath := filepath.Join(filepath.Dir(os.Args[0]), ".git")
+	dir, err := os.Stat(gitPath)
+	if err != nil {
+		return "", err
+	}
+	if dir.Mode().IsRegular() {
+		gitFile := dotGitFile{}
+		bs, err := ioutil.ReadFile(gitPath)
+		if err != nil {
+			return "", err
+		}
+
+		err = yaml.Unmarshal(bs, &gitFile)
+		if err != nil {
+			return "", err
+		}
+
+		gitPath = filepath.Join(filepath.Dir(os.Args[0]), gitFile.GitDir)
+	}
+	return gitPath, nil
 }
