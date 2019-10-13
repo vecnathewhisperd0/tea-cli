@@ -92,6 +92,10 @@ var CmdLabelCreate = cli.Command{
 			Usage: "label color value",
 		},
 		cli.StringFlag{
+			Name:  "description",
+			Usage: "label description",
+		},
+		cli.StringFlag{
 			Name:  "file",
 			Usage: "indicate a label file",
 		},
@@ -126,8 +130,9 @@ func runLabelCreate(ctx *cli.Context) error {
 	var err error
 	if len(labelFile) == 0 {
 		_, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
-			Name:  ctx.String("name"),
-			Color: ctx.String("color"),
+			Name:        ctx.String("name"),
+			Color:       ctx.String("color"),
+			Description: ctx.String("description"),
 		})
 	} else {
 		f, err := os.Open(labelFile)
@@ -141,13 +146,14 @@ func runLabelCreate(ctx *cli.Context) error {
 		// FIXME: if Gitea's API support create multiple labels once, we should move to that API.
 		for scanner.Scan() {
 			line := scanner.Text()
-			color, name, _ := splitLabelLine(line)
+			color, name, description := splitLabelLine(line)
 			if color == "" || name == "" {
 				log.Printf("Line %d ignored because lack of enough fields: %s\n", i, line)
 			} else {
 				_, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
-					Name:  name,
-					Color: color,
+					Name:        name,
+					Color:       color,
+					Description: description,
 				})
 			}
 
@@ -181,6 +187,10 @@ var CmdLabelUpdate = cli.Command{
 			Name:  "color",
 			Usage: "label color value",
 		},
+		cli.StringFlag{
+			Name:  "description",
+			Usage: "label description",
+		},
 	},
 }
 
@@ -188,20 +198,27 @@ func runLabelUpdate(ctx *cli.Context) error {
 	login, owner, repo := initCommand(ctx)
 
 	id := ctx.Int64("id")
-	var pName, pColor *string
+	var pName, pColor, pDescription *string
 	name := ctx.String("name")
-	color := ctx.String("color")
 	if name != "" {
 		pName = &name
 	}
+
+	color := ctx.String("color")
 	if color != "" {
 		pColor = &color
 	}
 
+	description := ctx.String("description")
+	if description != "" {
+		pDescription = &description
+	}
+
 	var err error
 	_, err = login.Client().EditLabel(owner, repo, id, gitea.EditLabelOption{
-		Name:  pName,
-		Color: pColor,
+		Name:        pName,
+		Color:       pColor,
+		Description: pDescription,
 	})
 
 	if err != nil {
