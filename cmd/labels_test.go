@@ -17,6 +17,7 @@ func TestParseLabelLine(t *testing.T) {
 #fbca04 kind/breaking ; breaking label
 #fc2929 kind/bug
 #c5def5 kind/deployment ; deployment label
+#000000 in progress ; in progress label
 `
 
 	scanner := bufio.NewScanner(strings.NewReader(labels))
@@ -40,6 +41,10 @@ func TestParseLabelLine(t *testing.T) {
 			assert.EqualValues(t, "#c5def5", color)
 			assert.EqualValues(t, "kind/deployment", name)
 			assert.EqualValues(t, "deployment label", description)
+		case 5:
+			assert.EqualValues(t, "#000000", color)
+			assert.EqualValues(t, "in progress", name)
+			assert.EqualValues(t, "in progress label", description)
 		}
 
 		i++
