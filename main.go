@@ -39,6 +39,7 @@ func main() {
 		cmd.CmdIssues,
 		cmd.CmdPulls,
 		cmd.CmdReleases,
+		cmd.CmdLabels,
 	}
 	app.Flags = cmd.LoginRepoFlags
 	app.EnableBashCompletion = true
