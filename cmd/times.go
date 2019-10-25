@@ -28,8 +28,16 @@ var CmdTrackedTimes = cli.Command{
 	},
 	Flags: append([]cli.Flag{
 		// TODO: add --from --to filters on t.Created
+		cli.StringFlag{
+			Name:  "from, f",
+			Usage: "Show only times tracked after this date",
+		},
+		cli.StringFlag{
+			Name:  "until, u",
+			Usage: "Show only times tracked before this date",
+		},
 		cli.BoolFlag{
-			Name:  "total",
+			Name:  "total, t",
 			Usage: "Print the total duration at the end",
 		},
 	}, AllDefaultFlags...),
@@ -76,7 +84,28 @@ func runTrackedTimes(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
+	var from, until time.Time
+	if ctx.String("from") != "" {
+		from, err = time.Parse("2006-01-02 15:04:05", ctx.String("from"))
+		if err != nil {
+			return err
+		}
+	}
+	if ctx.String("until") != "" {
+		until, err = time.Parse("2006-01-02 15:04:05", ctx.String("until"))
+		if err != nil {
+			return err
+		}
+	}
+
 	for _, t := range times {
+		if ctx.String("from") != "" && from.After(t.Created) {
+			continue
+		}
+		if ctx.String("until") != "" && until.Before(t.Created) {
+			continue
+		}
+
 		totalDuration += t.Time
 
 		outputValues = append(
