@@ -13,6 +13,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
+	"github.com/araddon/dateparse"
 	"github.com/urfave/cli"
 )
 
@@ -86,13 +87,13 @@ func runTrackedTimes(ctx *cli.Context) error {
 
 	var from, until time.Time
 	if ctx.String("from") != "" {
-		from, err = time.Parse("2006-01-02 15:04:05", ctx.String("from"))
+		from, err = dateparse.ParseLocal(ctx.String("from"))
 		if err != nil {
 			return err
 		}
 	}
 	if ctx.String("until") != "" {
-		until, err = time.Parse("2006-01-02 15:04:05", ctx.String("until"))
+		until, err = dateparse.ParseLocal(ctx.String("until"))
 		if err != nil {
 			return err
 		}
