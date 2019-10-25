@@ -5,13 +5,15 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
+	"strconv"
 
 	"code.gitea.io/sdk/gitea"
 
 	"github.com/urfave/cli"
 )
+
+var output string
 
 // CmdPulls represents to login a gitea server.
 var CmdPulls = cli.Command{
@@ -19,20 +21,11 @@ var CmdPulls = cli.Command{
 	Usage:       "Operate with pulls of the repository",
 	Description: `Operate with pulls of the repository`,
 	Action:      runPulls,
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
-	},
+	Flags:       AllDefaultFlags,
 }
 
 func runPulls(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	prs, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
 		Page:  0,
@@ -43,8 +36,17 @@ func runPulls(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
+	headers := []string{
+		"Index",
+		"Name",
+		"Updated",
+		"Title",
+	}
+
+	var values [][]string
+
 	if len(prs) == 0 {
-		fmt.Println("No pull requests left")
+		Output(output, headers, values)
 		return nil
 	}
 
@@ -56,8 +58,17 @@ func runPulls(ctx *cli.Context) error {
 		if len(name) == 0 {
 			name = pr.Poster.UserName
 		}
-		fmt.Printf("#%d\t%s\t%s\t%s\n", pr.Index, name, pr.Updated.Format("2006-01-02 15:04:05"), pr.Title)
+		values = append(
+			values,
+			[]string{
+				strconv.FormatInt(pr.Index, 10),
+				name,
+				pr.Updated.Format("2006-01-02 15:04:05"),
+				pr.Title,
+			},
+		)
 	}
+	Output(output, headers, values)
 
 	return nil
 }

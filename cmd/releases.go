@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,37 +23,43 @@ var CmdReleases = cli.Command{
 	Subcommands: []cli.Command{
 		CmdReleaseCreate,
 	},
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
-	},
+	Flags: AllDefaultFlags,
 }
 
 func runReleases(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	releases, err := login.Client().ListReleases(owner, repo)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	headers := []string{
+		"Tag-Name",
+		"Title",
+		"Published At",
+		"Tar URL",
+	}
+
+	var values [][]string
+
 	if len(releases) == 0 {
-		fmt.Println("No Releases")
+		Output(output, headers, values)
 		return nil
 	}
 
 	for _, release := range releases {
-		fmt.Printf("#%s\t%s\t%s\t%s\n", release.TagName,
-			release.Title,
-			release.PublishedAt.Format("2006-01-02 15:04:05"),
-			release.TarURL)
+		values = append(
+			values,
+			[]string{
+				release.TagName,
+				release.Title,
+				release.PublishedAt.Format("2006-01-02 15:04:05"),
+				release.TarURL,
+			},
+		)
 	}
+	Output(output, headers, values)
 
 	return nil
 }
@@ -65,7 +70,7 @@ var CmdReleaseCreate = cli.Command{
 	Usage:       "Create a release in repository",
 	Description: `Create a release in repository`,
 	Action:      runReleaseCreate,
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		cli.StringFlag{
 			Name:  "tag",
 			Usage: "release tag name",
@@ -94,11 +99,11 @@ var CmdReleaseCreate = cli.Command{
 			Name:  "asset, a",
 			Usage: "a list of files to attach to the release",
 		},
-	},
+	}, LoginRepoFlags...),
 }
 
 func runReleaseCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	release, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
 		TagName:      ctx.String("tag"),
