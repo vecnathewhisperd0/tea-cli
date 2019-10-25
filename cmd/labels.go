@@ -27,20 +27,12 @@ var CmdLabels = cli.Command{
 		CmdLabelUpdate,
 		CmdLabelDelete,
 	},
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
+	Flags: append([]cli.Flag{
 		cli.StringFlag{
 			Name:  "save, s",
 			Usage: "Save all the labels as a file",
 		},
-	},
+	}, LoginRepoFlags...), // @TODO: also support OutputFlag -> AllDefaultFlags?
 }
 
 func runLabels(ctx *cli.Context) error {
