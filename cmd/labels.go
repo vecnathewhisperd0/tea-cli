@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -32,11 +33,19 @@ var CmdLabels = cli.Command{
 			Name:  "save, s",
 			Usage: "Save all the labels as a file",
 		},
-	}, LoginRepoFlags...), // @TODO: also support OutputFlag -> AllDefaultFlags?
+	}, AllDefaultFlags...),
 }
 
 func runLabels(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
+
+	headers := []string{
+		"Index",
+		"Color",
+		"Name",
+	}
+
+	var values [][]string
 
 	labels, err := login.Client().ListRepoLabels(owner, repo)
 	if err != nil {
@@ -61,8 +70,16 @@ func runLabels(ctx *cli.Context) error {
 		}
 	} else {
 		for _, label := range labels {
-			fmt.Fprintf(os.Stdout, "%d #%s %s\n", label.ID, label.Color, label.Name)
+			values = append(
+				values,
+				[]string{
+					strconv.FormatInt(label.ID, 10),
+					label.Color,
+					label.Name,
+				},
+			)
 		}
+		Output(outputValue, headers, values)
 	}
 
 	return nil
