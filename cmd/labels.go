@@ -53,7 +53,7 @@ func runLabels(ctx *cli.Context) error {
 	}
 
 	if len(labels) == 0 {
-		fmt.Println("No Labels")
+		Output(outputValue, headers, values)
 		return nil
 	}
 
