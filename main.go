@@ -29,7 +29,7 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Tea"
+	app.Name = "tea"
 	app.Usage = "Command line tool to interact with Gitea"
 	app.Description = ``
 	app.Version = Version + formatBuiltWith(Tags)
