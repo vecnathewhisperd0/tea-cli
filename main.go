@@ -41,6 +41,7 @@ func main() {
 		&cmd.CmdReleases,
 		&cmd.CmdRepos,
 		&cmd.CmdLabels,
+		&cmd.CmdTrackedTimes,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
