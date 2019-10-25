@@ -16,11 +16,12 @@ import (
 	"github.com/urfave/cli"
 )
 
-// CmdLabels represents to operate repositories' labels.
+// CmdTrackedTimes represents the command to operate repositories' times.
 var CmdTrackedTimes = cli.Command{
 	Name:        "times",
 	Usage:       "Operate on tracked times of the repository's issues",
 	Description: `Operate on tracked times of the repository's issues`,
+	ArgsUsage:   "[username | #issue]",
 	Action:      runTrackedTimes,
 	Subcommands: []cli.Command{
 		CmdTrackedTimesAdd,
@@ -40,7 +41,6 @@ func runTrackedTimes(ctx *cli.Context) error {
 	var totalDuration int64
 	var times []*gitea.TrackedTime
 	var err error
-
 	var outputValues [][]string
 	headers := []string{
 		"Index",
@@ -51,10 +51,20 @@ func runTrackedTimes(ctx *cli.Context) error {
 	}
 
 	user := ctx.Args().First()
-	if user != "" {
-		times, err = login.Client().GetUserTrackedTimes(owner, repo, user)
-	} else {
+	fmt.Println(ctx.Command.ArgsUsage)
+	if user == "" {
+		// get all tracked times on the repo
 		times, err = login.Client().GetRepoTrackedTimes(owner, repo)
+	} else if strings.HasPrefix(user, "#") {
+		// get all tracked times on the specified issue
+		issue, err2 := strconv.ParseInt(user[1:], 10, 64)
+		if err2 != nil {
+			log.Fatal(err2)
+		}
+		times, err = login.Client().ListTrackedTimes(owner, repo, issue)
+	} else {
+		// get all tracked times by the specified user
+		times, err = login.Client().GetUserTrackedTimes(owner, repo, user)
 	}
 
 	if err != nil {
@@ -91,7 +101,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 	return nil
 }
 
-// CmdIssuesCreate represents a sub command of issues to create issue
+// CmdTrackedTimesAdd represents a sub command of times to add time to an issue
 var CmdTrackedTimesAdd = cli.Command{
 	Name:      "add",
 	Usage:     "Track spent time on an issue",
@@ -111,7 +121,11 @@ func runTrackedTimesAdd(ctx *cli.Context) error {
 		return fmt.Errorf("No issue or duration specified.\nUsage:\t%s", ctx.Command.UsageText)
 	}
 
-	issue, err := strconv.ParseInt(ctx.Args().First(), 10, 64)
+	issueStr := ctx.Args().First()
+	if strings.HasPrefix(issueStr, "#") {
+		issueStr = issueStr[1:]
+	}
+	issue, err := strconv.ParseInt(issueStr, 10, 64)
 	if err != nil {
 		log.Fatal(err)
 	}
