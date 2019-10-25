@@ -25,12 +25,19 @@ var CmdTrackedTimes = cli.Command{
 	Subcommands: []cli.Command{
 		CmdTrackedTimesAdd,
 	},
-	Flags: AllDefaultFlags,
+	Flags: append([]cli.Flag{
+		// TODO: add --from --to filters on t.Created
+		cli.BoolFlag{
+			Name:  "total",
+			Usage: "Print the total duration at the end",
+		},
+	}, AllDefaultFlags...),
 }
 
 func runTrackedTimes(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
+	var totalDuration int64
 	var times []*gitea.TrackedTime
 	var err error
 
@@ -60,6 +67,8 @@ func runTrackedTimes(ctx *cli.Context) error {
 	}
 
 	for _, t := range times {
+		totalDuration += t.Time
+
 		outputValues = append(
 			outputValues,
 			[]string{
@@ -71,8 +80,14 @@ func runTrackedTimes(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(outputValue, headers, outputValues)
 
+	if ctx.Bool("total") {
+		outputValues = append(outputValues, []string{
+			"TOTAL", "", "", "", time.Duration(1e9 * totalDuration).String(),
+		})
+	}
+
+	Output(outputValue, headers, outputValues)
 	return nil
 }
 
