@@ -5,9 +5,10 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
-	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"code.gitea.io/sdk/gitea"
@@ -18,11 +19,11 @@ import (
 // CmdLabels represents to operate repositories' labels.
 var CmdTrackedTimes = cli.Command{
 	Name:        "times",
-	Usage:       `Operate on tracked times of the repository's issues`,
+	Usage:       "Operate on tracked times of the repository's issues",
 	Description: `Operate on tracked times of the repository's issues`,
 	Action:      runTrackedTimes,
 	Subcommands: []cli.Command{
-		// CmdTimeAdd,
+		CmdTrackedTimesAdd,
 	},
 	Flags: AllDefaultFlags,
 }
@@ -42,8 +43,9 @@ func runTrackedTimes(ctx *cli.Context) error {
 		"Duration",
 	}
 
-	if len(os.Args) == 3 {
-		times, err = login.Client().GetUserTrackedTimes(owner, repo, os.Args[2])
+	user := ctx.Args().First()
+	if user != "" {
+		times, err = login.Client().GetUserTrackedTimes(owner, repo, user)
 	} else {
 		times, err = login.Client().GetRepoTrackedTimes(owner, repo)
 	}
@@ -58,7 +60,6 @@ func runTrackedTimes(ctx *cli.Context) error {
 	}
 
 	for _, t := range times {
-
 		outputValues = append(
 			outputValues,
 			[]string{
@@ -71,6 +72,46 @@ func runTrackedTimes(ctx *cli.Context) error {
 		)
 	}
 	Output(outputValue, headers, outputValues)
+
+	return nil
+}
+
+// CmdIssuesCreate represents a sub command of issues to create issue
+var CmdTrackedTimesAdd = cli.Command{
+	Name:      "add",
+	Usage:     "Track spent time on an issue",
+	UsageText: "tea times add <issue> <duration>",
+	Description: `Track spent time on an issue
+	 Example:
+		tea times add 1 1h25m
+	`,
+	Action: runTrackedTimesAdd,
+	Flags:  LoginRepoFlags,
+}
+
+func runTrackedTimesAdd(ctx *cli.Context) error {
+	login, owner, repo := initCommand()
+
+	if len(ctx.Args()) < 2 {
+		return fmt.Errorf("No issue or duration specified.\nUsage:\t%s", ctx.Command.UsageText)
+	}
+
+	issue, err := strconv.ParseInt(ctx.Args().First(), 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	duration, err := time.ParseDuration(strings.Join(ctx.Args().Tail(), ""))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = login.Client().AddTime(owner, repo, issue, gitea.AddTimeOption{
+		Time: int64(duration.Seconds()),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return nil
 }
