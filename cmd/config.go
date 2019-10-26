@@ -206,6 +206,13 @@ func curGitRepoPath() (*Login, string, error) {
 		for remote := range gitConfig.Remotes {
 			remoteValue = remote
 		}
+		if len(gitConfig.Remotes) > 1 {
+			//if master exist use this as default remote
+			masterBranch, ok := gitConfig.Branches["master"]
+			if ok {
+				remoteValue = masterBranch.Remote
+			}
+		}
 	}
 
 	remoteConfig, ok := gitConfig.Remotes[remoteValue]
