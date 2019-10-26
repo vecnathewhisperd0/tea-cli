@@ -195,6 +195,11 @@ func curGitRepoPath() (*Login, string, error) {
 	if err := gitConfig.Unmarshal(bs); err != nil {
 		return nil, "", err
 	}
+
+	if len(gitConfig.Remotes) == 0  {
+		return nil, "", errors.New("No remote repository set on this git repository")
+	}
+
 	remoteConfig, ok := gitConfig.Remotes["origin"]
 	if !ok || remoteConfig == nil {
 		return nil, "", errors.New("No remote origin found on this git repository")
