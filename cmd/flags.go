@@ -33,7 +33,7 @@ var RepoFlag = cli.StringFlag{
 	Destination: &repoValue,
 }
 
-// RepoFlag provides flag to specify repository
+// RemoteFlag provides flag to specify remote repository
 var RemoteFlag = cli.StringFlag{
 	Name:        "remote, R",
 	Usage:       "Set a specific remote repository, is optional if not set use git default one",
