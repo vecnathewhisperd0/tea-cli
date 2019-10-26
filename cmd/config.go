@@ -202,14 +202,11 @@ func curGitRepoPath() (*Login, string, error) {
 	}
 
 	// if only one remote exist
-	if len(remoteValue) == 1 && len(remoteValue) == 0 {
+	if len(gitConfig.Remotes) >= 1 && len(remoteValue) == 0 {
 		for remote := range gitConfig.Remotes {
 			remoteValue = remote
 		}
 	}
-
-	//if no remote param set default <- ToDo how to detect default remote
-	if len(remoteValue) == 0 {remoteValue = "origin"}
 
 	remoteConfig, ok := gitConfig.Remotes[remoteValue]
 	if !ok || remoteConfig == nil {
