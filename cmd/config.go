@@ -196,13 +196,24 @@ func curGitRepoPath() (*Login, string, error) {
 		return nil, "", err
 	}
 
+	// if no remotes
 	if len(gitConfig.Remotes) == 0  {
 		return nil, "", errors.New("No remote repository set on this git repository")
 	}
 
-	remoteConfig, ok := gitConfig.Remotes["origin"]
+	// if only one remote exist
+	if len(remoteValue) == 1 && len(remoteValue) == 0 {
+		for remote := range gitConfig.Remotes {
+			remoteValue = remote
+		}
+	}
+
+	//if no remote param set default <- ToDo how to detect default remote
+	if len(remoteValue) == 0 {remoteValue = "origin"}
+
+	remoteConfig, ok := gitConfig.Remotes[remoteValue]
 	if !ok || remoteConfig == nil {
-		return nil, "", errors.New("No remote origin found on this git repository")
+		return nil, "", errors.New("No remote " + remoteValue + " found on this git repository")
 	}
 
 	for _, l := range config.Logins {
