@@ -13,33 +13,17 @@ import (
 	"github.com/urfave/cli"
 )
 
-var output string
-
 // CmdPulls represents to login a gitea server.
 var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Usage:       "Operate with pulls of the repository",
 	Description: `Operate with pulls of the repository`,
 	Action:      runPulls,
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:        "output, o",
-			Usage:       outputUsage,
-			Destination: &output,
-		},
-	},
+	Flags:       AllDefaultFlags,
 }
 
 func runPulls(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	prs, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
 		Page:  0,
@@ -60,7 +44,7 @@ func runPulls(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(prs) == 0 {
-		Output(output, headers, values)
+		Output(outputValue, headers, values)
 		return nil
 	}
 
@@ -82,7 +66,7 @@ func runPulls(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(output, headers, values)
+	Output(outputValue, headers, values)
 
 	return nil
 }
