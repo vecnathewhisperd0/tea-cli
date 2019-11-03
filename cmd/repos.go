@@ -91,12 +91,12 @@ func runReposList(ctx *cli.Context) error {
 			}
 		}
 	} else {
-		fmt.Printf("Unknown mode '%s'\nUse one of the following:\n- fork\n- mirror\n- source\n", mode)
+		log.Fatal("Unknown mode '%s'\nUse one of the following:\n- fork\n- mirror\n- source\n", mode)
 		return nil
 	}
 
 	if len(rps) == 0 {
-		fmt.Println("No repositories found")
+		log.Fatal("No repositories found", rps)
 		return nil
 	}
 
