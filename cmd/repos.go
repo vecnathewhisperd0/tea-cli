@@ -90,7 +90,7 @@ func runReposList(ctx *cli.Context) error {
 			}
 		}
 	} else {
-		log.Fatal("Unknown mode '%s'\nUse one of the following:\n- fork\n- mirror\n- source\n", mode)
+		log.Fatal("Unknown mode: ", mode, "\nUse one of the following:\n- fork\n- mirror\n- source\n")
 		return nil
 	}
 
