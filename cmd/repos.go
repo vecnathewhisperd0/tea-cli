@@ -53,7 +53,7 @@ var CmdReposList = cli.Command{
 
 // runReposList list repositories
 func runReposList(ctx *cli.Context) error {
-	login := initCommandLoginOnly(ctx)
+	login := initCommandLoginOnly()
 
 	mode := ctx.String("mode")
 	org := ctx.String("org")
@@ -117,25 +117,4 @@ func runReposList(ctx *cli.Context) error {
 	}
 
 	return nil
-}
-
-func initCommandLoginOnly(ctx *cli.Context) *Login {
-	err := loadConfig(yamlConfigPath)
-	if err != nil {
-		log.Fatal("load config file failed", yamlConfigPath)
-	}
-
-	var login *Login
-	if loginFlag := getGlobalFlag(ctx, "login"); loginFlag == "" {
-		login, err = getActiveLogin()
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		login = getLoginByName(loginFlag)
-		if login == nil {
-			log.Fatal("indicated login name", loginFlag, "does not exist")
-		}
-	}
-	return login
 }
