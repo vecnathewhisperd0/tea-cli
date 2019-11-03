@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"code.gitea.io/sdk/gitea"
@@ -44,7 +43,7 @@ var CmdReposList = cli.Command{
 			Name:  "user",
 			Usage: "Filter listed repositories absed on user, optional",
 		},
-	}, LoginRepoFlags...),
+	}, LoginOutputFlags...),
 }
 
 // runReposList list repositories
@@ -100,7 +99,14 @@ func runReposList(ctx *cli.Context) error {
 		return nil
 	}
 
-	fmt.Println("Name | Type/Mode | SSH-URL | Owner")
+	headers := []string{
+		"Name",
+		"Type/Mode",
+		"SSH-URL",
+		"Owner",
+	}
+	var values [][]string
+
 	for _, rp := range repos {
 		var mode = "source"
 		if rp.Fork {
@@ -109,8 +115,18 @@ func runReposList(ctx *cli.Context) error {
 		if rp.Mirror {
 			mode = "mirror"
 		}
-		fmt.Printf("%s | %s | %s | %s\n", rp.FullName, mode, rp.SSHURL, rp.Owner.UserName)
+
+		values = append(
+			values,
+			[]string{
+				rp.FullName,
+				mode,
+				rp.SSHURL,
+				rp.Owner.UserName,
+			},
+		)
 	}
+	Output(outputValue, headers, values)
 
 	return nil
 }
