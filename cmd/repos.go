@@ -22,7 +22,7 @@ var CmdRepos = cli.Command{
 	Subcommands: []cli.Command{
 		CmdReposList,
 	},
-	Flags: AllDefaultFlags,
+	Flags: LoginOutputFlags,
 }
 
 // CmdReposList represents a sub command of issues to list issues
@@ -31,11 +31,7 @@ var CmdReposList = cli.Command{
 	Usage:       "List available repositories",
 	Description: `List available repositories`,
 	Action:      runReposList,
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
+	Flags: append([]cli.Flag{
 		cli.StringFlag{
 			Name:  "mode",
 			Usage: "Filter listed repositories based on mode, optional - fork, mirror, source",
@@ -48,7 +44,7 @@ var CmdReposList = cli.Command{
 			Name:  "user",
 			Usage: "Filter listed repositories absed on user, optional",
 		},
-	},
+	}, LoginRepoFlags...),
 }
 
 // runReposList list repositories
