@@ -22,12 +22,7 @@ var CmdRepos = cli.Command{
 	Subcommands: []cli.Command{
 		CmdReposList,
 	},
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-	},
+	Flags: AllDefaultFlags,
 }
 
 // CmdReposList represents a sub command of issues to list issues
