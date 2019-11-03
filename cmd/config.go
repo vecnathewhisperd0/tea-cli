@@ -20,7 +20,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
-	git_config "gopkg.in/src-d/go-git.v4/config"
+	go_git "gopkg.in/src-d/go-git.v4"
 
 	"github.com/go-gitea/yaml"
 )
@@ -187,17 +187,39 @@ func saveConfig(ymlPath string) error {
 }
 
 func curGitRepoPath() (*Login, string, error) {
-	gitConfig := git_config.NewConfig()
-	bs, err := ioutil.ReadFile(filepath.Join(filepath.Dir(os.Args[0]), ".git", "config"))
+	gitPath, err := go_git.PlainOpenWithOptions("./", &go_git.PlainOpenOptions{DetectDotGit: true})
+	if err != nil {
+		return nil, "", errors.New("No Gitea login found")
+	}
+	gitConfig, err := gitPath.Config()
 	if err != nil {
 		return nil, "", err
 	}
-	if err := gitConfig.Unmarshal(bs); err != nil {
-		return nil, "", err
+
+	// if no remote
+	if len(gitConfig.Remotes) == 0 {
+		return nil, "", errors.New("No remote repository set on this git repository")
 	}
-	remoteConfig, ok := gitConfig.Remotes["origin"]
+
+	// if only one remote exists
+	if len(gitConfig.Remotes) >= 1 && len(remoteValue) == 0 {
+		for remote := range gitConfig.Remotes {
+			remoteValue = remote
+		}
+		if len(gitConfig.Remotes) > 1 {
+			// if master branch is present, use it as the default remote
+			masterBranch, ok := gitConfig.Branches["master"]
+			if ok {
+				if len(masterBranch.Remote) > 0 {
+					remoteValue = masterBranch.Remote
+				}
+			}
+		}
+	}
+
+	remoteConfig, ok := gitConfig.Remotes[remoteValue]
 	if !ok || remoteConfig == nil {
-		return nil, "", errors.New("No remote origin found on this git repository")
+		return nil, "", errors.New("No remote " + remoteValue + " found on this git repository")
 	}
 
 	for _, l := range config.Logins {
@@ -213,7 +235,7 @@ func curGitRepoPath() (*Login, string, error) {
 					return &l, strings.TrimSuffix(path, ".git"), nil
 				}
 			} else if strings.EqualFold(p.Scheme, "ssh") {
-				if l.GetSSHHost() == p.Host {
+				if l.GetSSHHost() == strings.Split(p.Host, ":")[0] {
 					return &l, strings.TrimLeft(strings.TrimSuffix(p.Path, ".git"), "/"), nil
 				}
 			}
