@@ -101,8 +101,8 @@ func runReposList(ctx *cli.Context) error {
 
 	headers := []string{
 		"Name",
-		"Type/Mode",
-		"SSH-URL",
+		"Type",
+		"SSH",
 		"Owner",
 	}
 	var values [][]string
