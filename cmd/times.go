@@ -49,6 +49,10 @@ var CmdTrackedTimes = cli.Command{
 func runTrackedTimes(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
+	if err := login.CheckServerVersionConstraint(">= 1.11"); err != nil {
+		return err
+	}
+
 	var times []*gitea.TrackedTime
 	var err error
 

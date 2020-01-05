@@ -7,6 +7,7 @@ require (
 	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/go-gitea/yaml v0.0.0-20170812160011-eb3733d160e7
+	github.com/hashicorp/go-version v1.2.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/stretchr/testify v1.4.0
