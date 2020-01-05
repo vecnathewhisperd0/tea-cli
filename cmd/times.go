@@ -54,7 +54,6 @@ func runTrackedTimes(ctx *cli.Context) error {
 	var err error
 	var outputValues [][]string
 	headers := []string{
-		"Index",
 		"Created",
 		"Issue",
 		"User",
@@ -114,7 +113,6 @@ func runTrackedTimes(ctx *cli.Context) error {
 		outputValues = append(
 			outputValues,
 			[]string{
-				strconv.FormatInt(t.ID, 10),
 				t.Created.In(localLoc).Format("2006-01-02 15:04:05"),
 				"#" + strconv.FormatInt(t.Issue.Index, 10),
 				t.UserName,
@@ -125,7 +123,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 
 	if ctx.Bool("total") {
 		outputValues = append(outputValues, []string{
-			"TOTAL", "", "", "", time.Duration(1e9 * totalDuration).String(),
+			"TOTAL", "", "", time.Duration(1e9 * totalDuration).String(),
 		})
 	}
 
