@@ -56,8 +56,8 @@ func runTrackedTimes(ctx *cli.Context) error {
 	headers := []string{
 		"Index",
 		"Created",
-		"Issue", // FIXME: this is the internal issue ID, not the one of the repo....
-		"User",  // FIXME: we should print a username!
+		"Issue",
+		"User",
 		"Duration",
 	}
 
@@ -116,8 +116,8 @@ func runTrackedTimes(ctx *cli.Context) error {
 			[]string{
 				strconv.FormatInt(t.ID, 10),
 				t.Created.In(localLoc).Format("2006-01-02 15:04:05"),
-				"#" + strconv.FormatInt(t.IssueID, 10),
-				strconv.FormatInt(t.UserID, 10),
+				"#" + strconv.FormatInt(t.Issue.Index, 10),
+				t.UserName,
 				time.Duration(1e9 * t.Time).String(),
 			},
 		)
