@@ -14,7 +14,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 
 	"github.com/araddon/dateparse"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdTrackedTimes represents the command to operate repositories' times.
@@ -24,21 +24,23 @@ var CmdTrackedTimes = cli.Command{
 	Description: `Operate on tracked times of the repository's issues`,
 	ArgsUsage:   "[username | #issue]",
 	Action:      runTrackedTimes,
-	Subcommands: []cli.Command{
-		CmdTrackedTimesAdd,
+	Subcommands: []*cli.Command{
+		&CmdTrackedTimesAdd,
 	},
 	Flags: append([]cli.Flag{
-		// TODO: add --from --to filters on t.Created
-		cli.StringFlag{
-			Name:  "from, f",
+		&cli.StringFlag{
+			Name:  "from",
+			Aliases:  []string{"f"},
 			Usage: "Show only times tracked after this date",
 		},
-		cli.StringFlag{
-			Name:  "until, u",
+		&cli.StringFlag{
+			Name:  "until",
+			Aliases:  []string{"u"},
 			Usage: "Show only times tracked before this date",
 		},
-		cli.BoolFlag{
-			Name:  "total, t",
+		&cli.BoolFlag{
+			Name:  "total",
+			Aliases:  []string{"t"},
 			Usage: "Print the total duration at the end",
 		},
 	}, AllDefaultFlags...),
@@ -147,7 +149,7 @@ var CmdTrackedTimesAdd = cli.Command{
 func runTrackedTimesAdd(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	if len(ctx.Args()) < 2 {
+	if ctx.Args().Len() < 2 {
 		return fmt.Errorf("No issue or duration specified.\nUsage:\t%s", ctx.Command.UsageText)
 	}
 
