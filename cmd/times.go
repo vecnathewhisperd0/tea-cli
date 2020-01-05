@@ -29,19 +29,19 @@ var CmdTrackedTimes = cli.Command{
 	},
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:  "from",
-			Aliases:  []string{"f"},
-			Usage: "Show only times tracked after this date",
+			Name:    "from",
+			Aliases: []string{"f"},
+			Usage:   "Show only times tracked after this date",
 		},
 		&cli.StringFlag{
-			Name:  "until",
-			Aliases:  []string{"u"},
-			Usage: "Show only times tracked before this date",
+			Name:    "until",
+			Aliases: []string{"u"},
+			Usage:   "Show only times tracked before this date",
 		},
 		&cli.BoolFlag{
-			Name:  "total",
-			Aliases:  []string{"t"},
-			Usage: "Print the total duration at the end",
+			Name:    "total",
+			Aliases: []string{"t"},
+			Usage:   "Print the total duration at the end",
 		},
 	}, AllDefaultFlags...),
 }

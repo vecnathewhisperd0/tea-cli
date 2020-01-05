@@ -36,8 +36,9 @@ type Login struct {
 	Insecure bool   `yaml:"insecure"`
 }
 
-// Checks the logins server against a version constraint such as ">= 1.11.0+dev"
-func (l *Login) CheckServerVersionConstraint (constraint string) error {
+// CheckServerVersionConstraint validates that the login's server satisfies a
+// given version constraint such as ">= 1.11.0+dev"
+func (l *Login) CheckServerVersionConstraint(constraint string) error {
 	c, err := version.NewConstraint(constraint)
 	if err != nil {
 		return err
@@ -56,7 +57,6 @@ func (l *Login) CheckServerVersionConstraint (constraint string) error {
 
 	return nil
 }
-
 
 // Client returns a client to operate Gitea API
 func (l *Login) Client() *gitea.Client {
