@@ -1,4 +1,4 @@
-// Copyright 2019 The Gitea Authors. All rights reserved.
+// Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -49,16 +49,8 @@ var CmdTrackedTimes = cli.Command{
 func runTrackedTimes(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	var totalDuration int64
 	var times []*gitea.TrackedTime
 	var err error
-	var outputValues [][]string
-	headers := []string{
-		"Created",
-		"Issue",
-		"User",
-		"Duration",
-	}
 
 	user := ctx.Args().First()
 	fmt.Println(ctx.Command.ArgsUsage)
@@ -69,7 +61,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 		// get all tracked times on the specified issue
 		issue, err2 := strconv.ParseInt(user[1:], 10, 64)
 		if err2 != nil {
-			log.Fatal(err2)
+			return err2
 		}
 		times, err = login.Client().ListTrackedTimes(owner, repo, issue)
 	} else {
@@ -78,12 +70,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 	}
 
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	localLoc, err := time.LoadLocation("Local")
-	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	var from, until time.Time
@@ -100,11 +87,24 @@ func runTrackedTimes(ctx *cli.Context) error {
 		}
 	}
 
+	printTrackedTimes(times, outputValue, from, until, ctx.Bool("total"))
+	return nil
+}
+
+func printTrackedTimes(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {
+	var outputValues [][]string
+	var totalDuration int64
+
+	localLoc, err := time.LoadLocation("Local") // local timezone for time formatting
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for _, t := range times {
-		if ctx.String("from") != "" && from.After(t.Created) {
+		if !from.IsZero() && from.After(t.Created) {
 			continue
 		}
-		if ctx.String("until") != "" && until.Before(t.Created) {
+		if !until.IsZero() && until.Before(t.Created) {
 			continue
 		}
 
@@ -121,14 +121,19 @@ func runTrackedTimes(ctx *cli.Context) error {
 		)
 	}
 
-	if ctx.Bool("total") {
+	if printTotal {
 		outputValues = append(outputValues, []string{
 			"TOTAL", "", "", time.Duration(1e9 * totalDuration).String(),
 		})
 	}
 
-	Output(outputValue, headers, outputValues)
-	return nil
+	headers := []string{
+		"Created",
+		"Issue",
+		"User",
+		"Duration",
+	}
+	Output(outputType, headers, outputValues)
 }
 
 // CmdTrackedTimesAdd represents a sub command of times to add time to an issue
