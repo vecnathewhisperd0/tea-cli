@@ -23,7 +23,6 @@ import (
 	go_git "gopkg.in/src-d/go-git.v4"
 
 	"github.com/go-gitea/yaml"
-	"github.com/hashicorp/go-version"
 )
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
@@ -34,28 +33,6 @@ type Login struct {
 	Active   bool   `yaml:"active"`
 	SSHHost  string `yaml:"ssh_host"`
 	Insecure bool   `yaml:"insecure"`
-}
-
-// CheckServerVersionConstraint validates that the login's server satisfies a
-// given version constraint such as ">= 1.11.0+dev"
-func (l *Login) CheckServerVersionConstraint(constraint string) error {
-	c, err := version.NewConstraint(constraint)
-	if err != nil {
-		return err
-	}
-	serverVersionRaw, err := l.Client().ServerVersion()
-	if err != nil {
-		return err
-	}
-	serverVersion, err := version.NewVersion(serverVersionRaw)
-	if err != nil {
-		return err
-	}
-	if !c.Check(serverVersion) {
-		return fmt.Errorf("gitea server at %s does not satisfy version constraint %s", l.URL, constraint)
-	}
-
-	return nil
 }
 
 // Client returns a client to operate Gitea API

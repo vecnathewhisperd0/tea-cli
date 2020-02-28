@@ -48,8 +48,9 @@ var CmdTrackedTimes = cli.Command{
 
 func runTrackedTimes(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
+	client := login.Client()
 
-	if err := login.CheckServerVersionConstraint(">= 1.11"); err != nil {
+	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
 		return err
 	}
 
@@ -60,17 +61,17 @@ func runTrackedTimes(ctx *cli.Context) error {
 	fmt.Println(ctx.Command.ArgsUsage)
 	if user == "" {
 		// get all tracked times on the repo
-		times, err = login.Client().GetRepoTrackedTimes(owner, repo)
+		times, err = client.GetRepoTrackedTimes(owner, repo)
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
 		issue, err2 := strconv.ParseInt(user[1:], 10, 64)
 		if err2 != nil {
 			return err2
 		}
-		times, err = login.Client().ListTrackedTimes(owner, repo, issue)
+		times, err = client.ListTrackedTimes(owner, repo, issue)
 	} else {
 		// get all tracked times by the specified user
-		times, err = login.Client().GetUserTrackedTimes(owner, repo, user)
+		times, err = client.GetUserTrackedTimes(owner, repo, user)
 	}
 
 	if err != nil {
