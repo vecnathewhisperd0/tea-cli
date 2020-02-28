@@ -19,16 +19,18 @@ import (
 
 // CmdTrackedTimes represents the command to operate repositories' times.
 var CmdTrackedTimes = cli.Command{
-	Name:        "times",
+	Name:    "times",
 	Aliases: []string{"time"},
-	Usage:       "Operate on tracked times of a repository's issues & pulls",
+	Usage:   "Operate on tracked times of a repository's issues & pulls",
 	Description: `Operate on tracked times of a repository's issues & pulls.
 		 Depending on your permissions on the repository, only your own tracked
 		 times might be listed.`,
-	ArgsUsage:   "[username | #issue]",
-	Action:      runTrackedTimes,
+	ArgsUsage: "[username | #issue]",
+	Action:    runTrackedTimes,
 	Subcommands: []*cli.Command{
 		&CmdTrackedTimesAdd,
+		&CmdTrackedTimesDelete,
+		&CmdTrackedTimesReset,
 	},
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -181,6 +183,89 @@ func runTrackedTimesAdd(ctx *cli.Context) error {
 	_, err = login.Client().AddTime(owner, repo, issue, gitea.AddTimeOption{
 		Time: int64(duration.Seconds()),
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
+}
+
+// CmdTrackedTimesDelete is a sub command of CmdTrackedTimes, and removes time from an issue
+var CmdTrackedTimesDelete = cli.Command{
+	Name:      "delete",
+	Aliases:   []string{"rm"},
+	Usage:     "Delete a single tracked time on an issue",
+	UsageText: "tea times delete <issue> <time ID>",
+	Action:    runTrackedTimesDelete,
+	Flags:     LoginRepoFlags,
+}
+
+func runTrackedTimesDelete(ctx *cli.Context) error {
+	login, owner, repo := initCommand()
+	client := login.Client()
+
+	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
+		return err
+	}
+
+	if ctx.Args().Len() < 2 {
+		return fmt.Errorf("No issue or time ID specified.\nUsage:\t%s", ctx.Command.UsageText)
+	}
+
+	issueStr := ctx.Args().First()
+	if strings.HasPrefix(issueStr, "#") {
+		issueStr = issueStr[1:]
+	}
+	issue, err := strconv.ParseInt(issueStr, 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	timeID, err := strconv.ParseInt(ctx.Args().Get(1), 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.DeleteTime(owner, repo, issue, timeID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
+}
+
+// CmdTrackedTimesReset is a subcommand of CmdTrackedTimes, and
+// clears all tracked times on an issue.
+var CmdTrackedTimesReset = cli.Command{
+	Name:      "reset",
+	Usage:     "Reset tracked time on an issue",
+	UsageText: "tea times reset <issue>",
+	Action:    runTrackedTimesReset,
+	Flags:     LoginRepoFlags,
+}
+
+func runTrackedTimesReset(ctx *cli.Context) error {
+	login, owner, repo := initCommand()
+	client := login.Client()
+
+	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
+		return err
+	}
+
+	if ctx.Args().Len() != 1 {
+		return fmt.Errorf("No issue specified.\nUsage:\t%s", ctx.Command.UsageText)
+	}
+
+	issueStr := ctx.Args().First()
+	if strings.HasPrefix(issueStr, "#") {
+		issueStr = issueStr[1:]
+	}
+	issue, err := strconv.ParseInt(issueStr, 10, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = client.ResetIssueTime(owner, repo, issue)
 	if err != nil {
 		log.Fatal(err)
 	}
