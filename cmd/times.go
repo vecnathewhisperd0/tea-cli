@@ -20,8 +20,11 @@ import (
 // CmdTrackedTimes represents the command to operate repositories' times.
 var CmdTrackedTimes = cli.Command{
 	Name:        "times",
-	Usage:       "Operate on tracked times of the repository's issues",
-	Description: `Operate on tracked times of the repository's issues`,
+	Aliases: []string{"time"},
+	Usage:       "Operate on tracked times of a repository's issues & pulls",
+	Description: `Operate on tracked times of a repository's issues & pulls.
+		 Depending on your permissions on the repository, only your own tracked
+		 times might be listed.`,
 	ArgsUsage:   "[username | #issue]",
 	Action:      runTrackedTimes,
 	Subcommands: []*cli.Command{
