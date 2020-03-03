@@ -59,7 +59,7 @@ all: build
 
 .PHONY: clean
 clean:
-	$(GO) clean -i ./...
+	$(GO) clean -mod=vendor -i ./...
 	rm -rf $(EXECUTABLE) $(DIST)
 
 .PHONY: fmt
@@ -68,7 +68,7 @@ fmt:
 
 .PHONY: vet
 vet:
-	$(GO) vet $(PACKAGES)
+	$(GO) vet -mod=vendor $(PACKAGES)
 
 .PHONY: lint
 lint:
