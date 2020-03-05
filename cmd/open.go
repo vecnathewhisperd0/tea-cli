@@ -48,7 +48,6 @@ func runOpen(ctx *cli.Context) error {
 		case name.IsTag():
 			suffix = "commits/tag/" + name.Short()
 		}
-
 	case strings.EqualFold(number, "branches"):
 		suffix = "branches"
 	case strings.EqualFold(number, "wiki"):
@@ -57,6 +56,10 @@ func runOpen(ctx *cli.Context) error {
 		suffix = "activity"
 	case strings.EqualFold(number, "settings"):
 		suffix = "settings"
+	case strings.EqualFold(number, "labels"):
+		suffix = "labels"
+	case strings.EqualFold(number, "milestones"):
+		suffix = "milestones"
 	case number != "":
 		suffix = "issues/" + number
 	default:
