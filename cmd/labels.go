@@ -30,7 +30,7 @@ var CmdLabels = cli.Command{
 	},
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:    "save, s",
+			Name:    "save",
 			Aliases: []string{"s"},
 			Usage:   "Save all the labels as a file",
 		},
