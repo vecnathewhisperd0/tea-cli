@@ -5,6 +5,8 @@
 package git
 
 import (
+	"fmt"
+
 	"gopkg.in/src-d/go-git.v4"
 	git_config "gopkg.in/src-d/go-git.v4/config"
 	git_plumbing "gopkg.in/src-d/go-git.v4/plumbing"
@@ -43,4 +45,67 @@ func (r TeaRepo) TeaCheckout(branchName string) error {
 	}
 	localBranchRefName := git_plumbing.NewBranchReferenceName(branchName)
 	return tree.Checkout(&git.CheckoutOptions{Branch: localBranchRefName})
+}
+
+// TeaDeleteBranch removes the given branch locally, and if `remoteBranch` is
+// not empty deletes it at it's remote repo.
+func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string) error {
+	err := r.DeleteBranch(branch.Name)
+	if err != nil {
+		return err
+	}
+	err = r.Storer.RemoveReference(git_plumbing.NewBranchReferenceName(branch.Name))
+	if err != nil {
+		return err
+	}
+
+	if remoteBranch != "" {
+		// delete remote branch via git protocol:
+		// an empty source in the refspec means remote deletion to git 🙃
+		refspec := fmt.Sprintf(":%s", git_plumbing.NewBranchReferenceName(remoteBranch))
+		err = r.Push(&git.PushOptions{
+			RemoteName: branch.Remote,
+			RefSpecs:   []git_config.RefSpec{git_config.RefSpec(refspec)},
+			Prune:      true,
+		})
+	}
+
+	return err
+}
+
+// TeaFindBranch returns a branch that is at the the given SHA and syncs to the
+// given remote repo.
+func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err error) {
+	url, err := ParseURL(repoURL)
+	if err != nil {
+		return nil, err
+	}
+
+	branches, err := r.Branches()
+	if err != nil {
+		return nil, err
+	}
+	err = branches.ForEach(func(ref *git_plumbing.Reference) error {
+		name := ref.Name().Short()
+		if name != "master" && ref.Hash().String() == sha {
+			branch, _ := r.Branch(name)
+			repoConf, err := r.Config()
+			if err != nil {
+				return err
+			}
+			remote := repoConf.Remotes[branch.Remote]
+			for _, u := range remote.URLs {
+				remoteURL, err := ParseURL(u)
+				if err != nil {
+					return err
+				}
+				if remoteURL.Host == url.Host && remoteURL.Path == url.Path {
+					b = branch
+				}
+			}
+		}
+		return nil
+	})
+
+	return b, err
 }

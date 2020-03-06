@@ -10,23 +10,24 @@ import (
 	"strconv"
 	"strings"
 
-	"code.gitea.io/sdk/gitea"
 	local_git "code.gitea.io/tea/modules/git"
 
-	"gopkg.in/src-d/go-git.v4"
-
+	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
+	"gopkg.in/src-d/go-git.v4"
 )
 
 // CmdPulls is the main command to operate on PRs
 var CmdPulls = cli.Command{
 	Name:        "pulls",
+	Aliases:     []string{"pull", "pr"},
 	Usage:       "List open pull requests",
 	Description: `List open pull requests`,
 	Action:      runPulls,
 	Flags:       AllDefaultFlags,
 	Subcommands: []*cli.Command{
 		&CmdPullsCheckout,
+		&CmdPullsClean,
 	},
 }
 
@@ -144,6 +145,67 @@ func runPullsCheckout(ctx *cli.Context) error {
 
 	fmt.Printf("Checking out PR %v\n", idx)
 	err = localRepo.TeaCheckout(localBranchName)
+
+	return err
+}
+
+// CmdPullsClean removes the remote and local feature branches, if a PR is merged.
+var CmdPullsClean = cli.Command{
+	Name:        "clean",
+	Usage:       "Deletes local & remote feature-branches for a closed pull request",
+	Description: `Deletes local & remote feature-branches for a closed pull request`,
+	ArgsUsage:   "<pull index>",
+	Action:      runPullsClean,
+	Flags:       AllDefaultFlags,
+}
+
+func runPullsClean(ctx *cli.Context) error {
+	login, owner, repo := initCommand()
+	if ctx.Args().Len() != 1 {
+		return fmt.Errorf("Must specify a PR index")
+	}
+
+	// fetch PR source-repo & -branch from gitea
+	idx, err := argToIndex(ctx.Args().First())
+	if err != nil {
+		return err
+	}
+	pr, err := login.Client().GetPullRequest(owner, repo, idx)
+	if err != nil {
+		return err
+	}
+	if pr.State == gitea.StateOpen {
+		return fmt.Errorf("PR is still open, won't delete branches")
+	}
+
+	// check if the feature branch is ours:
+	// don't check name (user may be inconsistent with naming locally & remote),
+	// instead compare hashes & matching remote.
+	r, err := local_git.RepoForWorkdir()
+	if err != nil {
+		return err
+	}
+	branch, err := r.TeaFindBranch(pr.Head.Sha, pr.Head.Repository.CloneURL)
+	if branch == nil {
+		return fmt.Errorf("Remote branch %s not found in local repo. Maybe the local branch has diverged from the remote?", pr.Head.Ref)
+	}
+
+	// prepare deletion of local branch:
+	headRef, err := r.Head()
+	if err != nil {
+		return err
+	}
+	if headRef.Name().Short() == branch.Name {
+		fmt.Printf("Checking out 'master' to delete local branch '%s'", branch.Name)
+		err = r.TeaCheckout("master")
+		if err != nil {
+			return err
+		}
+	}
+
+	// remove local & remote branch
+	fmt.Printf("Deleting local branch %s and remote branch %s\n", branch.Name, pr.Head.Ref)
+	err = r.TeaDeleteBranch(branch, pr.Head.Ref)
 
 	return err
 }
