@@ -18,7 +18,7 @@ func (r TeaRepo) GetOrCreateRemote(remoteURL, newRemoteName string) (*git.Remote
 	if err != nil {
 		return nil, err
 	}
-	var localRemote *git.Remote = nil
+	var localRemote *git.Remote
 	for _, r := range remotes {
 		for _, u := range r.Config().URLs {
 			remoteURL, _ := ParseURL(u)
