@@ -4,11 +4,11 @@
 * FEATURES
   * add `tea times` command (#54)
 * ENHANCEMENTS
-  * chore(cli): upgrade urfave/cli to v2 version (#85)
+  * Upgrade urfave/cli to v2 version (#85)
   * Add --remote flag to add/create subcommands (#77)
 * BUILD
-  * chore(go-sdk): upgrade gitea/go-sdk to 2020-01-03 (#81)
-  * chore(testify): update stretchr/testify v1.3.0 -> v1.4.0 (#83)
+  * Upgrade gitea/go-sdk to 2020-01-03 (#81)
+  * Update stretchr/testify v1.3.0 -> v1.4.0 (#83)
   * Improve makefile to enable goproxy when go get tools (#98)
 
 ## [v0.1.2](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=59) - 2019-11-15
