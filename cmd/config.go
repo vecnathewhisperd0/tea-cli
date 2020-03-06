@@ -18,9 +18,8 @@ import (
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
-	local_git "code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
-	go_git "gopkg.in/src-d/go-git.v4"
 
 	"github.com/go-gitea/yaml"
 )
@@ -187,11 +186,11 @@ func saveConfig(ymlPath string) error {
 }
 
 func curGitRepoPath() (*Login, string, error) {
-	gitPath, err := go_git.PlainOpenWithOptions("./", &go_git.PlainOpenOptions{DetectDotGit: true})
+	repo, err := git.RepoForWorkdir()
 	if err != nil {
 		return nil, "", errors.New("No Gitea login found")
 	}
-	gitConfig, err := gitPath.Config()
+	gitConfig, err := repo.Config()
 	if err != nil {
 		return nil, "", err
 	}
@@ -224,7 +223,7 @@ func curGitRepoPath() (*Login, string, error) {
 
 	for _, l := range config.Logins {
 		for _, u := range remoteConfig.URLs {
-			p, err := local_git.ParseURL(strings.TrimSpace(u))
+			p, err := git.ParseURL(strings.TrimSpace(u))
 			if err != nil {
 				return nil, "", fmt.Errorf("Git remote URL parse failed: %s", err.Error())
 			}
