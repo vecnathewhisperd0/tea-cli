@@ -2,7 +2,7 @@
 
 ## [v0.2.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=538) - 2020-03-06
 * FEATURES
-  * add `tea times` command (#54)
+  * Add `tea times` command (#54)
 * ENHANCEMENTS
   * Upgrade urfave/cli to v2 version (#85)
   * Add --remote flag to add/create subcommands (#77)
