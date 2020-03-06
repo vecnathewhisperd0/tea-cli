@@ -36,6 +36,11 @@ func (p *URLParser) Parse(rawURL string) (u *url.URL, err error) {
 		u.Path = strings.TrimPrefix(u.Path, "/")
 	}
 
+	// .git suffix is optional and breaks normalization
+	if strings.HasSuffix(u.Path, ".git") {
+		u.Path = strings.TrimSuffix(u.Path, ".git")
+	}
+
 	return
 }
 
