@@ -115,14 +115,14 @@ func runPullsCheckout(ctx *cli.Context) error {
 	}
 
 	// verify related remote is in local repo, otherwise add it
-	newRemoteName := pr.Head.Repository.Owner.UserName
+	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
 	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, newRemoteName)
 	if err != nil {
 		return err
 	}
 
 	localRemoteName := localRemote.Config().Name
-	localBranchName := fmt.Sprintf("pull-%v-%v", idx, remoteBranchName)
+	localBranchName := fmt.Sprintf("pulls/%v-%v", idx, remoteBranchName)
 
 	// fetch remote
 	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
