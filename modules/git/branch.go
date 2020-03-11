@@ -6,6 +6,7 @@ package git
 
 import (
 	"fmt"
+	"strings"
 
 	"gopkg.in/src-d/go-git.v4"
 	git_config "gopkg.in/src-d/go-git.v4/config"
@@ -30,7 +31,7 @@ func (r TeaRepo) TeaCreateBranch(localBranchName, remoteBranchName, remoteName s
 	localBranchRefName := git_plumbing.NewBranchReferenceName(localBranchName)
 	remoteBranchRef, err := r.Storer.Reference(remoteBranchRefName)
 	if err != nil {
-		return nil
+		return err
 	}
 	localHashRef := git_plumbing.NewHashReference(localBranchRefName, remoteBranchRef.Hash())
 	r.Storer.SetReference(localHashRef)
@@ -41,7 +42,7 @@ func (r TeaRepo) TeaCreateBranch(localBranchName, remoteBranchName, remoteName s
 func (r TeaRepo) TeaCheckout(branchName string) error {
 	tree, err := r.Worktree()
 	if err != nil {
-		return nil
+		return err
 	}
 	localBranchRefName := git_plumbing.NewBranchReferenceName(branchName)
 	return tree.Checkout(&git.CheckoutOptions{Branch: localBranchRefName})
@@ -51,7 +52,9 @@ func (r TeaRepo) TeaCheckout(branchName string) error {
 // not empty deletes it at it's remote repo.
 func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string) error {
 	err := r.DeleteBranch(branch.Name)
-	if err != nil {
+	// if the branch is not found that's ok, as .git/config may have no entry if
+	// no remote tracking branch is configured for it (eg push without -u flag)
+	if err != nil && err.Error() != "branch not found" {
 		return err
 	}
 	err = r.Storer.RemoveReference(git_plumbing.NewBranchReferenceName(branch.Name))
@@ -76,36 +79,53 @@ func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string)
 // TeaFindBranch returns a branch that is at the the given SHA and syncs to the
 // given remote repo.
 func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err error) {
-	url, err := ParseURL(repoURL)
+	// find remote matching our repoURL
+	remote, err := r.GetRemote(repoURL)
 	if err != nil {
 		return nil, err
 	}
+	if remote == nil {
+		return nil, fmt.Errorf("No remote found for '%s'", repoURL)
+	}
+	remoteName := remote.Config().Name
 
-	branches, err := r.Branches()
+	// check if the given remote has our branch (.git/refs/remotes/<remoteName>/*)
+	iter, err := r.References()
 	if err != nil {
 		return nil, err
 	}
-	err = branches.ForEach(func(ref *git_plumbing.Reference) error {
-		name := ref.Name().Short()
-		if name != "master" && ref.Hash().String() == sha {
-			branch, _ := r.Branch(name)
-			repoConf, err := r.Config()
-			if err != nil {
-				return err
+	defer iter.Close()
+	var remoteRefName git_plumbing.ReferenceName
+	var localRefName git_plumbing.ReferenceName
+	err = iter.ForEach(func(ref *git_plumbing.Reference) error {
+		if ref.Name().IsRemote() {
+			name := ref.Name().Short()
+			if name != "master" &&
+				ref.Hash().String() == sha &&
+				strings.HasPrefix(name, remoteName) {
+				remoteRefName = ref.Name()
 			}
-			remote := repoConf.Remotes[branch.Remote]
-			for _, u := range remote.URLs {
-				remoteURL, err := ParseURL(u)
-				if err != nil {
-					return err
-				}
-				if remoteURL.Host == url.Host && remoteURL.Path == url.Path {
-					b = branch
-				}
-			}
+		}
+
+		if ref.Name().IsBranch() && ref.Hash().String() == sha {
+			localRefName = ref.Name()
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	if remoteRefName == "" {
+		// no remote tracking branch found, so a potential local branch
+		// can't be a match either
+		return nil, nil
+	}
 
-	return b, err
+	b = &git_config.Branch{
+		Remote: remoteName,
+		Name:   localRefName.Short(),
+		Merge: localRefName,
+	}
+	fmt.Println(b)
+	return b, b.Validate()
 }

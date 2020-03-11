@@ -9,10 +9,9 @@ import (
 	git_config "gopkg.in/src-d/go-git.v4/config"
 )
 
-// GetOrCreateRemote tries to match a Remote of the repo via the given URL.
-// If no match is found, a new Remote with `newRemoteName` is created.
+// GetRemote tries to match a Remote of the repo via the given URL.
 // Matching is based on the normalized URL, accepting different protocols.
-func (r TeaRepo) GetOrCreateRemote(remoteURL, newRemoteName string) (*git.Remote, error) {
+func (r TeaRepo) GetRemote(remoteURL string) (*git.Remote, error) {
 	repoURL, err := ParseURL(remoteURL)
 	if err != nil {
 		return nil, err
@@ -34,6 +33,18 @@ func (r TeaRepo) GetOrCreateRemote(remoteURL, newRemoteName string) (*git.Remote
 		if localRemote != nil {
 			break
 		}
+	}
+
+	return localRemote, err
+}
+
+// GetOrCreateRemote tries to match a Remote of the repo via the given URL.
+// If no match is found, a new Remote with `newRemoteName` is created.
+// Matching is based on the normalized URL, accepting different protocols.
+func (r TeaRepo) GetOrCreateRemote(remoteURL, newRemoteName string) (*git.Remote, error) {
+	localRemote, err := r.GetRemote(remoteURL)
+	if err != nil {
+		return nil, err
 	}
 
 	// if no match found, create a new remote

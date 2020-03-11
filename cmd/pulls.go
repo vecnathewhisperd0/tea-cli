@@ -186,6 +186,9 @@ func runPullsClean(ctx *cli.Context) error {
 		return err
 	}
 	branch, err := r.TeaFindBranch(pr.Head.Sha, pr.Head.Repository.CloneURL)
+	if err != nil {
+		return err
+	}
 	if branch == nil {
 		return fmt.Errorf("Remote branch %s not found in local repo. Maybe the local branch has diverged from the remote?", pr.Head.Ref)
 	}
@@ -196,7 +199,7 @@ func runPullsClean(ctx *cli.Context) error {
 		return err
 	}
 	if headRef.Name().Short() == branch.Name {
-		fmt.Printf("Checking out 'master' to delete local branch '%s'", branch.Name)
+		fmt.Printf("Checking out 'master' to delete local branch '%s'\n", branch.Name)
 		err = r.TeaCheckout("master")
 		if err != nil {
 			return err
