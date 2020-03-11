@@ -98,6 +98,9 @@ func runIssuesList(ctx *cli.Context) error {
 	}
 
 	for _, issue := range issues {
+		if issue.PullRequest != nil {
+			continue
+		}
 		name := issue.Poster.FullName
 		if len(name) == 0 {
 			name = issue.Poster.UserName
