@@ -16,26 +16,25 @@ import (
 // TeaCreateBranch creates a new branch in the repo, tracking from another branch.
 // If remoteName is not-null, a remote branch is tracked.
 func (r TeaRepo) TeaCreateBranch(localBranchName, remoteBranchName, remoteName string) error {
-	remoteBranchRefName := git_plumbing.NewBranchReferenceName(remoteBranchName)
+	// save in .git/config to assign remote for future pulls
+	localBranchRefName := git_plumbing.NewBranchReferenceName(localBranchName)
 	err := r.CreateBranch(&git_config.Branch{
 		Name:   localBranchName,
-		Merge:  remoteBranchRefName,
+		Merge:  git_plumbing.NewBranchReferenceName(remoteBranchName), // FIXME: should be remoteBranchName
 		Remote: remoteName,
 	})
 	if err != nil {
 		return err
 	}
 
-	// serialize the branch to .git/refs/heads (otherwise branch is only defined
-	// in .git/.config)
-	localBranchRefName := git_plumbing.NewBranchReferenceName(localBranchName)
+	// serialize the branch to .git/refs/heads
+	remoteBranchRefName := git_plumbing.NewRemoteReferenceName(remoteName, remoteBranchName)
 	remoteBranchRef, err := r.Storer.Reference(remoteBranchRefName)
 	if err != nil {
 		return err
 	}
 	localHashRef := git_plumbing.NewHashReference(localBranchRefName, remoteBranchRef.Hash())
-	r.Storer.SetReference(localHashRef)
-	return nil
+	return r.Storer.SetReference(localHashRef)
 }
 
 // TeaCheckout checks out the given branch in the worktree.
@@ -124,7 +123,7 @@ func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err e
 	b = &git_config.Branch{
 		Remote: remoteName,
 		Name:   localRefName.Short(),
-		Merge: localRefName,
+		Merge:  localRefName,
 	}
 	fmt.Println(b)
 	return b, b.Validate()
