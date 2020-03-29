@@ -7,7 +7,6 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 
 	"code.gitea.io/sdk/gitea"
@@ -34,12 +33,18 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      runIssuesList,
-	Flags:       AllDefaultFlags,
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:        "state",
+			Usage:       "Filter by issue state (all|open|closed)",
+			DefaultText: "open",
+		},
+	}, AllDefaultFlags...),
 }
 
 func runIssues(ctx *cli.Context) error {
-	if len(os.Args) == 3 {
-		return runIssueDetail(ctx, os.Args[2])
+	if ctx.Args().Len() == 1 {
+		return runIssueDetail(ctx, ctx.Args().First())
 	}
 	return runIssuesList(ctx)
 }
@@ -65,9 +70,19 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 func runIssuesList(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
+	state := gitea.StateOpen
+	switch ctx.String("state") {
+	case "all":
+		state = gitea.StateAll
+	case "open":
+		state = gitea.StateOpen
+	case "closed":
+		state = gitea.StateClosed
+	}
+
 	issues, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
 		Page:  0,
-		State: string(gitea.StateOpen),
+		State: string(state),
 	})
 
 	if err != nil {
@@ -76,7 +91,8 @@ func runIssuesList(ctx *cli.Context) error {
 
 	headers := []string{
 		"Index",
-		"Name",
+		"State",
+		"Author",
 		"Updated",
 		"Title",
 	}
@@ -97,6 +113,7 @@ func runIssuesList(ctx *cli.Context) error {
 			values,
 			[]string{
 				strconv.FormatInt(issue.Index, 10),
+				string(issue.State),
 				name,
 				issue.Updated.Format("2006-01-02 15:04:05"),
 				issue.Title,

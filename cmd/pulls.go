@@ -24,7 +24,13 @@ var CmdPulls = cli.Command{
 	Usage:       "List open pull requests",
 	Description: `List open pull requests`,
 	Action:      runPulls,
-	Flags:       AllDefaultFlags,
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:        "state",
+			Usage:       "Filter by PR state (all|open|closed)",
+			DefaultText: "open",
+		},
+	}, AllDefaultFlags...),
 	Subcommands: []*cli.Command{
 		&CmdPullsCheckout,
 		&CmdPullsClean,
@@ -34,9 +40,19 @@ var CmdPulls = cli.Command{
 func runPulls(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
+	state := gitea.StateOpen
+	switch ctx.String("state") {
+	case "all":
+		state = gitea.StateAll
+	case "open":
+		state = gitea.StateOpen
+	case "closed":
+		state = gitea.StateClosed
+	}
+
 	prs, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
 		Page:  0,
-		State: string(gitea.StateOpen),
+		State: string(state),
 	})
 
 	if err != nil {
@@ -45,7 +61,8 @@ func runPulls(ctx *cli.Context) error {
 
 	headers := []string{
 		"Index",
-		"Name",
+		"State",
+		"Author",
 		"Updated",
 		"Title",
 	}
@@ -69,6 +86,7 @@ func runPulls(ctx *cli.Context) error {
 			values,
 			[]string{
 				strconv.FormatInt(pr.Index, 10),
+				string(pr.State),
 				name,
 				pr.Updated.Format("2006-01-02 15:04:05"),
 				pr.Title,
