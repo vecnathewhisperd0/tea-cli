@@ -114,7 +114,7 @@ func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err e
 	if err != nil {
 		return nil, err
 	}
-	if remoteRefName == "" {
+	if remoteRefName == "" || localRefName == "" {
 		// no remote tracking branch found, so a potential local branch
 		// can't be a match either
 		return nil, nil
@@ -125,6 +125,5 @@ func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err e
 		Name:   localRefName.Short(),
 		Merge:  localRefName,
 	}
-	fmt.Println(b)
 	return b, b.Validate()
 }
