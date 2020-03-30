@@ -90,10 +90,9 @@ func runIssuesList(ctx *cli.Context) error {
 	}
 
 	issues, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		Page:  0,
-		State: string(state),
+		State: state,
+		Type:  gitea.IssueTypeIssue,
 	})
-
 	if err != nil {
 		log.Fatal(err)
 	}
