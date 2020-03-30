@@ -53,6 +53,9 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 	login, owner, repo := initCommand()
 
 	idx, err := argToIndex(index)
+	if err != nil {
+		return err
+	}
 	issue, err := login.Client().GetIssue(owner, repo, idx)
 	if err != nil {
 		return err
