@@ -75,9 +75,9 @@ func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string)
 	return err
 }
 
-// TeaFindBranch returns a branch that is at the the given SHA and syncs to the
+// TeaFindBranchBySha returns a branch that is at the the given SHA and syncs to the
 // given remote repo.
-func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err error) {
+func (r TeaRepo) TeaFindBranchBySha(sha, repoURL string) (b *git_config.Branch, err error) {
 	// find remote matching our repoURL
 	remote, err := r.GetRemote(repoURL)
 	if err != nil {
@@ -99,9 +99,7 @@ func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err e
 	err = iter.ForEach(func(ref *git_plumbing.Reference) error {
 		if ref.Name().IsRemote() {
 			name := ref.Name().Short()
-			if name != "master" &&
-				ref.Hash().String() == sha &&
-				strings.HasPrefix(name, remoteName) {
+			if ref.Hash().String() == sha && strings.HasPrefix(name, remoteName) {
 				remoteRefName = ref.Name()
 			}
 		}
@@ -117,6 +115,55 @@ func (r TeaRepo) TeaFindBranch(sha, repoURL string) (b *git_config.Branch, err e
 	if remoteRefName == "" || localRefName == "" {
 		// no remote tracking branch found, so a potential local branch
 		// can't be a match either
+		return nil, nil
+	}
+
+	b = &git_config.Branch{
+		Remote: remoteName,
+		Name:   localRefName.Short(),
+		Merge:  localRefName,
+	}
+	return b, b.Validate()
+}
+
+// TeaFindBranchByName returns a branch that is at the the given local and
+// remote names and syncs to the given remote repo. This method is less precise
+// than TeaFindBranchBySha(), but may be desirable if local and remote branch
+// have diverged.
+func (r TeaRepo) TeaFindBranchByName(branchName, repoURL string) (b *git_config.Branch, err error) {
+	// find remote matching our repoURL
+	remote, err := r.GetRemote(repoURL)
+	if err != nil {
+		return nil, err
+	}
+	if remote == nil {
+		return nil, fmt.Errorf("No remote found for '%s'", repoURL)
+	}
+	remoteName := remote.Config().Name
+
+	// check if the given remote has our branch (.git/refs/remotes/<remoteName>/*)
+	iter, err := r.References()
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+	var remoteRefName git_plumbing.ReferenceName
+	var localRefName git_plumbing.ReferenceName
+	var remoteSearchingName = fmt.Sprintf("%s/%s", remoteName, branchName)
+	err = iter.ForEach(func(ref *git_plumbing.Reference) error {
+		if ref.Name().IsRemote() && ref.Name().Short() == remoteSearchingName {
+			remoteRefName = ref.Name()
+		}
+		n := ref.Name()
+		if n.IsBranch() && n.Short() == branchName {
+			localRefName = n
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if remoteRefName == "" || localRefName == "" {
 		return nil, nil
 	}
 

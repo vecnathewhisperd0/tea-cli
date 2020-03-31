@@ -15,6 +15,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/src-d/go-git.v4"
+	git_config "gopkg.in/src-d/go-git.v4/config"
 )
 
 // CmdPulls is the main command to operate on PRs
@@ -174,7 +175,12 @@ var CmdPullsClean = cli.Command{
 	Description: `Deletes local & remote feature-branches for a closed pull request`,
 	ArgsUsage:   "<pull index>",
 	Action:      runPullsClean,
-	Flags:       AllDefaultFlags,
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:  "ignore-sha",
+			Usage: "Find the local branch by name instead of commit hash (less precise)",
+		},
+	}, AllDefaultFlags...),
 }
 
 func runPullsClean(ctx *cli.Context) error {
@@ -203,12 +209,24 @@ func runPullsClean(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	branch, err := r.TeaFindBranch(pr.Head.Sha, pr.Head.Repository.CloneURL)
+
+	var branch *git_config.Branch
+	if ctx.Bool("ignore-sha") {
+		branch, err = r.TeaFindBranchByName(pr.Head.Ref, pr.Head.Repository.CloneURL)
+	} else {
+		branch, err = r.TeaFindBranchBySha(pr.Head.Sha, pr.Head.Repository.CloneURL)
+	}
 	if err != nil {
 		return err
 	}
 	if branch == nil {
-		return fmt.Errorf("Remote branch %s not found in local repo. Maybe the local branch has diverged from the remote?", pr.Head.Ref)
+		if ctx.Bool("ignore-sha") {
+			return fmt.Errorf("Remote branch %s not found in local repo", pr.Head.Ref)
+		}
+		return fmt.Errorf(`Remote branch %s not found in local repo.
+Either you don't track this PR, or the local branch has diverged from the remote.
+If you still want to continue & are sure you don't loose any important commits,
+call me again with the --ignore-sha flag`, pr.Head.Ref)
 	}
 
 	// prepare deletion of local branch:
