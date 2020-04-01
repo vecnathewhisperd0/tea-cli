@@ -67,10 +67,6 @@ func runOpen(ctx *cli.Context) error {
 		suffix = number
 	}
 
-	if suffix == "" {
-		return cli.ShowCommandHelp(ctx, "open")
-	}
-
 	u := path.Join(login.URL, owner, repo, suffix)
 	err := open.Run(u)
 	if err != nil {
