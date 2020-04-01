@@ -25,7 +25,7 @@ var CmdIssues = cli.Command{
 	Subcommands: []*cli.Command{
 		&CmdIssuesList,
 		&CmdIssuesCreate,
-		&CmdIssuesOpen,
+		&CmdIssuesReopen,
 		&CmdIssuesClose,
 	},
 	Flags: AllDefaultFlags,
@@ -179,15 +179,15 @@ func runIssuesCreate(ctx *cli.Context) error {
 	return nil
 }
 
-// CmdIssuesOpen represents a sub command of issues to open an issue
-var CmdIssuesOpen = cli.Command{
+// CmdIssuesReopen represents a sub command of issues to open an issue
+var CmdIssuesReopen = cli.Command{
 	Name:        "reopen",
 	Aliases:     []string{"open"},
 	Usage:       "Change state of an issue to 'open'",
 	Description: `Change state of an issue to 'open'`,
 	ArgsUsage:   "<issue index>",
 	Action: func(ctx *cli.Context) error {
-		var s = string(gitea.StateOpen) // TODO: should be refactored with SDK v12
+		var s = string(gitea.StateOpen)
 		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
 	},
 	Flags: AllDefaultFlags,
@@ -200,7 +200,7 @@ var CmdIssuesClose = cli.Command{
 	Description: `Change state of an issue to 'closed'`,
 	ArgsUsage:   "<issue index>",
 	Action: func(ctx *cli.Context) error {
-		var s = string(gitea.StateClosed) // TODO: should be refactored with SDK v12
+		var s = string(gitea.StateClosed)
 		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
 	},
 	Flags: AllDefaultFlags,
