@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"log"
+	"path"
 	"strings"
 
 	local_git "code.gitea.io/tea/modules/git"
@@ -66,7 +67,11 @@ func runOpen(ctx *cli.Context) error {
 		suffix = number
 	}
 
-	u := login.URL + "/" + owner + "/" + repo + "/" + suffix
+	if suffix == "" {
+		return cli.ShowCommandHelp(ctx, "open")
+	}
+
+	u := path.Join(login.URL, owner, repo, suffix)
 	err := open.Run(u)
 	if err != nil {
 		log.Fatal(err)
