@@ -202,14 +202,12 @@ func runPullsClean(ctx *cli.Context) error {
 		return fmt.Errorf("PR is still open, won't delete branches")
 	}
 
-	// check if the feature branch is ours:
-	// don't check name (user may be inconsistent with naming locally & remote),
-	// instead compare hashes & matching remote.
 	r, err := local_git.RepoForWorkdir()
 	if err != nil {
 		return err
 	}
 
+	// find a branch with matching sha or name, that has a remote matching the repo url
 	var branch *git_config.Branch
 	if ctx.Bool("ignore-sha") {
 		branch, err = r.TeaFindBranchByName(pr.Head.Ref, pr.Head.Repository.CloneURL)

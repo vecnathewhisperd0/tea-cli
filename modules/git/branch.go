@@ -14,13 +14,12 @@ import (
 )
 
 // TeaCreateBranch creates a new branch in the repo, tracking from another branch.
-// If remoteName is not-null, a remote branch is tracked.
 func (r TeaRepo) TeaCreateBranch(localBranchName, remoteBranchName, remoteName string) error {
 	// save in .git/config to assign remote for future pulls
 	localBranchRefName := git_plumbing.NewBranchReferenceName(localBranchName)
 	err := r.CreateBranch(&git_config.Branch{
 		Name:   localBranchName,
-		Merge:  git_plumbing.NewBranchReferenceName(remoteBranchName), // FIXME: should be remoteBranchName
+		Merge:  git_plumbing.NewBranchReferenceName(remoteBranchName),
 		Remote: remoteName,
 	})
 	if err != nil {
