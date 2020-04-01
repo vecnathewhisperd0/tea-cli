@@ -21,21 +21,19 @@ func (r TeaRepo) GetRemote(remoteURL string) (*git.Remote, error) {
 	if err != nil {
 		return nil, err
 	}
-	var localRemote *git.Remote
 	for _, r := range remotes {
 		for _, u := range r.Config().URLs {
-			remoteURL, _ := ParseURL(u)
-			if remoteURL.Host == repoURL.Host && remoteURL.Path == repoURL.Path {
-				localRemote = r
-				break
+			remoteURL, err := ParseURL(u)
+			if err != nil {
+				return nil, err
 			}
-		}
-		if localRemote != nil {
-			break
+			if remoteURL.Host == repoURL.Host && remoteURL.Path == repoURL.Path {
+				return r, nil
+			}
 		}
 	}
 
-	return localRemote, err
+	return nil, nil
 }
 
 // GetOrCreateRemote tries to match a Remote of the repo via the given URL.
