@@ -146,7 +146,17 @@ func runPullsCheckout(ctx *cli.Context) error {
 	// fetch remote
 	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
 		idx, remoteURL, remoteBranchName, localRemoteName)
-	err = localRemote.Fetch(&git.FetchOptions{})
+
+	url, err := local_git.ParseURL(localRemote.Config().URLs[0])
+	if err != nil {
+		return err
+	}
+	auth, err := local_git.GetAuthForURL(url, login.User, login.SSHKey)
+	if err != nil {
+		return err
+	}
+
+	err = localRemote.Fetch(&git.FetchOptions{Auth: auth})
 	if err == git.NoErrAlreadyUpToDate {
 		fmt.Println(err)
 	} else if err != nil {
@@ -202,6 +212,8 @@ func runPullsClean(ctx *cli.Context) error {
 		return fmt.Errorf("PR is still open, won't delete branches")
 	}
 
+	// IDEA: abort if PR.Head.Repository.CloneURL does not match login.URL?
+
 	r, err := local_git.RepoForWorkdir()
 	if err != nil {
 		return err
@@ -242,9 +254,15 @@ call me again with the --ignore-sha flag`, pr.Head.Ref)
 
 	// remove local & remote branch
 	fmt.Printf("Deleting local branch %s and remote branch %s\n", branch.Name, pr.Head.Ref)
-	err = r.TeaDeleteBranch(branch, pr.Head.Ref)
-
-	return err
+	url, err := r.TeaRemoteURL(branch.Remote)
+	if err != nil {
+		return err
+	}
+	auth, err := local_git.GetAuthForURL(url, login.User, login.SSHKey)
+	if err != nil {
+		return err
+	}
+	return r.TeaDeleteBranch(branch, pr.Head.Ref, auth)
 }
 
 func argToIndex(arg string) (int64, error) {

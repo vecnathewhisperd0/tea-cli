@@ -5,6 +5,9 @@
 package git
 
 import (
+	"fmt"
+	"net/url"
+
 	"gopkg.in/src-d/go-git.v4"
 	git_config "gopkg.in/src-d/go-git.v4/config"
 )
@@ -57,4 +60,17 @@ func (r TeaRepo) GetOrCreateRemote(remoteURL, newRemoteName string) (*git.Remote
 	}
 
 	return localRemote, nil
+}
+
+// TeaRemoteURL returns the first url entry for the given remote name
+func (r TeaRepo) TeaRemoteURL(name string) (auth *url.URL, err error) {
+	remote, err := r.Remote(name)
+	if err != nil {
+		return nil, err
+	}
+	urls := remote.Config().URLs
+	if len(urls) == 0 {
+		return nil, fmt.Errorf("remote %s has no URL configured", name)
+	}
+	return ParseURL(remote.Config().URLs[0])
 }

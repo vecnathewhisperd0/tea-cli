@@ -11,6 +11,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	git_config "gopkg.in/src-d/go-git.v4/config"
 	git_plumbing "gopkg.in/src-d/go-git.v4/plumbing"
+	git_transport "gopkg.in/src-d/go-git.v4/plumbing/transport"
 )
 
 // TeaCreateBranch creates a new branch in the repo, tracking from another branch.
@@ -48,7 +49,7 @@ func (r TeaRepo) TeaCheckout(branchName string) error {
 
 // TeaDeleteBranch removes the given branch locally, and if `remoteBranch` is
 // not empty deletes it at it's remote repo.
-func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string) error {
+func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string, auth git_transport.AuthMethod) error {
 	err := r.DeleteBranch(branch.Name)
 	// if the branch is not found that's ok, as .git/config may have no entry if
 	// no remote tracking branch is configured for it (eg push without -u flag)
@@ -68,6 +69,7 @@ func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string)
 			RemoteName: branch.Remote,
 			RefSpecs:   []git_config.RefSpec{git_config.RefSpec(refspec)},
 			Prune:      true,
+			Auth:       auth,
 		})
 	}
 
