@@ -26,12 +26,16 @@ import (
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
 type Login struct {
-	Name     string `yaml:"name"`
-	URL      string `yaml:"url"`
-	Token    string `yaml:"token"`
-	Active   bool   `yaml:"active"`
-	SSHHost  string `yaml:"ssh_host"`
+	Name    string `yaml:"name"`
+	URL     string `yaml:"url"`
+	Token   string `yaml:"token"`
+	Active  bool   `yaml:"active"`
+	SSHHost string `yaml:"ssh_host"`
+	// optional path to the private key
+	SSHKey   string `yaml:"ssh_key"`
 	Insecure bool   `yaml:"insecure"`
+	// optional gitea username
+	User string `yaml:"user"`
 }
 
 // Client returns a client to operate Gitea API
