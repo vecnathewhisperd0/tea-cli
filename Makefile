@@ -68,7 +68,11 @@ fmt:
 
 .PHONY: vet
 vet:
+	# Default vet
 	$(GO) vet -mod=vendor $(PACKAGES)
+	# Custom vet
+	$(GO) build -mod=vendor gitea.com/jolheiser/gitea-vet
+	$(GO) vet -vettool=gitea-vet $(GO_PACKAGES)
 
 .PHONY: lint
 lint:
