@@ -4,6 +4,8 @@
 
 This project acts as a command line tool for operating one or multiple Gitea instances. It depends on [code.gitea.io/sdk](https://code.gitea.io/sdk) client SDK implementation written in Go to interact with the Gitea API implementation.
 
+![demo](demo.gif)
+
 ## Installation
 
 Currently no prebuilt binaries are provided. To install, a Go installation is needed.
