@@ -1,31 +1,30 @@
-# Gitea Command Line Tool for Go
+# The Gitea Command Line Tool
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Release](https://raster.shields.io/badge/dynamic/json.svg?label=release&url=https://gitea.com/api/v1/repos/gitea/tea/releases&query=$[0].tag_name)](https://gitea.com/gitea/tea/releases) [![Build Status](https://drone.gitea.com/api/badges/gitea/tea/status.svg)](https://drone.gitea.com/gitea/tea) [![Join the chat at https://img.shields.io/discord/322538954119184384.svg](https://img.shields.io/discord/322538954119184384.svg)](https://discord.gg/Gitea) [![Go Report Card](https://goreportcard.com/badge/code.gitea.io/tea)](https://goreportcard.com/report/code.gitea.io/tea) [![GoDoc](https://godoc.org/code.gitea.io/tea?status.svg)](https://godoc.org/code.gitea.io/tea)
 
-This project acts as a command line tool for operating one or multiple Gitea instances. It depends on [code.gitea.io/sdk](https://code.gitea.io/sdk) client SDK implementation written in Go to interact with the Gitea API implementation.
+## The official CLI interface for gitea
+
+This project acts as a command line tool for operating on one or multiple Gitea instances.  
+It use [code.gitea.io/sdk](https://code.gitea.io/sdk) and interact with the Gitea API
 
 ![demo](demo.gif)
 
 ## Installation
 
-Currently no prebuilt binaries are provided. To install, a Go installation is needed.
+You can use prebuild binaries from [dl.gitea.io](https://dl.gitea.io/tea/)!  
 
+via go:
 ```sh
 go get code.gitea.io/tea
 go install code.gitea.io/tea
 ```
 
-If the `tea` executable is not found, you might need to set up your `$GOPATH` and `$PATH` variables first:
-
-```sh
-export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-```
 
 If you have `brew` installed, you can install tea version via:
 
 ```sh
 brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
-brew install --devel tea
+brew install tea
 ```
 
 ## Usage
@@ -40,20 +39,28 @@ tea login add --name=try --url=https://try.gitea.io --token=xxxxxx
 Now you can use the `tea` commands:
 
 ```sh
-tea issues
-tea releases
+login            Log in to a Gitea server
+logout           Log out from a Gitea server
+issues           List and create issues
+pulls, pull, pr  List open pull requests
+releases         Create releases
+repos            Operate with repositories
+labels           Manage issue labels
+times, time      Operate on tracked times of a repositorys issues and pulls
+open             Open something of the repository on web browser
 ```
 
 To fetch issues from different repos, use the `--remote` flag (when inside a gitea repository directory) or `--login` & `--repo` flags.
 
 ## Compilation
 
+Make sure you have installed a current go version.
 To compile the sources yourself run the following:
 
 ```sh
-go get code.gitea.io/tea
-cd "${GOPATH}/src/code.gitea.io/tea"
-go build
+git clone https://gitea.com/gitea/tea.git
+cd tea
+make
 ```
 
 ## Contributing
