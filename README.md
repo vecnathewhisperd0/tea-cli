@@ -4,23 +4,24 @@
 
 ## The official CLI interface for gitea
 
-This project acts as a command line tool for operating on one or multiple Gitea instances.  
+This project acts as a command line tool for operating on one or multiple Gitea instances.
 It use [code.gitea.io/sdk](https://code.gitea.io/sdk) and interact with the Gitea API
 
-![demo](demo.gif)
+![demo gif](https://dl.gitea.io/screenshots/tea_demo.gif)
 
 ## Installation
 
-You can use prebuild binaries from [dl.gitea.io](https://dl.gitea.io/tea/)!  
+You can use the prebuilt from [dl.gitea.io](https://dl.gitea.io/tea/)
 
-via go:
+
+do it the `go` way:
 ```sh
 go get code.gitea.io/tea
 go install code.gitea.io/tea
 ```
 
 
-If you have `brew` installed, you can install tea version via:
+Or if you have `brew` installed, you can install `tea` via:
 
 ```sh
 brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
