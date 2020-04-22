@@ -208,15 +208,11 @@ func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
 		log.Fatal(ctx.Command.ArgsUsage)
 	}
 
-	index := ctx.Args().First()
-	if strings.HasPrefix(index, "#") {
-		index = index[1:]
-	}
-	idx, err := strconv.ParseInt(index, 10, 64)
+	index, err := argToIndex(ctx.Args().First())
 	if err != nil {
 		return err
 	}
 
-	_, err = login.Client().EditIssue(owner, repo, idx, opts)
+	_, err = login.Client().EditIssue(owner, repo, index, opts)
 	return err
 }
