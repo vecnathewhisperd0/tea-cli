@@ -4,17 +4,17 @@
 
 ## The official CLI interface for gitea
 
-This project acts as a command line tool for operating on one or multiple Gitea instances.
-It use [code.gitea.io/sdk](https://code.gitea.io/sdk) and interact with the Gitea API
+Tea is a command line tool for interacting on one or more Gitea instances.
+It uses [code.gitea.io/sdk](https://code.gitea.io/sdk) and interacts with the Gitea API
 
 ![demo gif](https://dl.gitea.io/screenshots/tea_demo.gif)
 
 ## Installation
 
-You can use the prebuilt from [dl.gitea.io](https://dl.gitea.io/tea/)
+You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
 
-do it the `go` way:
+To install from source, go 1.12 or newer is required:
 ```sh
 go get code.gitea.io/tea
 go install code.gitea.io/tea
@@ -37,17 +37,18 @@ Use this token to login with `tea`:
 tea login add --name=try --url=https://try.gitea.io --token=xxxxxx
 ```
 
-Now you can use the `tea` commands:
+Now you can use the following `tea` subcommands.
+Detailed usage information is available via `tea <command> --help`.
 
 ```sh
 login            Log in to a Gitea server
 logout           Log out from a Gitea server
-issues           List and create issues
-pulls, pull, pr  List open pull requests
+issues           List, create and update issues
+pulls            List, checkout and clean pull requests
 releases         Create releases
 repos            Operate with repositories
 labels           Manage issue labels
-times, time      Operate on tracked times of a repositorys issues and pulls
+times            Operate on tracked times of a repositorys issues and pulls
 open             Open something of the repository on web browser
 ```
 
