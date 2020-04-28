@@ -1,5 +1,8 @@
 # code.gitea.io/sdk/gitea v0.11.2
 code.gitea.io/sdk/gitea
+# gitea.com/jolheiser/gitea-vet v0.1.0
+gitea.com/jolheiser/gitea-vet
+gitea.com/jolheiser/gitea-vet/checks
 # github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
 github.com/araddon/dateparse
 # github.com/cpuguy83/go-md2man/v2 v2.0.0
@@ -122,6 +125,12 @@ golang.org/x/net/proxy
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
+# golang.org/x/tools v0.0.0-20200325010219-a49f79bcc224
+golang.org/x/tools/go/analysis
+golang.org/x/tools/go/analysis/internal/analysisflags
+golang.org/x/tools/go/analysis/internal/facts
+golang.org/x/tools/go/analysis/unitchecker
+golang.org/x/tools/go/types/objectpath
 # gopkg.in/warnings.v0 v0.1.2
 gopkg.in/warnings.v0
 # gopkg.in/yaml.v2 v2.2.8
