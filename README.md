@@ -28,7 +28,7 @@ brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
 brew install tea
 ```
 
-Distribution packages exist only for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))**
+Distribution packages exist for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** and **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
 
 ## Usage
 
