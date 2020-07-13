@@ -16,8 +16,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Version holds the current Gitea version
-var Version = "0.1.0-dev"
+// Version holds the current tea version
+var Version = "development"
 
 // Tags holds the build tags used
 var Tags = ""
@@ -29,7 +29,7 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Tea"
+	app.Name = "tea"
 	app.Usage = "Command line tool to interact with Gitea"
 	app.Description = ``
 	app.Version = Version + formatBuiltWith(Tags)
@@ -42,6 +42,8 @@ func main() {
 		&cmd.CmdReleases,
 		&cmd.CmdRepos,
 		&cmd.CmdLabels,
+		&cmd.CmdTrackedTimes,
+		&cmd.CmdOpen,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)

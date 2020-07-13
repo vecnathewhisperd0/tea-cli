@@ -7,9 +7,7 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"os"
 	"strconv"
-	"strings"
 
 	"code.gitea.io/sdk/gitea"
 
@@ -21,10 +19,13 @@ var CmdIssues = cli.Command{
 	Name:        "issues",
 	Usage:       "List and create issues",
 	Description: `List and create issues`,
+	ArgsUsage:   "[<issue index>]",
 	Action:      runIssues,
 	Subcommands: []*cli.Command{
 		&CmdIssuesList,
 		&CmdIssuesCreate,
+		&CmdIssuesReopen,
+		&CmdIssuesClose,
 	},
 	Flags: AllDefaultFlags,
 }
@@ -35,12 +36,18 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      runIssuesList,
-	Flags:       AllDefaultFlags,
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:        "state",
+			Usage:       "Filter by issue state (all|open|closed)",
+			DefaultText: "open",
+		},
+	}, AllDefaultFlags...),
 }
 
 func runIssues(ctx *cli.Context) error {
-	if len(os.Args) == 3 {
-		return runIssueDetail(ctx, os.Args[2])
+	if ctx.Args().Len() == 1 {
+		return runIssueDetail(ctx, ctx.Args().First())
 	}
 	return runIssuesList(ctx)
 }
@@ -48,21 +55,16 @@ func runIssues(ctx *cli.Context) error {
 func runIssueDetail(ctx *cli.Context, index string) error {
 	login, owner, repo := initCommand()
 
-	if strings.HasPrefix(index, "#") {
-		index = index[1:]
-	}
-
-	idx, err := strconv.ParseInt(index, 10, 64)
+	idx, err := argToIndex(index)
 	if err != nil {
 		return err
 	}
-
 	issue, err := login.Client().GetIssue(owner, repo, idx)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n\n%s", issue.Index,
+	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", issue.Index,
 		issue.Title,
 		issue.Poster.UserName,
 		issue.Created.Format("2006-01-02 15:04:05"),
@@ -74,9 +76,19 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 func runIssuesList(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
+	state := gitea.StateOpen
+	switch ctx.String("state") {
+	case "all":
+		state = gitea.StateAll
+	case "open":
+		state = gitea.StateOpen
+	case "closed":
+		state = gitea.StateClosed
+	}
+
 	issues, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		Page:  0,
-		State: string(gitea.StateOpen),
+		State: state,
+		Type:  gitea.IssueTypeIssue,
 	})
 
 	if err != nil {
@@ -85,7 +97,8 @@ func runIssuesList(ctx *cli.Context) error {
 
 	headers := []string{
 		"Index",
-		"Name",
+		"State",
+		"Author",
 		"Updated",
 		"Title",
 	}
@@ -106,6 +119,7 @@ func runIssuesList(ctx *cli.Context) error {
 			values,
 			[]string{
 				strconv.FormatInt(issue.Index, 10),
+				string(issue.State),
 				name,
 				issue.Updated.Format("2006-01-02 15:04:05"),
 				issue.Title,
@@ -125,12 +139,14 @@ var CmdIssuesCreate = cli.Command{
 	Action:      runIssuesCreate,
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:  "title, t",
-			Usage: "issue title to create",
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "issue title to create",
 		},
 		&cli.StringFlag{
-			Name:  "body, b",
-			Usage: "issue body to create",
+			Name:    "body",
+			Aliases: []string{"b"},
+			Usage:   "issue body to create",
 		},
 	}, LoginRepoFlags...),
 }
@@ -155,4 +171,47 @@ func runIssuesCreate(ctx *cli.Context) error {
 	}
 
 	return nil
+}
+
+// CmdIssuesReopen represents a sub command of issues to open an issue
+var CmdIssuesReopen = cli.Command{
+	Name:        "reopen",
+	Aliases:     []string{"open"},
+	Usage:       "Change state of an issue to 'open'",
+	Description: `Change state of an issue to 'open'`,
+	ArgsUsage:   "<issue index>",
+	Action: func(ctx *cli.Context) error {
+		var s = gitea.StateOpen
+		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
+	},
+	Flags: AllDefaultFlags,
+}
+
+// CmdIssuesClose represents a sub command of issues to close an issue
+var CmdIssuesClose = cli.Command{
+	Name:        "close",
+	Usage:       "Change state of an issue to 'closed'",
+	Description: `Change state of an issue to 'closed'`,
+	ArgsUsage:   "<issue index>",
+	Action: func(ctx *cli.Context) error {
+		var s = gitea.StateClosed
+		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
+	},
+	Flags: AllDefaultFlags,
+}
+
+// editIssueState abstracts the arg parsing to edit the given issue
+func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
+	login, owner, repo := initCommand()
+	if ctx.Args().Len() == 0 {
+		log.Fatal(ctx.Command.ArgsUsage)
+	}
+
+	index, err := argToIndex(ctx.Args().First())
+	if err != nil {
+		return err
+	}
+
+	_, err = login.Client().EditIssue(owner, repo, index, opts)
+	return err
 }

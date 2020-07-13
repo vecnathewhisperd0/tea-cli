@@ -30,8 +30,9 @@ var CmdLabels = cli.Command{
 	},
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:  "save, s",
-			Usage: "Save all the labels as a file",
+			Name:    "save",
+			Aliases: []string{"s"},
+			Usage:   "Save all the labels as a file",
 		},
 	}, AllDefaultFlags...),
 }
@@ -48,7 +49,7 @@ func runLabels(ctx *cli.Context) error {
 
 	var values [][]string
 
-	labels, err := login.Client().ListRepoLabels(owner, repo)
+	labels, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}

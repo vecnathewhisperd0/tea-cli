@@ -34,24 +34,36 @@ var cmdLoginAdd = cli.Command{
 	Description: `Add a Gitea login`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:  "name, n",
-			Usage: "Login name",
+			Name:     "name",
+			Aliases:  []string{"n"},
+			Usage:    "Login name",
+			Required: true,
 		},
 		&cli.StringFlag{
-			Name:    "url, u",
-			Value:   "https://try.gitea.io",
-			EnvVars: []string{"GITEA_SERVER_URL"},
-			Usage:   "Server URL",
+			Name:     "url",
+			Aliases:  []string{"u"},
+			Value:    "https://try.gitea.io",
+			EnvVars:  []string{"GITEA_SERVER_URL"},
+			Usage:    "Server URL",
+			Required: true,
 		},
 		&cli.StringFlag{
-			Name:    "token, t",
-			Value:   "",
-			EnvVars: []string{"GITEA_SERVER_TOKEN"},
-			Usage:   "Access token. Can be obtained from Settings > Applications",
+			Name:     "token",
+			Aliases:  []string{"t"},
+			Value:    "",
+			EnvVars:  []string{"GITEA_SERVER_TOKEN"},
+			Usage:    "Access token. Can be obtained from Settings > Applications",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:    "ssh-key",
+			Aliases: []string{"s"},
+			Usage:   "Path to a SSH key to use for pull/push operations",
 		},
 		&cli.BoolFlag{
-			Name:  "insecure, i",
-			Usage: "Disable TLS verification",
+			Name:    "insecure",
+			Aliases: []string{"i"},
+			Usage:   "Disable TLS verification",
 		},
 	},
 	Action: runLoginAdd,
@@ -96,6 +108,8 @@ func runLoginAdd(ctx *cli.Context) error {
 		URL:      ctx.String("url"),
 		Token:    ctx.String("token"),
 		Insecure: ctx.Bool("insecure"),
+		SSHKey:   ctx.String("ssh-key"),
+		User:     u.UserName,
 	})
 	if err != nil {
 		log.Fatal(err)

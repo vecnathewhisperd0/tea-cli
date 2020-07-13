@@ -1,3 +1,7 @@
+// Copyright 2019 The Gitea Authors. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
 package git
 
 import (
@@ -34,6 +38,11 @@ func (p *URLParser) Parse(rawURL string) (u *url.URL, err error) {
 
 	if strings.HasPrefix(u.Path, "//") {
 		u.Path = strings.TrimPrefix(u.Path, "/")
+	}
+
+	// .git suffix is optional and breaks normalization
+	if strings.HasSuffix(u.Path, ".git") {
+		u.Path = strings.TrimSuffix(u.Path, ".git")
 	}
 
 	return

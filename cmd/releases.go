@@ -29,7 +29,7 @@ var CmdReleases = cli.Command{
 func runReleases(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	releases, err := login.Client().ListReleases(owner, repo)
+	releases, err := login.Client().ListReleases(owner, repo, gitea.ListReleasesOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,24 +80,29 @@ var CmdReleaseCreate = cli.Command{
 			Usage: "Target refs, branch name or commit id",
 		},
 		&cli.StringFlag{
-			Name:  "title, t",
-			Usage: "Release title",
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "Release title",
 		},
 		&cli.StringFlag{
-			Name:  "note, n",
-			Usage: "Release notes",
+			Name:    "note",
+			Aliases: []string{"n"},
+			Usage:   "Release notes",
 		},
 		&cli.BoolFlag{
-			Name:  "draft, d",
-			Usage: "Is a draft",
+			Name:    "draft",
+			Aliases: []string{"d"},
+			Usage:   "Is a draft",
 		},
 		&cli.BoolFlag{
-			Name:  "prerelease, p",
-			Usage: "Is a pre-release",
+			Name:    "prerelease",
+			Aliases: []string{"p"},
+			Usage:   "Is a pre-release",
 		},
 		&cli.StringSliceFlag{
-			Name:  "asset, a",
-			Usage: "List of files to attach",
+			Name:    "asset",
+			Aliases: []string{"a"},
+			Usage:   "List of files to attach",
 		},
 	}, LoginRepoFlags...),
 }

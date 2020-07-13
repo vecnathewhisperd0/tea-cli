@@ -21,28 +21,32 @@ var (
 
 // LoginFlag provides flag to specify tea login profile
 var LoginFlag = cli.StringFlag{
-	Name:        "login, l",
+	Name:        "login",
+	Aliases:     []string{"l"},
 	Usage:       "Use a different Gitea login. Optional",
 	Destination: &loginValue,
 }
 
 // RepoFlag provides flag to specify repository
 var RepoFlag = cli.StringFlag{
-	Name:        "repo, r",
+	Name:        "repo",
+	Aliases:     []string{"r"},
 	Usage:       "Repository to interact with. Optional",
 	Destination: &repoValue,
 }
 
 // RemoteFlag provides flag to specify remote repository
 var RemoteFlag = cli.StringFlag{
-	Name:        "remote, R",
+	Name:        "remote",
+	Aliases:     []string{"R"},
 	Usage:       "Discover Gitea login from remote. Optional",
 	Destination: &remoteValue,
 }
 
 // OutputFlag provides flag to specify output type
 var OutputFlag = cli.StringFlag{
-	Name:        "output, o",
+	Name:        "output",
+	Aliases:     []string{"o"},
 	Usage:       "Output format. (csv, simple, table, tsv, yaml)",
 	Destination: &outputValue,
 }
@@ -77,24 +81,9 @@ var AllDefaultFlags = append([]cli.Flag{
 
 // initCommand returns repository and *Login based on flags
 func initCommand() (*Login, string, string) {
-	err := loadConfig(yamlConfigPath)
-	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
-	}
+	login := initCommandLoginOnly()
 
-	var login *Login
-	if loginValue == "" {
-		login, err = getActiveLogin()
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		login = getLoginByName(loginValue)
-		if login == nil {
-			log.Fatal("Login name " + loginValue + " does not exist")
-		}
-	}
-
+	var err error
 	repoPath := repoValue
 	if repoPath == "" {
 		login, repoPath, err = curGitRepoPath()
@@ -115,10 +104,16 @@ func initCommandLoginOnly() *Login {
 	}
 
 	var login *Login
-
-	login = getLoginByName(loginValue)
-	if login == nil {
-		log.Fatal("indicated login name ", loginValue, " does not exist")
+	if loginValue == "" {
+		login, err = getActiveLogin()
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		login = getLoginByName(loginValue)
+		if login == nil {
+			log.Fatal("Login name " + loginValue + " does not exist")
+		}
 	}
 
 	return login

@@ -1,5 +1,33 @@
 # Changelog
 
+## [v0.3.1](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1265) - 2020-06-15
+
+* BUGFIXES
+  * --ssh-key should be string not bool (#135) (#137)
+  * modules/git: fix dropped error (#127)
+  * Issues details: add missing newline (#126)
+
+## [v0.3.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1227) - 2020-04-22
+
+* FEATURES
+  * Add `tea pulls [checkout | clean]` commands (#93 #97 #107) (#105)
+  * Add `tea open` (#101)
+  * Add `tea issues [open|close]` commands (#99)
+* ENHANCEMENTS
+  * Ignore PRs for `tea issues` (#111)
+  * Add --state flag filter to issue & PR lists (#100)
+
+## [v0.2.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=538) - 2020-03-06
+* FEATURES
+  * Add `tea times` command (#54)
+* ENHANCEMENTS
+  * Upgrade urfave/cli to v2 version (#85)
+  * Add --remote flag to add/create subcommands (#77)
+* BUILD
+  * Upgrade gitea/go-sdk to 2020-01-03 (#81)
+  * Update stretchr/testify v1.3.0 -> v1.4.0 (#83)
+  * Improve makefile to enable goproxy when go get tools (#98)
+
 ## [v0.1.2](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=59) - 2019-11-15
 * BUILD
   * Fix typo in drone (#75)
