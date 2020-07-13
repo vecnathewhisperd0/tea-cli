@@ -273,47 +273,63 @@ var CmdPullsCreate = cli.Command{
 	Action:      runPullsCreate,
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:    "head",
-			Usage:   "pull-request head",
+			Name:  "head",
+			Usage: "Set head branch (default is current one)",
 		},
 		&cli.StringFlag{
 			Name:    "base",
 			Aliases: []string{"b"},
-			Usage:   "pull-request base",
+			Usage:   "Set base branch (default is default branch)",
 		},
 		&cli.StringFlag{
 			Name:    "title",
 			Aliases: []string{"t"},
-			Usage:   "pull-request title",
+			Usage:   "Set title of pull (default is head branch name)",
 		},
 		&cli.StringFlag{
 			Name:    "description",
 			Aliases: []string{"d"},
-			Usage:   "pull-request description",
+			Usage:   "Set body of new pull",
 		},
 	}, AllDefaultFlags...),
 }
 
 func runPullsCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, ownerArg, repoArg := initCommand()
+	client := login.Client()
 
-	/*
-	   Head      string   `json:"head" binding:"Required"`
-	   Base      string   `json:"base" binding:"Required"`
-	   Title     string   `json:"title" binding:"Required"`
-	   Body      string   `json:"body"`
-	   Assignee  string   `json:"assignee"`
-	   Assignees []string `json:"assignees"`
-	   Milestone int64    `json:"milestone"`
-	   Labels    []int64  `json:"labels"`
-	   // swagger:strfmt date-time
-	   Deadline *time.Time `json:"due_date"`
-	*/
+	repo, err := login.Client().GetRepo(ownerArg, repoArg)
 
-	pr, err := login.Client().CreatePullRequest(owner, repo, gitea.CreatePullRequestOption{
-		Head:  ctx.String("head"),
-		Base:  ctx.String("base"),
-		Title: ctx.String("title"),
+	// open local git repo
+	localRepo, err := local_git.RepoForWorkdir()
+	if err != nil {
+		return nil
+	}
+
+	base := ctx.String("base")
+	// default is default branch
+	if len(base) == 0 {
+		base = repo.DefaultBranch
+	}
+
+	head := ctx.String("head")
+	// default is current one
+	if len(head) == 0 {
+		head = localRepo.TeaGetCurrentBranchName()
+	}
+
+	title := ctx.String("title")
+	// default is head branch name
+	if len(title) == 0 {
+		title = strings.Replace(head, "-", " ", -1)
+		title = strings.Replace(title, "_", " ", -1)
+		title = strings.Title(strings.ToLower(title))
+	}
+
+	pr, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
+		Head:  head,
+		Base:  base,
+		Title: title,
 		Body:  ctx.String("body"),
 	})
 
@@ -321,7 +337,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n\n%s", pr.Index,
+	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", pr.Index,
 		pr.Title,
 		pr.Poster.UserName,
 		pr.Created.Format("2006-01-02 15:04:05"),
