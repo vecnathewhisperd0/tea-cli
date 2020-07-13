@@ -274,7 +274,6 @@ var CmdPullsCreate = cli.Command{
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:    "head",
-			Aliases: []string{"h"},
 			Usage:   "pull-request head",
 		},
 		&cli.StringFlag{
