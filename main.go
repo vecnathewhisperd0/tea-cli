@@ -38,7 +38,6 @@ func main() {
 		&cmd.CmdLogout,
 		&cmd.CmdIssues,
 		&cmd.CmdPulls,
-		&cmd.CmdPullRequest,
 		&cmd.CmdReleases,
 		&cmd.CmdRepos,
 		&cmd.CmdLabels,

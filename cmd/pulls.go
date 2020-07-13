@@ -35,6 +35,7 @@ var CmdPulls = cli.Command{
 	Subcommands: []*cli.Command{
 		&CmdPullsCheckout,
 		&CmdPullsClean,
+		&CmdPullsCreate,
 	},
 }
 
@@ -262,6 +263,72 @@ call me again with the --ignore-sha flag`, pr.Head.Ref)
 		return err
 	}
 	return r.TeaDeleteBranch(branch, pr.Head.Ref, auth)
+}
+
+// CmdPullsCreate creates a pull request
+var CmdPullsCreate = cli.Command{
+	Name:        "create",
+	Usage:       "Create a pull-request",
+	Description: "Create a pull-request",
+	Action:      runPullsCreate,
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:    "head",
+			Aliases: []string{"h"},
+			Usage:   "pull-request head",
+		},
+		&cli.StringFlag{
+			Name:    "base",
+			Aliases: []string{"b"},
+			Usage:   "pull-request base",
+		},
+		&cli.StringFlag{
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "pull-request title",
+		},
+		&cli.StringFlag{
+			Name:    "description",
+			Aliases: []string{"d"},
+			Usage:   "pull-request description",
+		},
+	}, AllDefaultFlags...),
+}
+
+func runPullsCreate(ctx *cli.Context) error {
+	login, owner, repo := initCommand()
+
+	/*
+	   Head      string   `json:"head" binding:"Required"`
+	   Base      string   `json:"base" binding:"Required"`
+	   Title     string   `json:"title" binding:"Required"`
+	   Body      string   `json:"body"`
+	   Assignee  string   `json:"assignee"`
+	   Assignees []string `json:"assignees"`
+	   Milestone int64    `json:"milestone"`
+	   Labels    []int64  `json:"labels"`
+	   // swagger:strfmt date-time
+	   Deadline *time.Time `json:"due_date"`
+	*/
+
+	pr, err := login.Client().CreatePullRequest(owner, repo, gitea.CreatePullRequestOption{
+		Head:  ctx.String("head"),
+		Base:  ctx.String("base"),
+		Title: ctx.String("title"),
+		Body:  ctx.String("body"),
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("#%d %s\n%s created %s\n\n%s", pr.Index,
+		pr.Title,
+		pr.Poster.UserName,
+		pr.Created.Format("2006-01-02 15:04:05"),
+		pr.Body,
+	)
+	return nil
 }
 
 func argToIndex(arg string) (int64, error) {
