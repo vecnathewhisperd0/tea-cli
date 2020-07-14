@@ -330,7 +330,11 @@ func runPullsCreate(ctx *cli.Context) error {
 	title := ctx.String("title")
 	// default is head branch name
 	if len(title) == 0 {
-		title = strings.Replace(head, "-", " ", -1)
+		title = head
+		if strings.Contains(title, ":") {
+			title = strings.SplitN(title, ":", 2)[1]
+		}
+		title = strings.Replace(title, "-", " ", -1)
 		title = strings.Replace(title, "_", " ", -1)
 		title = strings.Title(strings.ToLower(title))
 	}
@@ -340,7 +344,6 @@ func runPullsCreate(ctx *cli.Context) error {
 		return nil
 	}
 
-	fmt.Printf("Head: %s, Base: %s, Title: %s", head, base, title)
 	pr, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
 		Head:  head,
 		Base:  base,
@@ -352,12 +355,14 @@ func runPullsCreate(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", pr.Index,
+	fmt.Printf("#%d %s\n%s created %s\n", pr.Index,
 		pr.Title,
 		pr.Poster.UserName,
 		pr.Created.Format("2006-01-02 15:04:05"),
-		pr.Body,
 	)
+	if len(pr.Body) != 0 {
+		fmt.Printf("\n%s\n", pr.Body)
+	}
 	return nil
 }
 
