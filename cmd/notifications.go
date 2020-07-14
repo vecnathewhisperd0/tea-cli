@@ -25,11 +25,13 @@ var CmdNotifications = cli.Command{
 			Aliases: []string{"a"},
 			Usage:   "show all notifications of related gitea instance",
 		},
-		&cli.StringFlag{
+		/* // not supported jet
+		&cli.BoolFlag{
 			Name:    "read",
 			Aliases: []string{"rd"},
 			Usage:   "show read notifications instead unread",
 		},
+		*/
 		&cli.IntFlag{
 			Name:    "page",
 			Aliases: []string{"p"},
