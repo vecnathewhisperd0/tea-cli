@@ -348,7 +348,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		Head:  head,
 		Base:  base,
 		Title: title,
-		Body:  ctx.String("body"),
+		Body:  ctx.String("description"),
 	})
 
 	if err != nil {
