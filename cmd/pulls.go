@@ -299,11 +299,14 @@ func runPullsCreate(ctx *cli.Context) error {
 	client := login.Client()
 
 	repo, err := login.Client().GetRepo(ownerArg, repoArg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// open local git repo
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
-		return nil
+		log.Fatal(err)
 	}
 
 	base := ctx.String("base")
@@ -315,8 +318,14 @@ func runPullsCreate(ctx *cli.Context) error {
 	head := ctx.String("head")
 	// default is current one
 	if len(head) == 0 {
-		head = localRepo.TeaGetCurrentBranchName()
+		head, err = localRepo.TeaGetCurrentBranchName()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
+	// push if possible
+	_ = localRepo.Push(&git.PushOptions{})
 
 	title := ctx.String("title")
 	// default is head branch name
@@ -325,7 +334,13 @@ func runPullsCreate(ctx *cli.Context) error {
 		title = strings.Replace(title, "_", " ", -1)
 		title = strings.Title(strings.ToLower(title))
 	}
+	// title is required
+	if len(title) == 0 {
+		fmt.Printf("Can't create a title has to be set")
+		return nil
+	}
 
+	fmt.Printf("Head: %s, Base: %s, Title: %s", head, base, title)
 	pr, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
 		Head:  head,
 		Base:  base,
