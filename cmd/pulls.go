@@ -324,9 +324,6 @@ func runPullsCreate(ctx *cli.Context) error {
 		}
 	}
 
-	// push if possible
-	_ = localRepo.Push(&git.PushOptions{})
-
 	title := ctx.String("title")
 	// default is head branch name
 	if len(title) == 0 {
@@ -342,6 +339,12 @@ func runPullsCreate(ctx *cli.Context) error {
 	if len(title) == 0 {
 		fmt.Printf("Can't create a title has to be set")
 		return nil
+	}
+
+	// push if possible
+	err = localRepo.Push(&git.PushOptions{})
+	if err != nil {
+		fmt.Printf("Error ocure on 'git push':\n%s\n", err.Error())
 	}
 
 	pr, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
