@@ -337,7 +337,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	}
 	// title is required
 	if len(title) == 0 {
-		fmt.Printf("Can't create a title has to be set")
+		fmt.Printf("Title is required")
 		return nil
 	}
 
