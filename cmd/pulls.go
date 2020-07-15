@@ -366,6 +366,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	if len(pr.Body) != 0 {
 		fmt.Printf("\n%s\n", pr.Body)
 	}
+	fmt.Println(pr.HTMLURL)
 	return nil
 }
 
