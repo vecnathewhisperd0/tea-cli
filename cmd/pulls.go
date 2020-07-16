@@ -344,7 +344,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	// push if possible
 	err = localRepo.Push(&git.PushOptions{})
 	if err != nil {
-		fmt.Printf("Error ocure on 'git push':\n%s\n", err.Error())
+		fmt.Printf("Error occurred during 'git push':\n%s\n", err.Error())
 	}
 
 	pr, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
