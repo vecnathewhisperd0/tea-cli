@@ -91,6 +91,13 @@ func initCommand() (*Login, string, string) {
 		log.Fatal(err.Error())
 	}
 
+	if loginValue != "" {
+		login = getLoginByName(loginValue)
+		if login == nil {
+			log.Fatal("Login name " + loginValue + " does not exist")
+		}
+	}
+
 	owner, repo := splitRepo(repoPath)
 	return login, owner, repo
 }
