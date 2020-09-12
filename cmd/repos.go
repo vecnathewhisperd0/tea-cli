@@ -25,11 +25,12 @@ var CmdRepos = cli.Command{
 	Action:      runRepos,
 	Subcommands: []*cli.Command{
 		&CmdReposList,
+		&CmdRepoCreate,
 	},
 	Flags: LoginOutputFlags,
 }
 
-// CmdReposList represents a sub command of issues to list issues
+// CmdReposList represents a sub command of repos to list them
 var CmdReposList = cli.Command{
 	Name:        "ls",
 	Usage:       "List available repositories",
@@ -52,6 +53,73 @@ var CmdReposList = cli.Command{
 			Aliases:  []string{"u"},
 			Required: false,
 			Usage:    "Filter by user",
+		},
+	}, LoginOutputFlags...),
+}
+
+// CmdRepoCreate represents a sub command of repos to create one
+var CmdRepoCreate = cli.Command{
+	Name:        "create",
+	Aliases:     []string{"c"},
+	Usage:       "Create a repository",
+	Description: "Create a repository",
+	Action:      runRepoCreate,
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Aliases:  []string{""},
+			Required: true,
+			Usage:    "name of new repo",
+		},
+		&cli.StringFlag{
+			Name:     "owner",
+			Aliases:  []string{"O"},
+			Required: false,
+			Usage:    "name of repo owner",
+		},
+		&cli.BoolFlag{
+			Name:     "private",
+			Required: false,
+			Value:    false,
+			Usage:    "make repo private",
+		},
+		&cli.StringFlag{
+			Name:     "description",
+			Aliases:  []string{"desc"},
+			Required: false,
+			Usage:    "add description to repo",
+		},
+		&cli.BoolFlag{
+			Name:     "init",
+			Required: false,
+			Value:    false,
+			Usage:    "initialize repo",
+		},
+		&cli.StringFlag{
+			Name:     "labels",
+			Required: false,
+			Usage:    "name of label set to add",
+		},
+		&cli.StringFlag{
+			Name:     "gitignores",
+			Aliases:  []string{"git"},
+			Required: false,
+			Usage:    "list of gitignore templates (need --init)",
+		},
+		&cli.StringFlag{
+			Name:     "license",
+			Required: false,
+			Usage:    "add license (need --init)",
+		},
+		&cli.StringFlag{
+			Name:     "readme",
+			Required: false,
+			Usage:    "use readme template (need --init)",
+		},
+		&cli.StringFlag{
+			Name:     "branch",
+			Required: false,
+			Usage:    "use custom default branch (need --init)",
 		},
 	}, LoginOutputFlags...),
 }
@@ -166,7 +234,7 @@ func getRepoByPath(c *gitea.Client, repoPath string) (*gitea.Repository, error) 
 	}
 }
 
-func runRepoDetail(ctx *cli.Context, path string) error {
+func runRepoDetail(_ *cli.Context, path string) error {
 	login := initCommandLoginOnly()
 	client := login.Client()
 	repo, err := getRepoByPath(client, path)
@@ -207,4 +275,33 @@ func runRepoDetail(ctx *cli.Context, path string) error {
 
 	fmt.Print(output)
 	return nil
+}
+
+func runRepoCreate(ctx *cli.Context) error {
+	login := initCommandLoginOnly()
+	client := login.Client()
+	var (
+		repo *gitea.Repository
+		err  error
+	)
+	opts := gitea.CreateRepoOption{
+		Name:          ctx.String("name"),
+		Description:   ctx.String("description"),
+		Private:       ctx.Bool("private"),
+		AutoInit:      ctx.Bool("init"),
+		IssueLabels:   ctx.String("labels"),
+		Gitignores:    ctx.String("gitignores"),
+		License:       ctx.String("license"),
+		Readme:        ctx.String("readme"),
+		DefaultBranch: ctx.String("branch"),
+	}
+	if len(ctx.String("owner")) != 0 {
+		repo, err = client.CreateOrgRepo(ctx.String("owner"), opts)
+	} else {
+		repo, err = client.CreateRepo(opts)
+	}
+	if err != nil {
+		return err
+	}
+	return runRepoDetail(ctx, repo.FullName)
 }
