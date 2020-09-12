@@ -5,19 +5,24 @@
 package cmd
 
 import (
+	"errors"
+	"fmt"
 	"log"
+	"strings"
+
+	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
-
 	"github.com/urfave/cli/v2"
 )
 
 // CmdRepos represents to login a gitea server.
 var CmdRepos = cli.Command{
 	Name:        "repos",
-	Usage:       "Operate with repositories",
+	Usage:       "show repositories details",
 	Description: `Operate with repositories`,
-	Action:      runReposList,
+	ArgsUsage:   "[<repo owner>/<repo name>]",
+	Action:      runRepos,
 	Subcommands: []*cli.Command{
 		&CmdReposList,
 	},
@@ -49,6 +54,13 @@ var CmdReposList = cli.Command{
 			Usage:    "Filter by user",
 		},
 	}, LoginOutputFlags...),
+}
+
+func runRepos(ctx *cli.Context) error {
+	if ctx.Args().Len() == 1 {
+		return runRepoDetail(ctx, ctx.Args().First())
+	}
+	return runReposList(ctx)
 }
 
 // runReposList list repositories
@@ -135,5 +147,64 @@ func runReposList(ctx *cli.Context) error {
 	}
 	Output(outputValue, headers, values)
 
+	return nil
+}
+
+func getRepoByPath(c *gitea.Client, repoPath string) (*gitea.Repository, error) {
+	path := strings.Split(strings.Trim(repoPath, "/"), "/")
+	switch len(path) {
+	case 1:
+		u, err := c.GetMyUserInfo()
+		if err != nil {
+			return nil, err
+		}
+		return c.GetRepo(u.UserName, path[0])
+	case 2:
+		return c.GetRepo(path[0], path[1])
+	default:
+		return nil, errors.New("repo path incorrect")
+	}
+}
+
+func runRepoDetail(ctx *cli.Context, path string) error {
+	login := initCommandLoginOnly()
+	client := login.Client()
+	repo, err := getRepoByPath(client, path)
+	if err != nil {
+		return err
+	}
+	topics, err := client.ListRepoTopics(repo.Owner.UserName, repo.Name, gitea.ListRepoTopicsOptions{})
+	if err != nil {
+		return err
+	}
+
+	output := repo.FullName
+	if repo.Mirror {
+		output += " (mirror)"
+	}
+	if repo.Fork {
+		output += " (fork)"
+	}
+	if repo.Archived {
+		output += " (archived)"
+	}
+	if repo.Empty {
+		output += " (empty)"
+	}
+	output += "\n"
+	if len(topics) != 0 {
+		output += "Topics: " + strings.Join(topics, ", ") + "\n"
+	}
+	output += "\n"
+	output += repo.Description + "\n\n"
+	output += fmt.Sprintf(
+		"Open Issues: %d, Stars: %d, Forks: %d, Size: %s\n\n",
+		repo.OpenIssues,
+		repo.Stars,
+		repo.Forks,
+		utils.FormatSize(int64(repo.Size)),
+	)
+
+	fmt.Print(output)
 	return nil
 }
