@@ -86,18 +86,19 @@ var cmdLoginAdd = cli.Command{
 }
 
 func runLoginAdd(ctx *cli.Context) error {
-	name := ctx.String("name")
-	token := ctx.String("token")
-	user := ctx.String("user")
-	passwd := ctx.String("password")
-	insecure := ctx.Bool("insecure")
-	sshKey := ctx.String("ssh-key")
-	giteaURL, err := url.Parse(ctx.String("url"))
-	if err != nil {
-		return err
-	}
+	return runLoginAddMain(
+		ctx.String("name"),
+		ctx.String("token"),
+		ctx.String("user"),
+		ctx.String("password"),
+		ctx.String("ssh-key"),
+		ctx.String("url"),
+		ctx.Bool("insecure"))
+}
 
-	if len(giteaURL.String()) == 0 {
+func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
+
+	if len(giteaURL) == 0 {
 		log.Fatal("You have to input Gitea server URL")
 	}
 	if len(token) == 0 && (len(user)+len(passwd)) == 0 {
@@ -108,12 +109,12 @@ func runLoginAdd(ctx *cli.Context) error {
 		log.Fatal("No user set")
 	}
 
-	err = loadConfig(yamlConfigPath)
+	err := loadConfig(yamlConfigPath)
 	if err != nil {
 		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
-	client := gitea.NewClient(giteaURL.String(), token)
+	client := gitea.NewClient(giteaURL, token)
 	if len(token) == 0 {
 		client.SetBasicAuth(user, passwd)
 	}
@@ -127,6 +128,7 @@ func runLoginAdd(ctx *cli.Context) error {
 			},
 		})
 	}
+
 	u, err := client.GetMyUserInfo()
 	if err != nil {
 		log.Fatal(err)
@@ -153,8 +155,14 @@ func runLoginAdd(ctx *cli.Context) error {
 		token = t.Token
 	}
 
+	fmt.Println("Login successful! Login name " + u.UserName)
+
 	if len(name) == 0 {
-		name = strings.ReplaceAll(strings.Title(giteaURL.Host), ".", "")
+		parsedURL, err := url.Parse(giteaURL)
+		if err != nil {
+			return err
+		}
+		name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
 		for _, l := range config.Logins {
 			if l.Name == name {
 				name += "_" + u.UserName
@@ -163,11 +171,9 @@ func runLoginAdd(ctx *cli.Context) error {
 		}
 	}
 
-	fmt.Println("Login successful! Login name " + u.UserName)
-
 	err = addLogin(Login{
 		Name:     name,
-		URL:      giteaURL.String(),
+		URL:      giteaURL,
 		Token:    token,
 		Insecure: insecure,
 		SSHKey:   sshKey,
