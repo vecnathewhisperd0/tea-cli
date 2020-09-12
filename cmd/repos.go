@@ -303,5 +303,9 @@ func runRepoCreate(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	return runRepoDetail(ctx, repo.FullName)
+	if err = runRepoDetail(ctx, repo.FullName); err != nil {
+		return err
+	}
+	fmt.Printf("%s\n", repo.HTMLURL)
+	return nil
 }
