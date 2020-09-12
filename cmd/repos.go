@@ -32,16 +32,21 @@ var CmdReposList = cli.Command{
 	Action:      runReposList,
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:  "mode",
-			Usage: "Filter listed repositories based on mode, optional - fork, mirror, source",
+			Name:     "mode",
+			Aliases:  []string{"m"},
+			Required: false,
+			Usage:    "Filter by mode: fork, mirror, source",
 		},
 		&cli.StringFlag{
-			Name:  "org",
-			Usage: "Filter listed repositories based on organization, optional",
+			Name:     "org",
+			Required: false,
+			Usage:    "Filter by organization",
 		},
 		&cli.StringFlag{
-			Name:  "user",
-			Usage: "Filter listed repositories absed on user, optional",
+			Name:     "user",
+			Aliases:  []string{"u"},
+			Required: false,
+			Usage:    "Filter by user",
 		},
 	}, LoginOutputFlags...),
 }
@@ -57,6 +62,8 @@ func runReposList(ctx *cli.Context) error {
 	var rps []*gitea.Repository
 	var err error
 
+	// ToDo: on sdk v0.13.0 release, switch to SearchRepos()
+	// Note: user filter can be used as org filter too
 	if org != "" {
 		rps, err = login.Client().ListOrgRepos(org, gitea.ListOrgReposOptions{})
 	} else if user != "" {
