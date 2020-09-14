@@ -142,7 +142,7 @@ func runReposList(ctx *cli.Context) error {
 	var rps []*gitea.Repository
 	var err error
 
-	// ToDo: on sdk v0.13.0 release, switch to SearchRepos()
+	// TODO: on sdk v0.13.0 release, switch to SearchRepos()
 	// Note: user filter can be used as org filter too
 	if org != "" {
 		rps, err = login.Client().ListOrgRepos(org, gitea.ListOrgReposOptions{})
