@@ -101,7 +101,7 @@ func initCommand() (*Login, string, string) {
 		log.Fatal(err.Error())
 	}
 
-	if exist {
+	if exist || len(repoValue) == 0 {
 		login, repoPath, err = curGitRepoPath(repoValue)
 		if err != nil {
 			log.Fatal(err.Error())
