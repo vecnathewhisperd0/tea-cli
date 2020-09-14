@@ -106,8 +106,6 @@ func initCommand() (*Login, string, string) {
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-	} else {
-		repoPath = repoValue
 	}
 
 	if loginValue != "" {
@@ -117,7 +115,7 @@ func initCommand() (*Login, string, string) {
 		}
 	}
 
-	owner, repo := splitRepo(repoPath)
+	owner, repo := getOwnerAndRepo(repoPath, login.User)
 	return login, owner, repo
 }
 
