@@ -59,7 +59,7 @@ func runMilestoneDetail(ctx *cli.Context, value string) error {
 	login, owner, repo := initCommand()
 	client := login.Client()
 
-	mileID, err := getMileIDbyNameOrID(client, owner, repo, value)
+	mileID, err := getMilestoneID(client, owner, repo, value)
 	if err != nil {
 		return err
 	}
@@ -215,7 +215,7 @@ func editMilestoneStatus(ctx *cli.Context, close bool) error {
 	login, owner, repo := initCommand()
 	client := login.Client()
 
-	mileID, err := getMileIDbyNameOrID(client, owner, repo, ctx.Args().First())
+	mileID, err := getMilestoneID(client, owner, repo, ctx.Args().First())
 	if err != nil {
 		return err
 	}
@@ -247,7 +247,7 @@ func deleteMilestone(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 	client := login.Client()
 
-	mileID, err := getMileIDbyNameOrID(client, owner, repo, ctx.Args().First())
+	mileID, err := getMilestoneID(client, owner, repo, ctx.Args().First())
 	if err != nil {
 		return err
 	}
@@ -268,13 +268,11 @@ var CmdMilestonesReopen = cli.Command{
 	Flags: AllDefaultFlags,
 }
 
-func getMileIDbyNameOrID(client *gitea.Client, owner, repo, nameOrID string) (int64, error) {
+// getMilestoneID TODO: delete it and use sdk feature when v0.13.0 is released
+func getMilestoneID(client *gitea.Client, owner, repo, nameOrID string) (int64, error) {
 	if match, err := regexp.MatchString("^\\d+$", nameOrID); err == nil && match {
 		return strconv.ParseInt(nameOrID, 10, 64)
 	}
-
-	// since there is no API to resolve it we have to iterate all milestones :/
-	// https://gitea.com/gitea/go-sdk/issues/383
 	i := 0
 	for {
 		i++
