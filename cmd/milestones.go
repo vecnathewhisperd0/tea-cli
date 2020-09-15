@@ -7,9 +7,6 @@ package cmd
 import (
 	"fmt"
 	"log"
-	"regexp"
-	"strconv"
-	"strings"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -55,15 +52,11 @@ func runMilestones(ctx *cli.Context) error {
 	return runMilestonesList(ctx)
 }
 
-func runMilestoneDetail(ctx *cli.Context, value string) error {
+func runMilestoneDetail(ctx *cli.Context, name string) error {
 	login, owner, repo := initCommand()
 	client := login.Client()
 
-	mileID, err := getMilestoneID(client, owner, repo, value)
-	if err != nil {
-		return err
-	}
-	milestone, err := client.GetMilestone(owner, repo, mileID)
+	milestone, _, err := client.GetMilestoneByName(owner, repo, name)
 	if err != nil {
 		return err
 	}
@@ -91,7 +84,7 @@ func runMilestonesList(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	milestones, err := login.Client().ListRepoMilestones(owner, repo, gitea.ListMilestoneOption{
+	milestones, _, err := login.Client().ListRepoMilestones(owner, repo, gitea.ListMilestoneOption{
 		State: state,
 	})
 
@@ -178,7 +171,7 @@ func runMilestonesCreate(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	mile, err := login.Client().CreateMilestone(owner, repo, gitea.CreateMilestoneOption{
+	mile, _, err := login.Client().CreateMilestone(owner, repo, gitea.CreateMilestoneOption{
 		Title:       title,
 		Description: ctx.String("description"),
 		State:       state,
@@ -215,20 +208,15 @@ func editMilestoneStatus(ctx *cli.Context, close bool) error {
 	login, owner, repo := initCommand()
 	client := login.Client()
 
-	mileID, err := getMilestoneID(client, owner, repo, ctx.Args().First())
-	if err != nil {
-		return err
+	state := gitea.StateOpen
+	if close {
+		state = gitea.StateClosed
 	}
-	if mileID != 0 {
+	_, _, err := client.EditMilestoneByName(owner, repo, ctx.Args().First(), gitea.EditMilestoneOption{
+		State: &state,
+		Title: ctx.Args().First(),
+	})
 
-		state := string(gitea.StateOpen)
-		if close {
-			state = string(gitea.StateClosed)
-		}
-		_, err = client.EditMilestone(owner, repo, mileID, gitea.EditMilestoneOption{
-			State: &state,
-		})
-	}
 	return err
 }
 
@@ -247,12 +235,8 @@ func deleteMilestone(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 	client := login.Client()
 
-	mileID, err := getMilestoneID(client, owner, repo, ctx.Args().First())
-	if err != nil {
-		return err
-	}
-
-	return client.DeleteMilestone(owner, repo, mileID)
+	_, err := client.DeleteMilestoneByName(owner, repo, ctx.Args().First())
+	return err
 }
 
 // CmdMilestonesReopen represents a sub command of milestones to open an milestone
@@ -266,32 +250,4 @@ var CmdMilestonesReopen = cli.Command{
 		return editMilestoneStatus(ctx, false)
 	},
 	Flags: AllDefaultFlags,
-}
-
-// getMilestoneID TODO: delete it and use sdk feature when v0.13.0 is released
-func getMilestoneID(client *gitea.Client, owner, repo, nameOrID string) (int64, error) {
-	if match, err := regexp.MatchString("^\\d+$", nameOrID); err == nil && match {
-		return strconv.ParseInt(nameOrID, 10, 64)
-	}
-	i := 0
-	for {
-		i++
-		miles, err := client.ListRepoMilestones(owner, repo, gitea.ListMilestoneOption{
-			ListOptions: gitea.ListOptions{
-				Page: i,
-			},
-			State: "all",
-		})
-		if err != nil {
-			return 0, err
-		}
-		if len(miles) == 0 {
-			return 0, nil
-		}
-		for _, m := range miles {
-			if strings.ToLower(strings.TrimSpace(m.Title)) == strings.ToLower(strings.TrimSpace(nameOrID)) {
-				return m.ID, nil
-			}
-		}
-	}
 }
