@@ -106,10 +106,10 @@ func runMilestonesList(ctx *cli.Context) error {
 	if state == gitea.StateAll {
 		headers = append(headers, "State")
 	}
-	headers = append(headers, []string{
+	headers = append(headers,
 		"Open/Closed Issues",
 		"DueDate",
-	}...)
+	)
 
 	var values [][]string
 
@@ -127,10 +127,10 @@ func runMilestonesList(ctx *cli.Context) error {
 		if state == gitea.StateAll {
 			item = append(item, string(m.State))
 		}
-		item = append(item, []string{
+		item = append(item,
 			fmt.Sprintf("%d/%d", m.OpenIssues, m.ClosedIssues),
 			deadline,
-		}...)
+		)
 
 		values = append(values, item)
 	}
