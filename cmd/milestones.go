@@ -18,7 +18,7 @@ var CmdMilestones = cli.Command{
 	Aliases:     []string{"ms"},
 	Usage:       "List and create milestones",
 	Description: `List and create milestones`,
-	ArgsUsage:   "[<milestone name/id>]",
+	ArgsUsage:   "[<milestone name>]",
 	Action:      runMilestones,
 	Subcommands: []*cli.Command{
 		&CmdMilestonesList,
@@ -93,7 +93,6 @@ func runMilestonesList(ctx *cli.Context) error {
 	}
 
 	headers := []string{
-		"ID",
 		"Title",
 	}
 	if state == gitea.StateAll {
@@ -114,7 +113,6 @@ func runMilestonesList(ctx *cli.Context) error {
 		}
 
 		item := []string{
-			fmt.Sprintf("%d", m.ID),
 			m.Title,
 		}
 		if state == gitea.StateAll {
@@ -188,7 +186,7 @@ var CmdMilestonesClose = cli.Command{
 	Name:        "close",
 	Usage:       "Change state of an milestone to 'closed'",
 	Description: `Change state of an milestone to 'closed'`,
-	ArgsUsage:   "<milestone name/id>",
+	ArgsUsage:   "<milestone name>",
 	Action: func(ctx *cli.Context) error {
 		if ctx.Bool("force") {
 			return deleteMilestone(ctx)
@@ -226,7 +224,7 @@ var CmdMilestonesRemove = cli.Command{
 	Aliases:     []string{"rm"},
 	Usage:       "delete a milestone",
 	Description: "delete a milestone",
-	ArgsUsage:   "<milestone name/id>",
+	ArgsUsage:   "<milestone name>",
 	Action:      deleteMilestone,
 	Flags:       AllDefaultFlags,
 }
