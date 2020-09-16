@@ -222,13 +222,15 @@ func getRepoByPath(c *gitea.Client, repoPath string) (*gitea.Repository, error) 
 	path := strings.Split(strings.Trim(repoPath, "/"), "/")
 	switch len(path) {
 	case 1:
-		u, err := c.GetMyUserInfo()
+		u, _, err := c.GetMyUserInfo()
 		if err != nil {
 			return nil, err
 		}
-		return c.GetRepo(u.UserName, path[0])
+		repo, _, err := c.GetRepo(u.UserName, path[0])
+		return repo, err
 	case 2:
-		return c.GetRepo(path[0], path[1])
+		repo, _, err := c.GetRepo(path[0], path[1])
+		return repo, err
 	default:
 		return nil, errors.New("repo path incorrect")
 	}
@@ -241,7 +243,7 @@ func runRepoDetail(_ *cli.Context, path string) error {
 	if err != nil {
 		return err
 	}
-	topics, err := client.ListRepoTopics(repo.Owner.UserName, repo.Name, gitea.ListRepoTopicsOptions{})
+	topics, _, err := client.ListRepoTopics(repo.Owner.UserName, repo.Name, gitea.ListRepoTopicsOptions{})
 	if err != nil {
 		return err
 	}
@@ -296,9 +298,9 @@ func runRepoCreate(ctx *cli.Context) error {
 		DefaultBranch: ctx.String("branch"),
 	}
 	if len(ctx.String("owner")) != 0 {
-		repo, err = client.CreateOrgRepo(ctx.String("owner"), opts)
+		repo, _, err = client.CreateOrgRepo(ctx.String("owner"), opts)
 	} else {
-		repo, err = client.CreateRepo(opts)
+		repo, _, err = client.CreateRepo(opts)
 	}
 	if err != nil {
 		return err
