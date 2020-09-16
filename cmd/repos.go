@@ -44,15 +44,10 @@ var CmdReposList = cli.Command{
 			Usage:    "Filter by mode: fork, mirror, source",
 		},
 		&cli.StringFlag{
-			Name:     "org",
+			Name:     "owner",
+			Aliases:  []string{"u", "user", "org"},
 			Required: false,
-			Usage:    "Filter by organization",
-		},
-		&cli.StringFlag{
-			Name:     "user",
-			Aliases:  []string{"u"},
-			Required: false,
-			Usage:    "Filter by user",
+			Usage:    "Filter by owner",
 		},
 	}, LoginOutputFlags...),
 }
@@ -134,51 +129,52 @@ func runRepos(ctx *cli.Context) error {
 // runReposList list repositories
 func runReposList(ctx *cli.Context) error {
 	login := initCommandLoginOnly()
+	client := login.Client()
 
-	mode := ctx.String("mode")
-	org := ctx.String("org")
-	user := ctx.String("user")
-
-	var rps []*gitea.Repository
-	var err error
-
-	// TODO: on sdk v0.13.0 release, switch to SearchRepos()
-	// Note: user filter can be used as org filter too
-	if org != "" {
-		rps, _, err = login.Client().ListOrgRepos(org, gitea.ListOrgReposOptions{})
-	} else if user != "" {
-		rps, _, err = login.Client().ListUserRepos(user, gitea.ListReposOptions{})
+	var ownerID int64
+	if ctx.IsSet("owner") {
+		owner, _, err := client.GetUserInfo(ctx.String("owner"))
+		if err != nil {
+			return err
+		}
+		ownerID = owner.ID
 	} else {
-		rps, _, err = login.Client().ListMyRepos(gitea.ListReposOptions{})
+		me, _, err := client.GetMyUserInfo()
+		if err != nil {
+			return err
+		}
+		ownerID = me.ID
 	}
+
+	mode := gitea.RepoTypeNone
+	switch ctx.String("mode") {
+	case "fork":
+		mode = gitea.RepoTypeFork
+	case "mirror":
+		mode = gitea.RepoTypeMirror
+	case "source":
+		mode = gitea.RepoTypeSource
+	}
+
+	rps, _, err := client.SearchRepos(gitea.SearchRepoOptions{
+		OwnerID:    ownerID,
+		IsPrivate:  nil,
+		IsArchived: nil,
+		Type:       mode,
+	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	var repos []*gitea.Repository
-	if mode == "" {
-		repos = rps
-	} else if mode == "fork" {
-		for _, rp := range rps {
-			if rp.Fork == true {
-				repos = append(repos, rp)
+	// https://github.com/go-gitea/gitea/issues/12846
+	if ownerID == 0 {
+		var repos []*gitea.Repository
+		for i := range rps {
+			if rps[i].Owner.UserName == ctx.String("owner") {
+				repos = append(repos, rps[i])
 			}
 		}
-	} else if mode == "mirror" {
-		for _, rp := range rps {
-			if rp.Mirror == true {
-				repos = append(repos, rp)
-			}
-		}
-	} else if mode == "source" {
-		for _, rp := range rps {
-			if rp.Mirror != true && rp.Fork != true {
-				repos = append(repos, rp)
-			}
-		}
-	} else {
-		log.Fatal("Unknown mode: ", mode, "\nUse one of the following:\n- fork\n- mirror\n- source\n")
-		return nil
+		rps = repos
 	}
 
 	if len(rps) == 0 {
@@ -194,7 +190,7 @@ func runReposList(ctx *cli.Context) error {
 	}
 	var values [][]string
 
-	for _, rp := range repos {
+	for _, rp := range rps {
 		var mode = "source"
 		if rp.Fork {
 			mode = "fork"
