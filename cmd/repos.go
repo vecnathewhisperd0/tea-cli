@@ -49,6 +49,16 @@ var CmdReposList = cli.Command{
 			Required: false,
 			Usage:    "Filter by owner",
 		},
+		&cli.StringFlag{
+			Name:     "private",
+			Required: false,
+			Usage:    "Filter private repos (true|false)",
+		},
+		&cli.StringFlag{
+			Name:     "archived",
+			Required: false,
+			Usage:    "Filter archived repos (true|false)",
+		},
 	}, LoginOutputFlags...),
 }
 
@@ -146,6 +156,18 @@ func runReposList(ctx *cli.Context) error {
 		ownerID = me.ID
 	}
 
+	var isArchived *bool
+	if ctx.IsSet("archived") {
+		archived := strings.ToLower(ctx.String("archived"))[:1] == "t"
+		isArchived = &archived
+	}
+
+	var isPrivate *bool
+	if ctx.IsSet("private") {
+		private := strings.ToLower(ctx.String("private"))[:1] == "t"
+		isArchived = &private
+	}
+
 	mode := gitea.RepoTypeNone
 	switch ctx.String("mode") {
 	case "fork":
@@ -158,8 +180,8 @@ func runReposList(ctx *cli.Context) error {
 
 	rps, _, err := client.SearchRepos(gitea.SearchRepoOptions{
 		OwnerID:    ownerID,
-		IsPrivate:  nil,
-		IsArchived: nil,
+		IsPrivate:  isPrivate,
+		IsArchived: isArchived,
 		Type:       mode,
 	})
 	if err != nil {
