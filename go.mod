@@ -10,6 +10,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/go-git/go-git/v5 v5.1.0
 	github.com/hashicorp/go-version v1.2.1 // indirect
+	github.com/muesli/termenv v0.6.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/stretchr/testify v1.5.1
