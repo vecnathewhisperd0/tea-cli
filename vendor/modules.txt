@@ -112,8 +112,6 @@ github.com/go-git/go-git/v5/utils/merkletrie/filesystem
 github.com/go-git/go-git/v5/utils/merkletrie/index
 github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
 github.com/go-git/go-git/v5/utils/merkletrie/noder
-# github.com/google/goterm v0.0.0-20190703233501-fc88cf888a3f
-github.com/google/goterm/term
 # github.com/hashicorp/go-version v1.2.1
 github.com/hashicorp/go-version
 # github.com/imdario/mergo v0.3.9
@@ -137,7 +135,7 @@ github.com/muesli/reflow/ansi
 github.com/muesli/reflow/indent
 github.com/muesli/reflow/padding
 github.com/muesli/reflow/wordwrap
-# github.com/muesli/termenv v0.6.0
+# github.com/muesli/termenv v0.7.2
 github.com/muesli/termenv
 # github.com/olekukonko/tablewriter v0.0.4
 github.com/olekukonko/tablewriter
