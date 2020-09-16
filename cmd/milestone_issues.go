@@ -5,10 +5,11 @@
 package cmd
 
 import (
-	"code.gitea.io/sdk/gitea"
 	"fmt"
-	"github.com/urfave/cli/v2"
 	"strconv"
+
+	"code.gitea.io/sdk/gitea"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdMilestonesIssues represents a sub command of milestones to manage issue/pull of an milestone
