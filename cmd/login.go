@@ -31,6 +31,7 @@ var CmdLogin = cli.Command{
 		&cmdLoginList,
 		&cmdLoginAdd,
 		&cmdLoginEdit,
+		&cmdLoginSetActive,
 	},
 }
 
@@ -46,6 +47,44 @@ var cmdLoginEdit = cli.Command{
 func runLoginEdit(ctx *cli.Context) error {
 	open.Run(yamlConfigPath)
 	return nil
+}
+
+// cmdLoginSetActive represents to login a gitea server.
+var cmdLoginSetActive = cli.Command{
+	Name:        "default",
+	Usage:       "Set Active Login",
+	Description: `Set Active Login`,
+	ArgsUsage:   "<Login>",
+	Action:      runLoginSetActive,
+	Flags:       []cli.Flag{&OutputFlag},
+}
+
+func runLoginSetActive(ctx *cli.Context) error {
+	if err := loadConfig(yamlConfigPath); err != nil {
+		return err
+	}
+	if ctx.Args().Len() == 0 {
+		l, err := getActiveLogin()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Activ Login: %s\n", l.Name)
+		return nil
+	}
+	loginExist := false
+	for i := range config.Logins {
+		config.Logins[i].Active = false
+		if config.Logins[i].Name == ctx.Args().First() {
+			config.Logins[i].Active = true
+			loginExist = true
+		}
+	}
+
+	if !loginExist {
+		return fmt.Errorf("login '%s' not found", ctx.Args().First())
+	}
+
+	return saveConfig(yamlConfigPath)
 }
 
 // CmdLogin represents to login a gitea server.
@@ -303,6 +342,7 @@ func runLoginList(ctx *cli.Context) error {
 		"URL",
 		"SSHHost",
 		"User",
+		"Active",
 	}
 
 	var values [][]string
@@ -313,6 +353,7 @@ func runLoginList(ctx *cli.Context) error {
 			l.URL,
 			l.GetSSHHost(),
 			l.User,
+			fmt.Sprint(l.Active),
 		})
 	}
 
