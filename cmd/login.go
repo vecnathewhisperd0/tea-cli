@@ -17,6 +17,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
+	"github.com/skratchdot/open-golang/open"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,7 +30,22 @@ var CmdLogin = cli.Command{
 	Subcommands: []*cli.Command{
 		&cmdLoginList,
 		&cmdLoginAdd,
+		&cmdLoginEdit,
 	},
+}
+
+// cmdLoginEdit represents to login a gitea server.
+var cmdLoginEdit = cli.Command{
+	Name:        "edit",
+	Usage:       "Edit Gitea logins",
+	Description: `Edit Gitea logins`,
+	Action:      runLoginEdit,
+	Flags:       []cli.Flag{&OutputFlag},
+}
+
+func runLoginEdit(ctx *cli.Context) error {
+	open.Run(yamlConfigPath)
+	return nil
 }
 
 // CmdLogin represents to login a gitea server.
