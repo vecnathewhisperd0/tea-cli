@@ -26,6 +26,7 @@ var CmdMilestones = cli.Command{
 		&CmdMilestonesClose,
 		&CmdMilestonesDelete,
 		&CmdMilestonesReopen,
+		&CmdMilestonesIssues,
 	},
 	Flags: AllDefaultFlags,
 }
