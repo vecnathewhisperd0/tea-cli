@@ -44,8 +44,13 @@ var CmdReposList = cli.Command{
 			Usage:    "Filter by mode: fork, mirror, source",
 		},
 		&cli.StringFlag{
-			Name:     "owner",
-			Aliases:  []string{"u", "user", "org"},
+			Name:     "user",
+			Aliases:  []string{"u"},
+			Required: false,
+			Usage:    "Filter by owner",
+		},
+		&cli.StringFlag{
+			Name:     "org",
 			Required: false,
 			Usage:    "Filter by owner",
 		},
@@ -142,12 +147,18 @@ func runReposList(ctx *cli.Context) error {
 	client := login.Client()
 
 	var ownerID int64
-	if ctx.IsSet("owner") {
-		owner, _, err := client.GetUserInfo(ctx.String("owner"))
+	if ctx.IsSet("user") {
+		owner, _, err := client.GetUserInfo(ctx.String("user"))
 		if err != nil {
 			return err
 		}
 		ownerID = owner.ID
+	} else if ctx.IsSet("org") {
+		org, _, err := client.GetOrg(ctx.String("org"))
+		if err != nil {
+			return err
+		}
+		ownerID = org.ID
 	} else {
 		me, _, err := client.GetMyUserInfo()
 		if err != nil {
