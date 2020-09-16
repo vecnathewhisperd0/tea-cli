@@ -24,7 +24,7 @@ var CmdMilestones = cli.Command{
 		&CmdMilestonesList,
 		&CmdMilestonesCreate,
 		&CmdMilestonesClose,
-		&CmdMilestonesRemove,
+		&CmdMilestonesDelete,
 		&CmdMilestonesReopen,
 	},
 	Flags: AllDefaultFlags,
@@ -218,9 +218,9 @@ func editMilestoneStatus(ctx *cli.Context, close bool) error {
 	return err
 }
 
-// CmdMilestonesRemove represents a sub command of milestones to delete an milestone
-var CmdMilestonesRemove = cli.Command{
-	Name:        "remove",
+// CmdMilestonesDelete represents a sub command of milestones to delete an milestone
+var CmdMilestonesDelete = cli.Command{
+	Name:        "delete",
 	Aliases:     []string{"rm"},
 	Usage:       "delete a milestone",
 	Description: "delete a milestone",
