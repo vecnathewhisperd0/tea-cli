@@ -15,7 +15,7 @@ import (
 // CmdMilestones represents to operate repositories milestones.
 var CmdMilestones = cli.Command{
 	Name:        "milestones",
-	Aliases:     []string{"ms"},
+	Aliases:     []string{"ms", "mile"},
 	Usage:       "List and create milestones",
 	Description: `List and create milestones`,
 	ArgsUsage:   "[<milestone name>]",
@@ -178,7 +178,7 @@ func runMilestonesCreate(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	return runMilestoneDetail(ctx, fmt.Sprintf("%d", mile.ID))
+	return runMilestoneDetail(ctx, mile.Title)
 }
 
 // CmdMilestonesClose represents a sub command of milestones to close an milestone
@@ -243,7 +243,7 @@ var CmdMilestonesReopen = cli.Command{
 	Aliases:     []string{"open"},
 	Usage:       "Change state of an milestone to 'open'",
 	Description: `Change state of an milestone to 'open'`,
-	ArgsUsage:   "<milestone name/id>",
+	ArgsUsage:   "<milestone name>",
 	Action: func(ctx *cli.Context) error {
 		return editMilestoneStatus(ctx, false)
 	},
