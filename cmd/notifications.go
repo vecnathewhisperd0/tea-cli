@@ -29,6 +29,11 @@ var CmdNotifications = cli.Command{
 			Aliases: []string{"rd"},
 			Usage:   "show read notifications instead unread",
 		},
+		&cli.BoolFlag{
+			Name:    "pinned",
+			Aliases: []string{"pd"},
+			Usage:   "show pinned notifications instead unread",
+		},
 		&cli.IntFlag{
 			Name:    "page",
 			Aliases: []string{"p"},
@@ -55,6 +60,9 @@ func runNotifications(ctx *cli.Context) error {
 	var status []gitea.NotifyStatus
 	if ctx.Bool("read") {
 		status = []gitea.NotifyStatus{gitea.NotifyStatusRead}
+	}
+	if ctx.Bool("pinned") {
+		status = append(status, gitea.NotifyStatusPinned)
 	}
 
 	if ctx.Bool("all") {

@@ -196,11 +196,14 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			}}
 	}
-	client, _ := gitea.NewClient(giteaURL,
+	client, err := gitea.NewClient(giteaURL,
 		gitea.SetToken(token),
 		gitea.SetBasicAuth(user, passwd),
 		gitea.SetHTTPClient(httpClient),
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	u, _, err := client.GetMyUserInfo()
 	if err != nil {
