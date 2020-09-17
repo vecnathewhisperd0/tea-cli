@@ -199,17 +199,6 @@ func runReposList(ctx *cli.Context) error {
 		return err
 	}
 
-	// https://github.com/go-gitea/gitea/issues/12846
-	if ownerID == 0 {
-		var repos []*gitea.Repository
-		for i := range rps {
-			if rps[i].Owner.UserName == ctx.String("owner") {
-				repos = append(repos, rps[i])
-			}
-		}
-		rps = repos
-	}
-
 	if len(rps) == 0 {
 		log.Fatal("No repositories found", rps)
 		return nil
