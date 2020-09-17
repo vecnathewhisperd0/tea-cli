@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -236,28 +235,11 @@ func runReposList(ctx *cli.Context) error {
 	return nil
 }
 
-func getRepoByPath(c *gitea.Client, repoPath string) (*gitea.Repository, error) {
-	path := strings.Split(strings.Trim(repoPath, "/"), "/")
-	switch len(path) {
-	case 1:
-		u, _, err := c.GetMyUserInfo()
-		if err != nil {
-			return nil, err
-		}
-		repo, _, err := c.GetRepo(u.UserName, path[0])
-		return repo, err
-	case 2:
-		repo, _, err := c.GetRepo(path[0], path[1])
-		return repo, err
-	default:
-		return nil, errors.New("repo path incorrect")
-	}
-}
-
 func runRepoDetail(_ *cli.Context, path string) error {
 	login := initCommandLoginOnly()
 	client := login.Client()
-	repo, err := getRepoByPath(client, path)
+	repoOwner, repoName := getOwnerAndRepo(path, login.User)
+	repo, _, err := client.GetRepo(repoOwner, repoName)
 	if err != nil {
 		return err
 	}
