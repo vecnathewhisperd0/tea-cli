@@ -72,7 +72,7 @@ func runOpen(ctx *cli.Context) error {
 	}
 
 	u := path.Join(login.URL, owner, repo, suffix)
-	err := open.Run(u)
+	err := open.Start(u)
 	if err != nil {
 		log.Fatal(err)
 	}
