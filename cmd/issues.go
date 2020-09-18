@@ -71,7 +71,7 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 		issue.Created.Format("2006-01-02 15:04:05"),
 		issue.Body,
 	)
-	out, err := glamour.Render(in, "dark")
+	out, err := glamour.Render(in, getGlamourTheme())
 	fmt.Print(out)
 	return nil
 }
