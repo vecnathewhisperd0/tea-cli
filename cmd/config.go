@@ -199,6 +199,7 @@ func saveConfig(ymlPath string) error {
 	return ioutil.WriteFile(ymlPath, bs, 0660)
 }
 
+// extracts a matching login and repo slug for a given local path or PWD
 func curGitRepoPath(path string) (*Login, string, error) {
 	var err error
 	var repo *git.TeaRepo
