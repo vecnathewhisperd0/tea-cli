@@ -16,7 +16,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Version holds the current tea version
+// Version holds the current tea version, injected by make via ldflags
 var Version = "development"
 
 // Tags holds the build tags used
@@ -32,7 +32,7 @@ func main() {
 	app.Name = "tea"
 	app.Usage = "Command line tool to interact with Gitea"
 	app.Description = ``
-	app.Version = Version + formatBuiltWith(Tags)
+	app.Version = setting.AppVer + setting.AppBuiltWith
 	app.Commands = []*cli.Command{
 		&cmd.CmdLogin,
 		&cmd.CmdLogout,
@@ -58,5 +58,5 @@ func formatBuiltWith(Tags string) string {
 		return ""
 	}
 
-	return " built with: " + strings.Replace(Tags, " ", ", ", -1)
+	return " built with " + strings.Replace(Tags, " ", ", ", -1)
 }

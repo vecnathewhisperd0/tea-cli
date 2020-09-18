@@ -21,9 +21,6 @@ endif
 GOFILES := $(shell find . -name "*.go" -type f ! -path "./vendor/*" ! -path "*/bindata.go")
 GOFMT ?= gofmt -s
 
-GOFLAGS := -i -v
-EXTRA_GOFLAGS ?=
-
 MAKE_VERSION := $(shell make -v | head -n 1)
 
 ifneq ($(DRONE_TAG),)
@@ -38,12 +35,19 @@ else
 	TEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 endif
 
+TAGS ?=
+TAGS_STATIC := osusergo,netgo,static_build,$(TAGS)
+
 LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)"
+LDFLAGS_STATIC := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS_STATIC)" -linkmode external -extldflags "-fno-PIC -static"
+
+GOFLAGS := -mod=vendor -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' # includes flags for native builds not needed / supported by xgo
+XGOFLAGS := -tags '$(TAGS)' -ldflags '$(LDFLAGS) -s -w'         # smaller non-debug binaries
+XGOFLAGS_STATIC := -tags '$(TAGS_STATIC)' -ldflags '$(LDFLAGS_STATIC) -s -w' -buildmode=pie
+GOFLAGS_STATIC := $(GOFLAGS) $(XGOFLAGS_STATIC)
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
 SOURCES ?= $(shell find . -name "*.go" -type f)
-
-TAGS ?=
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := tea.exe
@@ -129,15 +133,17 @@ test-vendor: vendor
 .PHONY: check
 check: test
 
-.PHONY: install
-install: $(wildcard *.go)
-	$(GO) install -v -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)'
-
 .PHONY: build
 build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES)
-	$(GO) build -mod=vendor $(GOFLAGS) $(EXTRA_GOFLAGS) -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -o $@
+	@echo "building development executable '$@'"
+	$(GO) build $(GOFLAGS) -o $@
+
+.PHONY: install
+install: $(SOURCES)
+	@echo "installing static executable to $(GOPATH)/bin/$(EXECUTABLE)"
+	$(GO) install $(GOFLAGS_STATIC)
 
 .PHONY: release
 release: release-dirs release-windows release-linux release-darwin release-copy release-compress release-check
@@ -151,7 +157,9 @@ release-windows:
 	@hash xgo > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u src.techknowlogick.com/xgo; \
 	fi
-	GO111MODULE=off xgo -dest $(DIST)/binaries -tags 'netgo $(TAGS)' -ldflags '-linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'windows/*' -out tea-$(VERSION) .
+	# go modules are turned off due to https://github.com/techknowlogick/xgo/issues/16
+	# xgo autodetects --mod=vendor, so no need to set it here.
+	GO111MODULE=off xgo -dest $(DIST)/binaries $(XGOFLAGS_STATIC) -targets 'windows/*' -out tea-$(VERSION) .
 ifeq ($(CI),drone)
 	cp /build/* $(DIST)/binaries
 endif
@@ -161,7 +169,9 @@ release-linux:
 	@hash xgo > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u src.techknowlogick.com/xgo; \
 	fi
-	GO111MODULE=off xgo -dest $(DIST)/binaries -tags 'netgo $(TAGS)' -ldflags '-linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'linux/amd64,linux/386,linux/arm-5,linux/arm-6,linux/arm64,linux/mips64le,linux/mips,linux/mipsle' -out tea-$(VERSION) .
+	# go modules are turned off due to https://github.com/techknowlogick/xgo/issues/16
+	# xgo autodetects --mod=vendor, so no need to set it here.
+	GO111MODULE=off xgo -dest $(DIST)/binaries $(XGOFLAGS_STATIC) -targets 'linux/amd64,linux/386,linux/arm-5,linux/arm-6,linux/arm64,linux/mips64le,linux/mips,linux/mipsle' -out tea-$(VERSION) .
 ifeq ($(CI),drone)
 	cp /build/* $(DIST)/binaries
 endif
@@ -171,7 +181,10 @@ release-darwin:
 	@hash xgo > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u src.techknowlogick.com/xgo; \
 	fi
-	GO111MODULE=off xgo -dest $(DIST)/binaries -tags 'netgo $(TAGS)' -ldflags '$(LDFLAGS)' -targets 'darwin/*' -out tea-$(VERSION) .
+	# go modules are turned off due to https://github.com/techknowlogick/xgo/issues/16
+	# xgo autodetects --mod=vendor, so no need to set it here.
+	# osx requires dynamic linking to system libraries, so don't build a static binary.
+	GO111MODULE=off xgo -dest $(DIST)/binaries $(XGOFLAGS) -targets 'darwin/*' -out tea-$(VERSION) .
 ifeq ($(CI),drone)
 	cp /build/* $(DIST)/binaries
 endif
@@ -182,6 +195,7 @@ release-copy:
 
 .PHONY: release-compress
 release-compress:
+	# go modules are turned off due to https://github.com/techknowlogick/xgo/issues/16
 	@hash gxz > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		GO111MODULE=off $(GO) get -u github.com/ulikunitz/xz/cmd/gxz; \
 	fi

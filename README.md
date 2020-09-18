@@ -13,22 +13,27 @@ It uses [code.gitea.io/sdk](https://code.gitea.io/sdk) and interacts with the Gi
 
 You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
-
-To install from source, go 1.12 or newer is required:
-```sh
-go get code.gitea.io/tea
-go install code.gitea.io/tea
-```
-
-
-If you have `brew` installed, you can install `tea` via:
-
-```sh
-brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
-brew install tea
-```
-
 Distribution packages exist for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** and **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
+
+To install from source, go 1.12 or newer is required.
+
+- Build static binary using git & make:
+	```
+	git clone https://gitea.com/gitea/tea
+	make install
+	```
+
+- If you have `brew` installed, you can install `tea` via:
+	```sh
+	brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
+	brew install tea
+	```
+
+- The quick & dirty way, (only go installation needed, no version injected, dynamically linked):
+	```sh
+	go get code.gitea.io/tea
+	go install code.gitea.io/tea
+	```
 
 ## Usage
 
