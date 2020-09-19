@@ -306,13 +306,22 @@ func runPullsCreate(ctx *cli.Context) error {
 
 	repo, _, err := login.Client().GetRepo(ownerArg, repoArg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("could not fetch repo meta: ", err)
 	}
 
 	// open local git repo
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("could not open local repo: ", err)
+	}
+
+	// push if possible
+	log.Println("git push")
+	err = localRepo.Push(&git.PushOptions{})
+	if err == git.NoErrAlreadyUpToDate {
+		log.Println(err.Error())
+	} else if err != nil {
+		log.Printf("Error occurred during 'git push':\n%s\n", err.Error())
 	}
 
 	base := ctx.String("base")
@@ -324,10 +333,35 @@ func runPullsCreate(ctx *cli.Context) error {
 	head := ctx.String("head")
 	// default is current one
 	if len(head) == 0 {
-		head, err = localRepo.TeaGetCurrentBranchName()
+		headBranch, err := localRepo.Head()
+		if err != nil {
+			return err
+		}
+		sha := headBranch.Hash().String()
+
+		remote, err := localRepo.TeaFindBranchRemote("", sha)
+		if err != nil {
+			return err
+		}
+
+		if remote == nil {
+			// if no remote branch is found for the local hash, we abort:
+			// user has probably not configured a remote for the local branch,
+			// or local branch does not represent remote state.
+			log.Fatal("no matching remote found for this branch. try git push -u <remote> <branch>")
+		}
+
+		branchName, err := localRepo.TeaGetCurrentBranchName()
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		url, err := local_git.ParseURL(remote.Config().URLs[0])
+		if err != nil {
+			return err
+		}
+		owner, _ := getOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
+		head = fmt.Sprintf("%s:%s", owner, branchName)
 	}
 
 	title := ctx.String("title")
@@ -347,12 +381,6 @@ func runPullsCreate(ctx *cli.Context) error {
 		return nil
 	}
 
-	// push if possible
-	err = localRepo.Push(&git.PushOptions{})
-	if err != nil {
-		fmt.Printf("Error occurred during 'git push':\n%s\n", err.Error())
-	}
-
 	pr, _, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
 		Head:  head,
 		Base:  base,
@@ -361,7 +389,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("could not create PR: ", err)
 	}
 
 	fmt.Printf("#%d %s\n%s created %s\n", pr.Index,
@@ -369,6 +397,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		pr.Poster.UserName,
 		pr.Created.Format("2006-01-02 15:04:05"),
 	)
+	// TODO: use glamour
 	if len(pr.Body) != 0 {
 		fmt.Printf("\n%s\n", pr.Body)
 	}
