@@ -42,7 +42,7 @@ func (r TeaRepo) GetRemote(remoteURL string) (*git.Remote, error) {
 // GetOrCreateRemote tries to match a Remote of the repo via the given URL.
 // If no match is found, a new Remote with `newRemoteName` is created.
 // Matching is based on the normalized URL, accepting different protocols.
-func (r TeaRepo) GetOrCreateRemote(remoteURL, newRemoteName string) (*git.Remote, error) {
+func (r TeaRepo) GetOrCreateRemote(remoteURL, remoteURLSSH, newRemoteName string) (*git.Remote, error) {
 	localRemote, err := r.GetRemote(remoteURL)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (r TeaRepo) GetOrCreateRemote(remoteURL, newRemoteName string) (*git.Remote
 	if localRemote == nil {
 		localRemote, err = r.CreateRemote(&git_config.RemoteConfig{
 			Name: newRemoteName,
-			URLs: []string{remoteURL},
+			URLs: []string{remoteURL, remoteURLSSH},
 		})
 		if err != nil {
 			return nil, err

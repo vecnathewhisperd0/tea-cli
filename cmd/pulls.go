@@ -131,6 +131,7 @@ func runPullsCheckout(ctx *cli.Context) error {
 		return err
 	}
 	remoteURL := pr.Head.Repository.CloneURL
+	remoteURLSSH := pr.Head.Repository.SSHURL
 	remoteBranchName := pr.Head.Ref
 
 	// open local git repo
@@ -141,7 +142,7 @@ func runPullsCheckout(ctx *cli.Context) error {
 
 	// verify related remote is in local repo, otherwise add it
 	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
-	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, newRemoteName)
+	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, remoteURLSSH, newRemoteName)
 	if err != nil {
 		return err
 	}
@@ -153,7 +154,16 @@ func runPullsCheckout(ctx *cli.Context) error {
 	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
 		idx, remoteURL, remoteBranchName, localRemoteName)
 
-	url, err := local_git.ParseURL(localRemote.Config().URLs[0])
+	fetchURL := remoteURL
+	keys, _, err := login.Client().ListMyPublicKeys(gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return err
+	}
+	if len(keys) != 0 {
+		fetchURL = remoteURLSSH
+	}
+
+	url, err := local_git.ParseURL(fetchURL)
 	if err != nil {
 		return err
 	}
@@ -162,6 +172,7 @@ func runPullsCheckout(ctx *cli.Context) error {
 		return err
 	}
 
+	// FIXME: we need to set fetchURL here, blocked by https://github.com/go-git/go-git/issues/173
 	err = localRemote.Fetch(&git.FetchOptions{Auth: auth})
 	if err == git.NoErrAlreadyUpToDate {
 		fmt.Println(err)
