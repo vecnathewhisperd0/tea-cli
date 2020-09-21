@@ -18,16 +18,27 @@ import (
 
 // CmdReleases represents to login a gitea server.
 var CmdReleases = cli.Command{
-	Name:        "releases",
-	Usage:       "Create releases",
-	Description: `Create releases`,
+	Name:        "release",
+	Aliases:     []string{"releases"},
+	Usage:       "Manage releases",
+	Description: "Manage releases",
 	Action:      runReleases,
 	Subcommands: []*cli.Command{
+		&CmdReleaseList,
 		&CmdReleaseCreate,
 		&CmdReleaseDelete,
 		&CmdReleaseEdit,
 	},
 	Flags: AllDefaultFlags,
+}
+
+// CmdReleaseList represents a sub command of Release to list releases
+var CmdReleaseList = cli.Command{
+	Name:        "ls",
+	Usage:       "List Releases",
+	Description: "List Releases",
+	Action:      runReleases,
+	Flags:       AllDefaultFlags,
 }
 
 func runReleases(ctx *cli.Context) error {
@@ -116,7 +127,7 @@ var CmdReleaseCreate = cli.Command{
 			Aliases: []string{"a"},
 			Usage:   "List of files to attach",
 		},
-	}, LoginRepoFlags...),
+	}, AllDefaultFlags...),
 }
 
 func runReleaseCreate(ctx *cli.Context) error {
@@ -166,7 +177,7 @@ var CmdReleaseDelete = cli.Command{
 	Description: `Delete a release`,
 	ArgsUsage:   "[<release tag>]",
 	Action:      runReleaseDelete,
-	Flags:       LoginRepoFlags,
+	Flags:       AllDefaultFlags,
 }
 
 func runReleaseDelete(ctx *cli.Context) error {
@@ -245,10 +256,10 @@ var CmdReleaseEdit = cli.Command{
 			Usage:   "Mark as Pre-Release",
 		},
 		&cli.BoolFlag{
-			Name:    "release",
-			Usage:   "Release Draft/Pre-Release",
+			Name:  "release",
+			Usage: "Release Draft/Pre-Release",
 		},
-	}, LoginRepoFlags...),
+	}, AllDefaultFlags...),
 }
 
 func runReleaseEdit(ctx *cli.Context) error {
