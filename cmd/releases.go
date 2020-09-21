@@ -7,6 +7,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -120,7 +121,7 @@ var CmdReleaseCreate = cli.Command{
 func runReleaseCreate(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	release, _, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
+	release, resp, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
 		TagName:      ctx.String("tag"),
 		Target:       ctx.String("target"),
 		Title:        ctx.String("title"),
@@ -130,10 +131,10 @@ func runReleaseCreate(ctx *cli.Context) error {
 	})
 
 	if err != nil {
-		if err.Error() == "409 Conflict" {
-			log.Fatal("error: There already is a release for this tag")
+		if resp != nil && resp.StatusCode == http.StatusConflict {
+			fmt.Println("error: There already is a release for this tag")
+			return nil
 		}
-
 		log.Fatal(err)
 	}
 
