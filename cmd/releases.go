@@ -38,6 +38,7 @@ func runReleases(ctx *cli.Context) error {
 		"Tag-Name",
 		"Title",
 		"Published At",
+		"Status",
 		"Tar URL",
 	}
 
@@ -49,12 +50,19 @@ func runReleases(ctx *cli.Context) error {
 	}
 
 	for _, release := range releases {
+		status := "released"
+		if release.IsDraft {
+			status = "draft"
+		} else if release.IsPrerelease {
+			status = "prerelease"
+		}
 		values = append(
 			values,
 			[]string{
 				release.TagName,
 				release.Title,
 				release.PublishedAt.Format("2006-01-02 15:04:05"),
+				status,
 				release.TarURL,
 			},
 		)
