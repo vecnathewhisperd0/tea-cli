@@ -27,7 +27,7 @@ var CmdIssues = cli.Command{
 		&CmdIssuesReopen,
 		&CmdIssuesClose,
 	},
-	Flags: AllDefaultFlags,
+	Flags: IssuePRFlags,
 }
 
 // CmdIssuesList represents a sub command of issues to list issues
@@ -36,13 +36,7 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      runIssuesList,
-	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by issue state (all|open|closed)",
-			DefaultText: "open",
-		},
-	}, AllDefaultFlags...),
+	Flags:       IssuePRFlags,
 }
 
 func runIssues(ctx *cli.Context) error {
