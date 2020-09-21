@@ -25,6 +25,7 @@ var CmdReleases = cli.Command{
 	Subcommands: []*cli.Command{
 		&CmdReleaseCreate,
 		&CmdReleaseDelete,
+		&CmdReleaseEdit,
 	},
 	Flags: AllDefaultFlags,
 }
@@ -206,4 +207,89 @@ func getReleaseByTag(owner, repo, tag string, client *gitea.Client) (*gitea.Rele
 	}
 	fmt.Println("Release tag does not exist")
 	return nil, nil
+}
+
+// CmdReleaseEdit represents a sub command of Release to edit releases
+var CmdReleaseEdit = cli.Command{
+	Name:        "edit",
+	Usage:       "Edit a release",
+	Description: `Edit a release`,
+	Action:      runReleaseEdit,
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:  "tag",
+			Usage: "Change Tag",
+		},
+		&cli.StringFlag{
+			Name:  "target",
+			Usage: "Change Target",
+		},
+		&cli.StringFlag{
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "Change Title",
+		},
+		&cli.StringFlag{
+			Name:    "note",
+			Aliases: []string{"n"},
+			Usage:   "Change Notes",
+		},
+		&cli.BoolFlag{
+			Name:    "draft",
+			Aliases: []string{"d"},
+			Usage:   "Mark as Draft",
+		},
+		&cli.BoolFlag{
+			Name:    "prerelease",
+			Aliases: []string{"p"},
+			Usage:   "Mark as Pre-Release",
+		},
+		&cli.BoolFlag{
+			Name:    "release",
+			Usage:   "Release Draft/Pre-Release",
+		},
+	}, LoginRepoFlags...),
+}
+
+func runReleaseEdit(ctx *cli.Context) error {
+	login, owner, repo := initCommand()
+	client := login.Client()
+
+	tag := ctx.Args().First()
+	if len(tag) == 0 {
+		fmt.Println("Release tag needed to delete")
+		return nil
+	}
+
+	release, err := getReleaseByTag(owner, repo, tag, client)
+	if err != nil {
+		return err
+	}
+	if release == nil {
+		return nil
+	}
+
+	var isDraft, isPre *bool
+	bTrue := true
+	bFalse := false
+	if ctx.IsSet("draft") {
+		isDraft = &bTrue
+	}
+	if ctx.IsSet("prerelease") {
+		isPre = &bTrue
+	}
+	if ctx.IsSet("release") {
+		isDraft = &bFalse
+		isPre = &bFalse
+	}
+
+	_, _, err = client.EditRelease(owner, repo, release.ID, gitea.EditReleaseOption{
+		TagName:      ctx.String("tag"),
+		Target:       ctx.String("target"),
+		Title:        ctx.String("title"),
+		Note:         ctx.String("note"),
+		IsDraft:      isDraft,
+		IsPrerelease: isPre,
+	})
+	return err
 }
