@@ -5,6 +5,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -22,6 +23,7 @@ var CmdReleases = cli.Command{
 	Action:      runReleases,
 	Subcommands: []*cli.Command{
 		&CmdReleaseCreate,
+		&CmdReleaseDelete,
 	},
 	Flags: AllDefaultFlags,
 }
@@ -72,7 +74,7 @@ func runReleases(ctx *cli.Context) error {
 	return nil
 }
 
-// CmdReleaseCreate represents a sub command of Release to create release.
+// CmdReleaseCreate represents a sub command of Release to create release
 var CmdReleaseCreate = cli.Command{
 	Name:        "create",
 	Usage:       "Create a release",
@@ -153,4 +155,54 @@ func runReleaseCreate(ctx *cli.Context) error {
 	}
 
 	return nil
+}
+
+// CmdReleaseDelete represents a sub command of Release to delete a release
+var CmdReleaseDelete = cli.Command{
+	Name:        "delete",
+	Usage:       "Delete a release",
+	Description: `Delete a release`,
+	ArgsUsage:   "[<release tag>]",
+	Action:      runReleaseDelete,
+	Flags:       LoginRepoFlags,
+}
+
+func runReleaseDelete(ctx *cli.Context) error {
+	login, owner, repo := initCommand()
+	client := login.Client()
+
+	tag := ctx.Args().First()
+	if len(tag) == 0 {
+		fmt.Println("Release tag needed to delete")
+		return nil
+	}
+
+	release, err := getReleaseByTag(owner, repo, tag, client)
+	if err != nil {
+		return err
+	}
+	if release == nil {
+		return nil
+	}
+
+	_, err = client.DeleteRelease(owner, repo, release.ID)
+	return err
+}
+
+func getReleaseByTag(owner, repo, tag string, client *gitea.Client) (*gitea.Release, error) {
+	rl, _, err := client.ListReleases(owner, repo, gitea.ListReleasesOptions{})
+	if err != nil {
+		return nil, err
+	}
+	if len(rl) == 0 {
+		fmt.Println("Repo does not have any release")
+		return nil, nil
+	}
+	for _, r := range rl {
+		if r.TagName == tag {
+			return r, nil
+		}
+	}
+	fmt.Println("Release tag does not exist")
+	return nil, nil
 }
