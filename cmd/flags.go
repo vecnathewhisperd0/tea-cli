@@ -53,6 +53,13 @@ var OutputFlag = cli.StringFlag{
 	Destination: &outputValue,
 }
 
+// StateFlag provides flag to specify issue/pr state, defaulting to "open"
+var StateFlag = cli.StringFlag{
+	Name:        "state",
+	Usage:       "Filter by state (all|open|closed)",
+	DefaultText: "open",
+}
+
 // LoginOutputFlags defines login and output flags that should
 // added to all subcommands and appended to the flags of the
 // subcommand to work around issue and provide --login and --output:
@@ -81,6 +88,11 @@ var AllDefaultFlags = append([]cli.Flag{
 	&RemoteFlag,
 }, LoginOutputFlags...)
 
+// IssuePRFlags defines flags that should be available on issue & pr listing flags.
+var IssuePRFlags = append([]cli.Flag{
+	&StateFlag,
+}, AllDefaultFlags...)
+
 // initCommand returns repository and *Login based on flags
 func initCommand() (*Login, string, string) {
 	var login *Login
@@ -90,7 +102,7 @@ func initCommand() (*Login, string, string) {
 		log.Fatal("load config file failed ", yamlConfigPath)
 	}
 
-	if login, err = getActiveLogin(); err != nil {
+	if login, err = getDefaultLogin(); err != nil {
 		log.Fatal(err.Error())
 	}
 
@@ -126,7 +138,7 @@ func initCommandLoginOnly() *Login {
 
 	var login *Login
 	if loginValue == "" {
-		login, err = getActiveLogin()
+		login, err = getDefaultLogin()
 		if err != nil {
 			log.Fatal(err)
 		}

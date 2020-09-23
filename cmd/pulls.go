@@ -13,6 +13,7 @@ import (
 	local_git "code.gitea.io/tea/modules/git"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/charmbracelet/glamour"
 	"github.com/go-git/go-git/v5"
 	git_config "github.com/go-git/go-git/v5/config"
 	"github.com/urfave/cli/v2"
@@ -24,15 +25,11 @@ var CmdPulls = cli.Command{
 	Aliases:     []string{"pull", "pr"},
 	Usage:       "List open pull requests",
 	Description: `List open pull requests`,
+	ArgsUsage:   "[<pull index>]",
 	Action:      runPulls,
-	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by PR state (all|open|closed)",
-			DefaultText: "open",
-		},
-	}, AllDefaultFlags...),
+	Flags:       IssuePRFlags,
 	Subcommands: []*cli.Command{
+		&CmdPullsList,
 		&CmdPullsCheckout,
 		&CmdPullsClean,
 		&CmdPullsCreate,
@@ -40,6 +37,44 @@ var CmdPulls = cli.Command{
 }
 
 func runPulls(ctx *cli.Context) error {
+	if ctx.Args().Len() == 1 {
+		return runPullDetail(ctx, ctx.Args().First())
+	}
+	return runPullsList(ctx)
+}
+
+// CmdPullsList represents a sub command of issues to list pulls
+var CmdPullsList = cli.Command{
+	Name:        "ls",
+	Usage:       "List pull requests of the repository",
+	Description: `List pull requests of the repository`,
+	Action:      runPullsList,
+	Flags:       IssuePRFlags,
+}
+
+func runPullDetail(ctx *cli.Context, index string) error {
+	login, owner, repo := initCommand()
+
+	idx, err := argToIndex(index)
+	if err != nil {
+		return err
+	}
+	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
+	if err != nil {
+		return err
+	}
+
+	// TODO: use glamour once #181 is merged
+	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", pr.Index,
+		pr.Title,
+		pr.Poster.UserName,
+		pr.Created.Format("2006-01-02 15:04:05"),
+		pr.Body,
+	)
+	return nil
+}
+
+func runPullsList(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
 	state := gitea.StateOpen
@@ -364,14 +399,16 @@ func runPullsCreate(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n", pr.Index,
+	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", pr.Index,
 		pr.Title,
+		pr.State,
 		pr.Poster.UserName,
 		pr.Created.Format("2006-01-02 15:04:05"),
+		pr.Body,
 	)
-	if len(pr.Body) != 0 {
-		fmt.Printf("\n%s\n", pr.Body)
-	}
+	out, err := glamour.Render(in, getGlamourTheme())
+	fmt.Print(out)
+
 	fmt.Println(pr.HTMLURL)
 	return nil
 }
