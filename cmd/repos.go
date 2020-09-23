@@ -7,6 +7,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
 	"code.gitea.io/tea/modules/utils"
@@ -43,13 +44,8 @@ var CmdReposList = cli.Command{
 			Usage:    "Filter by mode: fork, mirror, source",
 		},
 		&cli.StringFlag{
-			Name:     "user",
-			Aliases:  []string{"u"},
-			Required: false,
-			Usage:    "Filter by owner",
-		},
-		&cli.StringFlag{
-			Name:     "org",
+			Name:     "owner",
+			Aliases:  []string{"O"},
 			Required: false,
 			Usage:    "Filter by owner",
 		},
@@ -146,18 +142,22 @@ func runReposList(ctx *cli.Context) error {
 	client := login.Client()
 
 	var ownerID int64
-	if ctx.IsSet("user") {
-		owner, _, err := client.GetUserInfo(ctx.String("user"))
+	if ctx.IsSet("owner") {
+		// test if owner is a organisation
+		org, resp, err := client.GetOrg(ctx.String("owner"))
 		if err != nil {
-			return err
+			if resp == nil || resp.StatusCode != http.StatusNotFound {
+				return err
+			}
+			// if owner is no org, its a user
+			user, _, err := client.GetUserInfo(ctx.String("owner"))
+			if err != nil {
+				return err
+			}
+			ownerID = user.ID
+		} else {
+			ownerID = org.ID
 		}
-		ownerID = owner.ID
-	} else if ctx.IsSet("org") {
-		org, _, err := client.GetOrg(ctx.String("org"))
-		if err != nil {
-			return err
-		}
-		ownerID = org.ID
 	} else {
 		me, _, err := client.GetMyUserInfo()
 		if err != nil {
