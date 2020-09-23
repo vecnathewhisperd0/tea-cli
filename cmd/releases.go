@@ -175,7 +175,7 @@ var CmdReleaseDelete = cli.Command{
 	Name:        "delete",
 	Usage:       "Delete a release",
 	Description: `Delete a release`,
-	ArgsUsage:   "[<release tag>]",
+	ArgsUsage:   "<release tag>",
 	Action:      runReleaseDelete,
 	Flags:       AllDefaultFlags,
 }
@@ -225,6 +225,7 @@ var CmdReleaseEdit = cli.Command{
 	Name:        "edit",
 	Usage:       "Edit a release",
 	Description: `Edit a release`,
+	ArgsUsage:   "<release tag>",
 	Action:      runReleaseEdit,
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -268,7 +269,7 @@ func runReleaseEdit(ctx *cli.Context) error {
 
 	tag := ctx.Args().First()
 	if len(tag) == 0 {
-		fmt.Println("Release tag needed to delete")
+		fmt.Println("Release tag needed to edit")
 		return nil
 	}
 
