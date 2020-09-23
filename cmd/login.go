@@ -64,7 +64,7 @@ func runLoginSetDefault(ctx *cli.Context) error {
 		return err
 	}
 	if ctx.Args().Len() == 0 {
-		l, err := getActiveLogin()
+		l, err := getDefaultLogin()
 		if err != nil {
 			return err
 		}

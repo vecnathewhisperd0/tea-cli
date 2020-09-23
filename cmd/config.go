@@ -119,7 +119,7 @@ func getOwnerAndRepo(repoPath, user string) (string, string) {
 	return user, repoPath
 }
 
-func getActiveLogin() (*Login, error) {
+func getDefaultLogin() (*Login, error) {
 	if len(config.Logins) == 0 {
 		return nil, errors.New("No available login")
 	}
