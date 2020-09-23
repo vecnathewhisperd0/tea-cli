@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"code.gitea.io/sdk/gitea"
 
@@ -246,19 +247,17 @@ var CmdReleaseEdit = cli.Command{
 			Aliases: []string{"n"},
 			Usage:   "Change Notes",
 		},
-		&cli.BoolFlag{
-			Name:    "draft",
-			Aliases: []string{"d"},
-			Usage:   "Mark as Draft",
+		&cli.StringFlag{
+			Name:        "draft",
+			Aliases:     []string{"d"},
+			Usage:       "Mark as Draft [True/false]",
+			DefaultText: "true",
 		},
-		&cli.BoolFlag{
-			Name:    "prerelease",
-			Aliases: []string{"p"},
-			Usage:   "Mark as Pre-Release",
-		},
-		&cli.BoolFlag{
-			Name:  "release",
-			Usage: "Release Draft/Pre-Release",
+		&cli.StringFlag{
+			Name:        "prerelease",
+			Aliases:     []string{"p"},
+			Usage:       "Mark as Pre-Release [True/false]",
+			DefaultText: "true",
 		},
 	}, AllDefaultFlags...),
 }
@@ -285,14 +284,16 @@ func runReleaseEdit(ctx *cli.Context) error {
 	bTrue := true
 	bFalse := false
 	if ctx.IsSet("draft") {
-		isDraft = &bTrue
+		isDraft = &bFalse
+		if strings.ToLower(ctx.String("draft"))[:1] == "t" {
+			isDraft = &bTrue
+		}
 	}
 	if ctx.IsSet("prerelease") {
-		isPre = &bTrue
-	}
-	if ctx.IsSet("release") {
-		isDraft = &bFalse
 		isPre = &bFalse
+		if strings.ToLower(ctx.String("prerelease"))[:1] == "t" {
+			isPre = &bTrue
+		}
 	}
 
 	_, _, err = client.EditRelease(owner, repo, release.ID, gitea.EditReleaseOption{
