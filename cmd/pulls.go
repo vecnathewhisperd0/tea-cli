@@ -353,9 +353,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	// push if possible
 	log.Println("git push")
 	err = localRepo.Push(&git.PushOptions{})
-	if err == git.NoErrAlreadyUpToDate {
-		log.Println(err.Error())
-	} else if err != nil {
+	if err != nil && err != git.NoErrAlreadyUpToDate {
 		log.Printf("Error occurred during 'git push':\n%s\n", err.Error())
 	}
 
