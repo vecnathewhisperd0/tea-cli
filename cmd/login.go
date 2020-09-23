@@ -45,15 +45,14 @@ var cmdLoginEdit = cli.Command{
 }
 
 func runLoginEdit(ctx *cli.Context) error {
-	open.Run(yamlConfigPath)
-	return nil
+	return open.Start(yamlConfigPath)
 }
 
 // cmdLoginSetDefault represents to login a gitea server.
 var cmdLoginSetDefault = cli.Command{
 	Name:        "default",
-	Usage:       "Set Default Login",
-	Description: `Set Default Login`,
+	Usage:       "Get or Set Default Login",
+	Description: `Get or Set Default Login`,
 	ArgsUsage:   "<Login>",
 	Action:      runLoginSetDefault,
 	Flags:       []cli.Flag{&OutputFlag},
@@ -68,7 +67,7 @@ func runLoginSetDefault(ctx *cli.Context) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Activ Login: %s\n", l.Name)
+		fmt.Printf("Default Login: %s\n", l.Name)
 		return nil
 	}
 	loginExist := false
