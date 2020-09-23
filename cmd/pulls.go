@@ -370,7 +370,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	if len(head) == 0 {
 		headBranch, err := localRepo.Head()
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 		sha := headBranch.Hash().String()
 
@@ -393,7 +393,7 @@ func runPullsCreate(ctx *cli.Context) error {
 
 		url, err := local_git.ParseURL(remote.Config().URLs[0])
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 		owner, _ := getOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
 		head = fmt.Sprintf("%s:%s", owner, branchName)
