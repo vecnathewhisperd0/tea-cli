@@ -339,7 +339,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	login, ownerArg, repoArg := initCommand()
 	client := login.Client()
 
-	repo, _, err := login.Client().GetRepo(ownerArg, repoArg)
+	repo, _, err := client.GetRepo(ownerArg, repoArg)
 	if err != nil {
 		log.Fatal("could not fetch repo meta: ", err)
 	}
@@ -436,7 +436,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	fmt.Print(out)
 
 	fmt.Println(pr.HTMLURL)
-	return nil
+	return err
 }
 
 func argToIndex(arg string) (int64, error) {
