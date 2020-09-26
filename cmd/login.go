@@ -5,17 +5,10 @@
 package cmd
 
 import (
-	"crypto/tls"
 	"fmt"
 	"log"
-	"net/http"
-	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"strings"
-	"time"
-
-	"code.gitea.io/sdk/gitea"
 
 	"github.com/skratchdot/open-golang/open"
 	"github.com/urfave/cli/v2"
@@ -224,7 +217,6 @@ func runLoginAddInteractive(ctx *cli.Context) error {
 }
 
 func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
-
 	if len(giteaURL) == 0 {
 		log.Fatal("You have to input Gitea server URL")
 	}
@@ -236,63 +228,40 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 		log.Fatal("No user set")
 	}
 
-	err := loadConfig(yamlConfigPath)
+	serverURL, err := parseURL(giteaURL, insecure)
+	if err != nil {
+		log.Fatal("Unable to parse URL", err)
+	}
+
+	err = loadConfig(yamlConfigPath)
 	if err != nil {
 		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
-	httpClient := &http.Client{}
-	if insecure {
-		cookieJar, _ := cookiejar.New(nil)
-		httpClient = &http.Client{
-			Jar: cookieJar,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			}}
+	login := Login{
+		Name:     name,
+		URL:      serverURL.String(),
+		Token:    token,
+		Insecure: insecure,
+		SSHKey:   sshKey,
 	}
-	client, err := gitea.NewClient(giteaURL,
-		gitea.SetToken(token),
-		gitea.SetBasicAuth(user, passwd),
-		gitea.SetHTTPClient(httpClient),
-	)
-	if err != nil {
-		log.Fatal(err)
+	client := login.Client()
+
+	if token == "" {
+		login.Token, err = login.GenerateToken(user, passwd)
+		if err != nil {
+			return err
+		}
 	}
 
 	u, _, err := client.GetMyUserInfo()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	if len(token) == 0 {
-		// create token
-		host, _ := os.Hostname()
-		tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
-		if err != nil {
-			return err
-		}
-		tokenName := host + "-tea"
-		for i := range tl {
-			if tl[i].Name == tokenName {
-				tokenName += time.Now().Format("2006-01-02_15-04-05")
-				break
-			}
-		}
-		t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
-		if err != nil {
-			return err
-		}
-		token = t.Token
-	}
-
-	fmt.Println("Login successful! Login name " + u.UserName)
+	login.User = u.UserName
 
 	if len(name) == 0 {
-		parsedURL, err := url.Parse(giteaURL)
-		if err != nil {
-			return err
-		}
-		name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
+		name = strings.ReplaceAll(strings.Title(serverURL.Host), ".", "")
 		for _, l := range config.Logins {
 			if l.Name == name {
 				name += "_" + u.UserName
@@ -301,14 +270,7 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 		}
 	}
 
-	err = addLogin(Login{
-		Name:     name,
-		URL:      giteaURL,
-		Token:    token,
-		Insecure: insecure,
-		SSHKey:   sshKey,
-		User:     u.UserName,
-	})
+	err = addLogin(login)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -317,6 +279,8 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Printf("Login as %s on %s successful. Added this login as %s\n", u.UserName, giteaURL, name)
 
 	return nil
 }
@@ -359,4 +323,16 @@ func runLoginList(ctx *cli.Context) error {
 	Output(outputValue, headers, values)
 
 	return nil
+}
+
+// parseURL normalizes the input with a protocol
+func parseURL(raw string, insecure bool) (*url.URL, error) {
+	prefix := "https://"
+	if strings.HasPrefix(raw, "http") {
+		prefix = ""
+	}
+	if insecure {
+		prefix = "http://"
+	}
+	return url.Parse(prefix + raw)
 }

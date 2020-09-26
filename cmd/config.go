@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/git"
@@ -74,6 +75,29 @@ func (l *Login) GetSSHHost() string {
 	}
 
 	return u.Hostname()
+}
+
+// Generate Token creates a new token when given BasicAuth credentials
+func (l *Login) GenerateToken(user, pass string) (string, error) {
+	client := l.Client()
+	gitea.SetBasicAuth(user, pass)
+
+	host, _ := os.Hostname()
+	tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
+	if err != nil {
+		return "", err
+	}
+	tokenName := host + "-tea"
+
+	for i := range tl {
+		if tl[i].Name == tokenName {
+			tokenName += time.Now().Format("2006-01-02_15-04-05")
+			break
+		}
+	}
+
+	t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
+	return t.Token, err
 }
 
 // Config reprensents local configurations
