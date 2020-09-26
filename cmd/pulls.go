@@ -374,7 +374,7 @@ func runPullsCreate(ctx *cli.Context) error {
 
 		remote, err := localRepo.TeaFindBranchRemote("", sha)
 		if err != nil {
-			return err
+			log.Fatal("could not determine remote for current branch: ", err)
 		}
 
 		if remote == nil {
@@ -422,7 +422,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal("could not create PR: ", err)
+		log.Fatalf("could not create PR from %s to %s:%s: %s", head, ownerArg, base, err)
 	}
 
 	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", pr.Index,
