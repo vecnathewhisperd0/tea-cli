@@ -77,7 +77,7 @@ func (l *Login) GetSSHHost() string {
 	return u.Hostname()
 }
 
-// Generate Token creates a new token when given BasicAuth credentials
+// GenerateToken creates a new token when given BasicAuth credentials
 func (l *Login) GenerateToken(user, pass string) (string, error) {
 	client := l.Client()
 	gitea.SetBasicAuth(user, pass)
