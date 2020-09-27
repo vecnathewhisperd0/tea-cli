@@ -5,19 +5,13 @@
 package cmd
 
 import (
-	"crypto/tls"
 	"fmt"
 	"log"
-	"net/http"
-	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"strings"
-	"time"
 
 	"code.gitea.io/tea/modules/intern"
 
-	"code.gitea.io/sdk/gitea"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/urfave/cli/v2"
 )
@@ -141,7 +135,7 @@ var cmdLoginAdd = cli.Command{
 }
 
 func runLoginAdd(ctx *cli.Context) error {
-	return runLoginAddMain(
+	return intern.AddLogin(
 		ctx.String("name"),
 		ctx.String("token"),
 		ctx.String("user"),
@@ -221,105 +215,7 @@ func runLoginAddInteractive(ctx *cli.Context) error {
 		insecure = len(stdin) != 0 && strings.ToLower(stdin[:1]) == "y"
 	}
 
-	return runLoginAddMain(name, token, user, passwd, sshKey, giteaURL, insecure)
-}
-
-func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
-
-	if len(giteaURL) == 0 {
-		log.Fatal("You have to input Gitea server URL")
-	}
-	if len(token) == 0 && (len(user)+len(passwd)) == 0 {
-		log.Fatal("No token set")
-	} else if len(user) != 0 && len(passwd) == 0 {
-		log.Fatal("No password set")
-	} else if len(user) == 0 && len(passwd) != 0 {
-		log.Fatal("No user set")
-	}
-
-	err := intern.LoadConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	httpClient := &http.Client{}
-	if insecure {
-		cookieJar, _ := cookiejar.New(nil)
-		httpClient = &http.Client{
-			Jar: cookieJar,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			}}
-	}
-	client, err := gitea.NewClient(giteaURL,
-		gitea.SetToken(token),
-		gitea.SetBasicAuth(user, passwd),
-		gitea.SetHTTPClient(httpClient),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	u, _, err := client.GetMyUserInfo()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(token) == 0 {
-		// create token
-		host, _ := os.Hostname()
-		tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
-		if err != nil {
-			return err
-		}
-		tokenName := host + "-tea"
-		for i := range tl {
-			if tl[i].Name == tokenName {
-				tokenName += time.Now().Format("2006-01-02_15-04-05")
-				break
-			}
-		}
-		t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
-		if err != nil {
-			return err
-		}
-		token = t.Token
-	}
-
-	fmt.Println("Login successful! Login name " + u.UserName)
-
-	if len(name) == 0 {
-		parsedURL, err := url.Parse(giteaURL)
-		if err != nil {
-			return err
-		}
-		name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
-		for _, l := range intern.Config.Logins {
-			if l.Name == name {
-				name += "_" + u.UserName
-				break
-			}
-		}
-	}
-
-	err = intern.AddLogin(intern.Login{
-		Name:     name,
-		URL:      giteaURL,
-		Token:    token,
-		Insecure: insecure,
-		SSHKey:   sshKey,
-		User:     u.UserName,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = intern.SaveConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return intern.AddLogin(name, token, user, passwd, sshKey, giteaURL, insecure)
 }
 
 // CmdLogin represents to login a gitea server.
