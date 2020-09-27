@@ -13,12 +13,12 @@
   * Fix Pulls Create (#202)
   * Pulls create: detect head branch repo owner (#193)
   * Fix Labels Delete (#180)
-  * More Options To Specify Repo (#178)
 * ENHANCEMENTS
   * Add Pagination Options for List Subcomands (#204)
   * Issues/Pulls: Details show State (#196)
   * Make issues & pulls subcommands consistent (#188)
   * Update SDK to v0.13.0 (#179)
+  * More Options To Specify Repo (#178)
   * Add Repo Create subcomand & enhancements (#173)
   * Times: format duration as seconds for machine-readable outputs (#168)
   * Add user message to login list view (#166)
