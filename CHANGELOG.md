@@ -6,8 +6,8 @@
   * Add Login Manage Functions (#182)
 * FEATURES
   * Add Release Subcomands (#195)
-  * Use glamour and termev to render/colorize content (#181)
-  * Login: add BasicAuth & Interactive (#174)
+  * Render Markdown and colorize labels table (#181)
+  * Add BasicAuth & Interactive for Login (#174)
   * Add milestones subcomands (#149)
 * BUGFIXES
   * Fix Pulls Create (#202)
