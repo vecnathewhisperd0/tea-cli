@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	local_git "code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/intern"
 
 	"github.com/skratchdot/open-golang/open"
 	"github.com/urfave/cli/v2"
@@ -25,7 +26,7 @@ var CmdOpen = cli.Command{
 }
 
 func runOpen(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	var suffix string
 	number := ctx.Args().Get(0)

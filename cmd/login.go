@@ -15,8 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/modules/intern"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/urfave/cli/v2"
 )
@@ -45,7 +46,7 @@ var cmdLoginEdit = cli.Command{
 }
 
 func runLoginEdit(ctx *cli.Context) error {
-	return open.Start(yamlConfigPath)
+	return open.Start(intern.GetConfigPath())
 }
 
 // cmdLoginSetDefault represents to login a gitea server.
@@ -59,11 +60,11 @@ var cmdLoginSetDefault = cli.Command{
 }
 
 func runLoginSetDefault(ctx *cli.Context) error {
-	if err := loadConfig(yamlConfigPath); err != nil {
+	if err := intern.LoadConfig(); err != nil {
 		return err
 	}
 	if ctx.Args().Len() == 0 {
-		l, err := getDefaultLogin()
+		l, err := intern.GetDefaultLogin()
 		if err != nil {
 			return err
 		}
@@ -71,10 +72,10 @@ func runLoginSetDefault(ctx *cli.Context) error {
 		return nil
 	}
 	loginExist := false
-	for i := range config.Logins {
-		config.Logins[i].Default = false
-		if config.Logins[i].Name == ctx.Args().First() {
-			config.Logins[i].Default = true
+	for i := range intern.Config.Logins {
+		intern.Config.Logins[i].Default = false
+		if intern.Config.Logins[i].Name == ctx.Args().First() {
+			intern.Config.Logins[i].Default = true
 			loginExist = true
 		}
 	}
@@ -83,7 +84,7 @@ func runLoginSetDefault(ctx *cli.Context) error {
 		return fmt.Errorf("login '%s' not found", ctx.Args().First())
 	}
 
-	return saveConfig(yamlConfigPath)
+	return intern.SaveConfig()
 }
 
 // CmdLogin represents to login a gitea server.
@@ -236,9 +237,9 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 		log.Fatal("No user set")
 	}
 
-	err := loadConfig(yamlConfigPath)
+	err := intern.LoadConfig()
 	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
+		log.Fatal(err)
 	}
 
 	httpClient := &http.Client{}
@@ -293,7 +294,7 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 			return err
 		}
 		name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
-		for _, l := range config.Logins {
+		for _, l := range intern.Config.Logins {
 			if l.Name == name {
 				name += "_" + u.UserName
 				break
@@ -301,7 +302,7 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 		}
 	}
 
-	err = addLogin(Login{
+	err = intern.AddLogin(intern.Login{
 		Name:     name,
 		URL:      giteaURL,
 		Token:    token,
@@ -313,7 +314,7 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 		log.Fatal(err)
 	}
 
-	err = saveConfig(yamlConfigPath)
+	err = intern.SaveConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -331,9 +332,9 @@ var cmdLoginList = cli.Command{
 }
 
 func runLoginList(ctx *cli.Context) error {
-	err := loadConfig(yamlConfigPath)
+	err := intern.LoadConfig()
 	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
+		log.Fatal(err)
 	}
 
 	headers := []string{
@@ -346,7 +347,7 @@ func runLoginList(ctx *cli.Context) error {
 
 	var values [][]string
 
-	for _, l := range config.Logins {
+	for _, l := range intern.Config.Logins {
 		values = append(values, []string{
 			l.Name,
 			l.URL,
@@ -356,7 +357,7 @@ func runLoginList(ctx *cli.Context) error {
 		})
 	}
 
-	Output(outputValue, headers, values)
+	Output(globalOutputValue, headers, values)
 
 	return nil
 }

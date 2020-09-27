@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"code.gitea.io/tea/modules/intern"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
@@ -62,7 +64,7 @@ var CmdMilestoneRemoveIssue = cli.Command{
 }
 
 func runMilestoneIssueList(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	state := gitea.StateOpen
@@ -112,7 +114,7 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(issues) == 0 {
-		Output(outputValue, headers, values)
+		Output(globalOutputValue, headers, values)
 		return nil
 	}
 
@@ -137,12 +139,12 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(outputValue, headers, values)
+	Output(globalOutputValue, headers, values)
 	return nil
 }
 
 func runMilestoneIssueAdd(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")
@@ -168,7 +170,7 @@ func runMilestoneIssueAdd(ctx *cli.Context) error {
 }
 
 func runMilestoneIssueRemove(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")

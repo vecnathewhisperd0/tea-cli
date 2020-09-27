@@ -8,6 +8,8 @@ import (
 	"log"
 	"strings"
 
+	"code.gitea.io/tea/modules/intern"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
@@ -57,13 +59,13 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if ctx.Bool("all") {
-		login := initCommandLoginOnly()
+		login := intern.InitCommandLoginOnly(globalLoginValue)
 		news, _, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
 		})
 	} else {
-		login, owner, repo := initCommand()
+		login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 		news, _, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
@@ -107,7 +109,7 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if len(values) != 0 {
-		Output(outputValue, headers, values)
+		Output(globalOutputValue, headers, values)
 	}
 	return nil
 }

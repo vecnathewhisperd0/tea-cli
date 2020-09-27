@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	local_git "code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/intern"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/charmbracelet/glamour"
@@ -53,7 +54,7 @@ var CmdPullsList = cli.Command{
 }
 
 func runPullDetail(ctx *cli.Context, index string) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	idx, err := argToIndex(index)
 	if err != nil {
@@ -75,7 +76,7 @@ func runPullDetail(ctx *cli.Context, index string) error {
 }
 
 func runPullsList(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {
@@ -107,7 +108,7 @@ func runPullsList(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(prs) == 0 {
-		Output(outputValue, headers, values)
+		Output(globalOutputValue, headers, values)
 		return nil
 	}
 
@@ -135,7 +136,7 @@ func runPullsList(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(outputValue, headers, values)
+	Output(globalOutputValue, headers, values)
 
 	return nil
 }
@@ -151,7 +152,7 @@ var CmdPullsCheckout = cli.Command{
 }
 
 func runPullsCheckout(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	if ctx.Args().Len() != 1 {
 		log.Fatal("Must specify a PR index")
 	}
@@ -235,7 +236,7 @@ var CmdPullsClean = cli.Command{
 }
 
 func runPullsClean(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	if ctx.Args().Len() != 1 {
 		return fmt.Errorf("Must specify a PR index")
 	}
@@ -336,7 +337,7 @@ var CmdPullsCreate = cli.Command{
 }
 
 func runPullsCreate(ctx *cli.Context) error {
-	login, ownerArg, repoArg := initCommand()
+	login, ownerArg, repoArg := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	repo, _, err := client.GetRepo(ownerArg, repoArg)
@@ -393,7 +394,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		owner, _ := getOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
+		owner, _ := intern.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
 		head = fmt.Sprintf("%s:%s", owner, branchName)
 	}
 

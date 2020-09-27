@@ -11,8 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/modules/intern"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
 )
@@ -52,7 +53,7 @@ var CmdTrackedTimes = cli.Command{
 }
 
 func runTrackedTimes(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
@@ -97,7 +98,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 		}
 	}
 
-	printTrackedTimes(times, outputValue, from, until, ctx.Bool("total"))
+	printTrackedTimes(times, globalOutputValue, from, until, ctx.Bool("total"))
 	return nil
 }
 
@@ -169,7 +170,7 @@ var CmdTrackedTimesAdd = cli.Command{
 }
 
 func runTrackedTimesAdd(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	if ctx.Args().Len() < 2 {
 		return fmt.Errorf("No issue or duration specified.\nUsage:\t%s", ctx.Command.UsageText)
@@ -206,7 +207,7 @@ var CmdTrackedTimesDelete = cli.Command{
 }
 
 func runTrackedTimesDelete(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
@@ -246,7 +247,7 @@ var CmdTrackedTimesReset = cli.Command{
 }
 
 func runTrackedTimesReset(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {

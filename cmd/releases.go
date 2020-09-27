@@ -12,8 +12,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/modules/intern"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -46,7 +47,7 @@ var CmdReleaseList = cli.Command{
 }
 
 func runReleases(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	releases, _, err := login.Client().ListReleases(owner, repo, gitea.ListReleasesOptions{ListOptions: getListOptions(ctx)})
 	if err != nil {
@@ -64,7 +65,7 @@ func runReleases(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(releases) == 0 {
-		Output(outputValue, headers, values)
+		Output(globalOutputValue, headers, values)
 		return nil
 	}
 
@@ -86,7 +87,7 @@ func runReleases(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(outputValue, headers, values)
+	Output(globalOutputValue, headers, values)
 
 	return nil
 }
@@ -135,7 +136,7 @@ var CmdReleaseCreate = cli.Command{
 }
 
 func runReleaseCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	release, resp, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
 		TagName:      ctx.String("tag"),
@@ -185,7 +186,7 @@ var CmdReleaseDelete = cli.Command{
 }
 
 func runReleaseDelete(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	tag := ctx.Args().First()
@@ -266,7 +267,7 @@ var CmdReleaseEdit = cli.Command{
 }
 
 func runReleaseEdit(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	tag := ctx.Args().First()

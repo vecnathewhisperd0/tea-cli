@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 
+	"code.gitea.io/tea/modules/intern"
 	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
@@ -140,7 +141,7 @@ func runRepos(ctx *cli.Context) error {
 
 // runReposList list repositories
 func runReposList(ctx *cli.Context) error {
-	login := initCommandLoginOnly()
+	login := intern.InitCommandLoginOnly(globalLoginValue)
 	client := login.Client()
 
 	var ownerID int64
@@ -233,15 +234,15 @@ func runReposList(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(outputValue, headers, values)
+	Output(globalOutputValue, headers, values)
 
 	return nil
 }
 
 func runRepoDetail(_ *cli.Context, path string) error {
-	login := initCommandLoginOnly()
+	login := intern.InitCommandLoginOnly(globalLoginValue)
 	client := login.Client()
-	repoOwner, repoName := getOwnerAndRepo(path, login.User)
+	repoOwner, repoName := intern.GetOwnerAndRepo(path, login.User)
 	repo, _, err := client.GetRepo(repoOwner, repoName)
 	if err != nil {
 		return err
@@ -283,7 +284,7 @@ func runRepoDetail(_ *cli.Context, path string) error {
 }
 
 func runRepoCreate(ctx *cli.Context) error {
-	login := initCommandLoginOnly()
+	login := intern.InitCommandLoginOnly(globalLoginValue)
 	client := login.Client()
 	var (
 		repo *gitea.Repository

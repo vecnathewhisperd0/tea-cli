@@ -9,6 +9,8 @@ import (
 	"log"
 	"strconv"
 
+	"code.gitea.io/tea/modules/intern"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/charmbracelet/glamour"
 	"github.com/urfave/cli/v2"
@@ -47,7 +49,7 @@ func runIssues(ctx *cli.Context) error {
 }
 
 func runIssueDetail(ctx *cli.Context, index string) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	idx, err := argToIndex(index)
 	if err != nil {
@@ -71,7 +73,7 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 }
 
 func runIssuesList(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {
@@ -105,7 +107,7 @@ func runIssuesList(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(issues) == 0 {
-		Output(outputValue, headers, values)
+		Output(globalOutputValue, headers, values)
 		return nil
 	}
 
@@ -130,7 +132,7 @@ func runIssuesList(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(outputValue, headers, values)
+	Output(globalOutputValue, headers, values)
 
 	return nil
 }
@@ -156,7 +158,7 @@ var CmdIssuesCreate = cli.Command{
 }
 
 func runIssuesCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	_, _, err := login.Client().CreateIssue(owner, repo, gitea.CreateIssueOption{
 		Title: ctx.String("title"),
@@ -206,7 +208,7 @@ var CmdIssuesClose = cli.Command{
 
 // editIssueState abstracts the arg parsing to edit the given issue
 func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	if ctx.Args().Len() == 0 {
 		log.Fatal(ctx.Command.ArgsUsage)
 	}

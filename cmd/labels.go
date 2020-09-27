@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"strings"
 
-	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/modules/intern"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/muesli/termenv"
 	"github.com/urfave/cli/v2"
 )
@@ -41,7 +42,7 @@ var CmdLabels = cli.Command{
 }
 
 func runLabels(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	headers := []string{
 		"Index",
@@ -58,7 +59,7 @@ func runLabels(ctx *cli.Context) error {
 	}
 
 	if len(labels) == 0 {
-		Output(outputValue, headers, values)
+		Output(globalOutputValue, headers, values)
 		return nil
 	}
 
@@ -89,7 +90,7 @@ func runLabels(ctx *cli.Context) error {
 				},
 			)
 		}
-		Output(outputValue, headers, values)
+		Output(globalOutputValue, headers, values)
 	}
 
 	return nil
@@ -143,7 +144,7 @@ func splitLabelLine(line string) (string, string, string) {
 }
 
 func runLabelCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	labelFile := ctx.String("file")
 	var err error
@@ -214,7 +215,7 @@ var CmdLabelUpdate = cli.Command{
 }
 
 func runLabelUpdate(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	id := ctx.Int64("id")
 	var pName, pColor, pDescription *string
@@ -262,7 +263,7 @@ var CmdLabelDelete = cli.Command{
 }
 
 func runLabelDelete(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	_, err := login.Client().DeleteLabel(owner, repo, ctx.Int64("id"))
 	if err != nil {

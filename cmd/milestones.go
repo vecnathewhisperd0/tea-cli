@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log"
 
+	"code.gitea.io/tea/modules/intern"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
@@ -56,7 +58,7 @@ func runMilestones(ctx *cli.Context) error {
 }
 
 func runMilestoneDetail(ctx *cli.Context, name string) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	milestone, _, err := client.GetMilestoneByName(owner, repo, name)
@@ -77,7 +79,7 @@ func runMilestoneDetail(ctx *cli.Context, name string) error {
 }
 
 func runMilestonesList(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {
@@ -129,7 +131,7 @@ func runMilestonesList(ctx *cli.Context) error {
 
 		values = append(values, item)
 	}
-	Output(outputValue, headers, values)
+	Output(globalOutputValue, headers, values)
 
 	return nil
 }
@@ -160,7 +162,7 @@ var CmdMilestonesCreate = cli.Command{
 }
 
 func runMilestonesCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	title := ctx.String("title")
 	if len(title) == 0 {
@@ -207,7 +209,7 @@ var CmdMilestonesClose = cli.Command{
 }
 
 func editMilestoneStatus(ctx *cli.Context, close bool) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	state := gitea.StateOpen
@@ -234,7 +236,7 @@ var CmdMilestonesDelete = cli.Command{
 }
 
 func deleteMilestone(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
 	_, err := client.DeleteMilestoneByName(owner, repo, ctx.Args().First())
