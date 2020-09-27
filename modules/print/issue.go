@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/glamour"
 )
 
+// IssueDetails print an issue rendered to stdout
 func IssueDetails(issue *gitea.Issue) {
 
 	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", issue.Index,

@@ -19,12 +19,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Config reprensents local configurations
+// LocalConfig represents local configurations
 type LocalConfig struct {
 	Logins []Login `yaml:"logins"`
 }
 
 var (
+	// Config contain if loaded local tea config
 	Config         LocalConfig
 	yamlConfigPath string
 )
@@ -44,10 +45,12 @@ func init() {
 	yamlConfigPath = filepath.Join(dir, "tea.yml")
 }
 
+// GetConfigPath return path to tea config file
 func GetConfigPath() string {
 	return yamlConfigPath
 }
 
+// LoadConfig load config into global Config var
 func LoadConfig() error {
 	ymlPath := GetConfigPath()
 	exist, _ := utils.FileExist(ymlPath)
@@ -67,6 +70,7 @@ func LoadConfig() error {
 	return nil
 }
 
+// SaveConfig save config from global Config var into config file
 func SaveConfig() error {
 	ymlPath := GetConfigPath()
 	bs, err := yaml.Marshal(Config)
@@ -141,6 +145,8 @@ func curGitRepoPath(repoValue, remoteValue string) (*Login, string, error) {
 	return nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
 }
 
+// GetOwnerAndRepo return repoOwner and repoName
+// based on relative path and default owner (if not in path)
 func GetOwnerAndRepo(repoPath, user string) (string, string) {
 	if len(repoPath) == 0 {
 		return "", ""

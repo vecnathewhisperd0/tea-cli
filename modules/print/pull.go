@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/glamour"
 )
 
+// PullDetails print an pull rendered to stdout
 func PullDetails(pr *gitea.PullRequest) {
 
 	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", pr.Index,

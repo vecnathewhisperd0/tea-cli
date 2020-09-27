@@ -11,6 +11,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 )
 
+// RepoDetails print an repo formatted to stdout
 func RepoDetails(repo *gitea.Repository, topics []string) {
 	output := repo.FullName
 	if repo.Mirror {
@@ -36,7 +37,7 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 		repo.OpenIssues,
 		repo.Stars,
 		repo.Forks,
-		FormatSize(int64(repo.Size)),
+		formatSize(int64(repo.Size)),
 	)
 
 	fmt.Print(output)

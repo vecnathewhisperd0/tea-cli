@@ -10,6 +10,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 )
 
+// MilestoneDetails print an milestone formatted to stdout
 func MilestoneDetails(milestone *gitea.Milestone) {
 	fmt.Printf("%s\n",
 		milestone.Title,

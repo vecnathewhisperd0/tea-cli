@@ -68,6 +68,7 @@ func (l *Login) GetSSHHost() string {
 	return u.Hostname()
 }
 
+// GetDefaultLogin return the default login
 func GetDefaultLogin() (*Login, error) {
 	if len(Config.Logins) == 0 {
 		return nil, errors.New("No available login")
@@ -81,6 +82,7 @@ func GetDefaultLogin() (*Login, error) {
 	return &Config.Logins[0], nil
 }
 
+// GetLoginByName get login by name
 func GetLoginByName(name string) *Login {
 	for _, l := range Config.Logins {
 		if l.Name == name {
@@ -90,6 +92,7 @@ func GetLoginByName(name string) *Login {
 	return nil
 }
 
+// AddLogin add a login to global Config var
 func AddLogin(login Login) error {
 	for _, l := range Config.Logins {
 		if l.Name == login.Name {

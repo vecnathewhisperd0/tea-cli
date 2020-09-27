@@ -17,8 +17,8 @@ func getGlamourTheme() string {
 	return "light"
 }
 
-// FormatSize get kb in int and return string
-func FormatSize(kb int64) string {
+// formatSize get kb in int and return string
+func formatSize(kb int64) string {
 	if kb < 1024 {
 		return fmt.Sprintf("%d Kb", kb)
 	}
