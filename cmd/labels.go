@@ -163,7 +163,6 @@ func runLabelCreate(ctx *cli.Context) error {
 
 		scanner := bufio.NewScanner(f)
 		var i = 1
-		// FIXME: if Gitea's API support create multiple labels once, we should move to that API.
 		for scanner.Scan() {
 			line := scanner.Text()
 			color, name, description := splitLabelLine(line)

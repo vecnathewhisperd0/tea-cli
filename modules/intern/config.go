@@ -44,8 +44,12 @@ func init() {
 	yamlConfigPath = filepath.Join(dir, "tea.yml")
 }
 
+func GetConfigPath() string {
+	return yamlConfigPath
+}
+
 func LoadConfig() error {
-	ymlPath := yamlConfigPath
+	ymlPath := GetConfigPath()
 	exist, _ := utils.FileExist(ymlPath)
 	if exist {
 		fmt.Println("Found config file", ymlPath)
@@ -64,7 +68,7 @@ func LoadConfig() error {
 }
 
 func SaveConfig() error {
-	ymlPath := yamlConfigPath
+	ymlPath := GetConfigPath()
 	bs, err := yaml.Marshal(Config)
 	if err != nil {
 		return err
@@ -135,10 +139,6 @@ func curGitRepoPath(repoValue, remoteValue string) (*Login, string, error) {
 	}
 
 	return nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
-}
-
-func GetConfigPath() string {
-	return yamlConfigPath
 }
 
 func GetOwnerAndRepo(repoPath, user string) (string, string) {

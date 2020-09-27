@@ -42,12 +42,12 @@ var CmdIssuesList = cli.Command{
 
 func runIssues(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
-		return runIssueDetail(ctx, ctx.Args().First())
+		return runIssueDetail(ctx.Args().First())
 	}
 	return runIssuesList(ctx)
 }
 
-func runIssueDetail(ctx *cli.Context, index string) error {
+func runIssueDetail(index string) error {
 	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
 	idx, err := argToIndex(index)

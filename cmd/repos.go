@@ -134,7 +134,7 @@ var CmdRepoCreate = cli.Command{
 
 func runRepos(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
-		return runRepoDetail(ctx, ctx.Args().First())
+		return runRepoDetail(ctx.Args().First())
 	}
 	return runReposList(ctx)
 }
@@ -239,7 +239,7 @@ func runReposList(ctx *cli.Context) error {
 	return nil
 }
 
-func runRepoDetail(_ *cli.Context, path string) error {
+func runRepoDetail(path string) error {
 	login := intern.InitCommandLoginOnly(globalLoginValue)
 	client := login.Client()
 	repoOwner, repoName := intern.GetOwnerAndRepo(path, login.User)
@@ -282,7 +282,7 @@ func runRepoCreate(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	if err = runRepoDetail(ctx, repo.FullName); err != nil {
+	if err = runRepoDetail(repo.FullName); err != nil {
 		return err
 	}
 	fmt.Printf("%s\n", repo.HTMLURL)

@@ -53,12 +53,12 @@ var CmdMilestonesList = cli.Command{
 
 func runMilestones(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
-		return runMilestoneDetail(ctx, ctx.Args().First())
+		return runMilestoneDetail(ctx.Args().First())
 	}
 	return runMilestonesList(ctx)
 }
 
-func runMilestoneDetail(ctx *cli.Context, name string) error {
+func runMilestoneDetail(name string) error {
 	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 	client := login.Client()
 
@@ -177,7 +177,7 @@ func runMilestonesCreate(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	return runMilestoneDetail(ctx, mile.Title)
+	return runMilestoneDetail(mile.Title)
 }
 
 // CmdMilestonesClose represents a sub command of milestones to close an milestone
