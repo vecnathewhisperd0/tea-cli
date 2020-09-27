@@ -6,16 +6,8 @@ package cmd
 
 import (
 	"code.gitea.io/sdk/gitea"
-	"github.com/muesli/termenv"
 	"github.com/urfave/cli/v2"
 )
-
-func getGlamourTheme() string {
-	if termenv.HasDarkBackground() {
-		return "dark"
-	}
-	return "light"
-}
 
 func getListOptions(ctx *cli.Context) gitea.ListOptions {
 	page := ctx.Int("page")

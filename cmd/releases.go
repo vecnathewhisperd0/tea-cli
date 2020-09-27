@@ -49,6 +49,8 @@ var CmdReleaseList = cli.Command{
 func runReleases(ctx *cli.Context) error {
 	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
 
+	// ToDo: ReleaseDetails
+
 	releases, _, err := login.Client().ListReleases(owner, repo, gitea.ListReleasesOptions{ListOptions: getListOptions(ctx)})
 	if err != nil {
 		log.Fatal(err)

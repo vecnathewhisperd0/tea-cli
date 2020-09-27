@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/modules/intern"
-	"code.gitea.io/tea/modules/utils"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -252,34 +252,7 @@ func runRepoDetail(_ *cli.Context, path string) error {
 		return err
 	}
 
-	output := repo.FullName
-	if repo.Mirror {
-		output += " (mirror)"
-	}
-	if repo.Fork {
-		output += " (fork)"
-	}
-	if repo.Archived {
-		output += " (archived)"
-	}
-	if repo.Empty {
-		output += " (empty)"
-	}
-	output += "\n"
-	if len(topics) != 0 {
-		output += "Topics: " + strings.Join(topics, ", ") + "\n"
-	}
-	output += "\n"
-	output += repo.Description + "\n\n"
-	output += fmt.Sprintf(
-		"Open Issues: %d, Stars: %d, Forks: %d, Size: %s\n\n",
-		repo.OpenIssues,
-		repo.Stars,
-		repo.Forks,
-		utils.FormatSize(int64(repo.Size)),
-	)
-
-	fmt.Print(output)
+	print.RepoDetails(repo, topics)
 	return nil
 }
 

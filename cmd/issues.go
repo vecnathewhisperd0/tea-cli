@@ -5,14 +5,13 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 
 	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
-	"github.com/charmbracelet/glamour"
 	"github.com/urfave/cli/v2"
 )
 
@@ -59,16 +58,7 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 	if err != nil {
 		return err
 	}
-
-	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", issue.Index,
-		issue.Title,
-		issue.State,
-		issue.Poster.UserName,
-		issue.Created.Format("2006-01-02 15:04:05"),
-		issue.Body,
-	)
-	out, err := glamour.Render(in, getGlamourTheme())
-	fmt.Print(out)
+	print.IssueDetails(issue)
 	return nil
 }
 

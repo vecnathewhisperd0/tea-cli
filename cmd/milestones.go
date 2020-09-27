@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -66,15 +67,7 @@ func runMilestoneDetail(ctx *cli.Context, name string) error {
 		return err
 	}
 
-	fmt.Printf("%s\n",
-		milestone.Title,
-	)
-	if len(milestone.Description) != 0 {
-		fmt.Printf("\n%s\n", milestone.Description)
-	}
-	if milestone.Deadline != nil && !milestone.Deadline.IsZero() {
-		fmt.Printf("\nDeadline: %s\n", milestone.Deadline.Format("2006-01-02 15:04:05"))
-	}
+	print.MilestoneDetails(milestone)
 	return nil
 }
 

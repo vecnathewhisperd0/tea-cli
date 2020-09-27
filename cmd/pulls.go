@@ -12,9 +12,9 @@ import (
 
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
-	"github.com/charmbracelet/glamour"
 	"github.com/go-git/go-git/v5"
 	git_config "github.com/go-git/go-git/v5/config"
 	"github.com/urfave/cli/v2"
@@ -426,15 +426,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		log.Fatalf("could not create PR from %s to %s:%s: %s", head, ownerArg, base, err)
 	}
 
-	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", pr.Index,
-		pr.Title,
-		pr.State,
-		pr.Poster.UserName,
-		pr.Created.Format("2006-01-02 15:04:05"),
-		pr.Body,
-	)
-	out, err := glamour.Render(in, getGlamourTheme())
-	fmt.Print(out)
+	print.PullDetails(pr)
 
 	fmt.Println(pr.HTMLURL)
 	return err

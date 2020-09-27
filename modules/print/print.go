@@ -2,9 +2,20 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package utils
+package print
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/muesli/termenv"
+)
+
+func getGlamourTheme() string {
+	if termenv.HasDarkBackground() {
+		return "dark"
+	}
+	return "light"
+}
 
 // FormatSize get kb in int and return string
 func FormatSize(kb int64) string {
