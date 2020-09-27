@@ -1,5 +1,28 @@
 # Changelog
 
+## [v0.5.0](https://gitea.com/gitea/tea/releases/tag/v0.5.0) - 2020-09-27
+
+* BREAKING
+  * Add Login Manage Functions (#182)
+* FEATURES
+  * Add Release Subcomands (#195)
+  * Use glamour and termev to render/colorize content (#181)
+  * Login: add BasicAuth & Interactive (#174)
+  * Add milestones subcomands (#149)
+* BUGFIXES
+  * Fix Pulls Create (#202)
+  * Pulls create: detect head branch repo owner (#193)
+  * Fix Labels Delete (#180)
+  * More Options To Specify Repo (#178)
+* ENHANCEMENTS
+  * Add Pagination Options for List Subcomands (#204)
+  * Issues/Pulls: Details show State (#196)
+  * Make issues & pulls subcommands consistent (#188)
+  * Update SDK to v0.13.0 (#179)
+  * Add Repo Create subcomand & enhancements (#173)
+  * Times: format duration as seconds for machine-readable outputs (#168)
+  * Add user message to login list view (#166)
+
 ## [v0.4.1](https://gitea.com/gitea/tea/releases/tag/v0.4.1) - 2020-09-13
 
 * BUGFIXES
