@@ -5,6 +5,7 @@
 package cmd
 
 import (
+	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -104,3 +105,16 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationPageFlag,
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
+
+// getListOptions return ListOptions based on PaginationFlags
+func getListOptions(ctx *cli.Context) gitea.ListOptions {
+	page := ctx.Int("page")
+	limit := ctx.Int("limit")
+	if limit != 0 && page == 0 {
+		page = 1
+	}
+	return gitea.ListOptions{
+		Page:     page,
+		PageSize: limit,
+	}
+}
