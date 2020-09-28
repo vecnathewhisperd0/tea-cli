@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -96,32 +95,6 @@ func runLabels(ctx *cli.Context) error {
 	return nil
 }
 
-// CmdLabelCreate represents a sub command of labels to create label.
-var CmdLabelCreate = cli.Command{
-	Name:        "create",
-	Usage:       "Create a label",
-	Description: `Create a label`,
-	Action:      runLabelCreate,
-	Flags: []cli.Flag{
-		&cli.StringFlag{
-			Name:  "name",
-			Usage: "label name",
-		},
-		&cli.StringFlag{
-			Name:  "color",
-			Usage: "label color value",
-		},
-		&cli.StringFlag{
-			Name:  "description",
-			Usage: "label description",
-		},
-		&cli.StringFlag{
-			Name:  "file",
-			Usage: "indicate a label file",
-		},
-	},
-}
-
 func splitLabelLine(line string) (string, string, string) {
 	fields := strings.SplitN(line, ";", 2)
 	var color, name, description string
@@ -141,133 +114,4 @@ func splitLabelLine(line string) (string, string, string) {
 		name = strings.Join(fields[1:], " ")
 	}
 	return color, name, description
-}
-
-func runLabelCreate(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
-
-	labelFile := ctx.String("file")
-	var err error
-	if len(labelFile) == 0 {
-		_, _, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
-			Name:        ctx.String("name"),
-			Color:       ctx.String("color"),
-			Description: ctx.String("description"),
-		})
-	} else {
-		f, err := os.Open(labelFile)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-
-		scanner := bufio.NewScanner(f)
-		var i = 1
-		for scanner.Scan() {
-			line := scanner.Text()
-			color, name, description := splitLabelLine(line)
-			if color == "" || name == "" {
-				log.Printf("Line %d ignored because lack of enough fields: %s\n", i, line)
-			} else {
-				_, _, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
-					Name:        name,
-					Color:       color,
-					Description: description,
-				})
-			}
-
-			i++
-		}
-	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
-}
-
-// CmdLabelUpdate represents a sub command of labels to update label.
-var CmdLabelUpdate = cli.Command{
-	Name:        "update",
-	Usage:       "Update a label",
-	Description: `Update a label`,
-	Action:      runLabelUpdate,
-	Flags: []cli.Flag{
-		&cli.IntFlag{
-			Name:  "id",
-			Usage: "label id",
-		},
-		&cli.StringFlag{
-			Name:  "name",
-			Usage: "label name",
-		},
-		&cli.StringFlag{
-			Name:  "color",
-			Usage: "label color value",
-		},
-		&cli.StringFlag{
-			Name:  "description",
-			Usage: "label description",
-		},
-	},
-}
-
-func runLabelUpdate(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
-
-	id := ctx.Int64("id")
-	var pName, pColor, pDescription *string
-	name := ctx.String("name")
-	if name != "" {
-		pName = &name
-	}
-
-	color := ctx.String("color")
-	if color != "" {
-		pColor = &color
-	}
-
-	description := ctx.String("description")
-	if description != "" {
-		pDescription = &description
-	}
-
-	var err error
-	_, _, err = login.Client().EditLabel(owner, repo, id, gitea.EditLabelOption{
-		Name:        pName,
-		Color:       pColor,
-		Description: pDescription,
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
-}
-
-// CmdLabelDelete represents a sub command of labels to delete label.
-var CmdLabelDelete = cli.Command{
-	Name:        "delete",
-	Usage:       "Delete a label",
-	Description: `Delete a label`,
-	Action:      runLabelDelete,
-	Flags: []cli.Flag{
-		&cli.IntFlag{
-			Name:  "id",
-			Usage: "label id",
-		},
-	},
-}
-
-func runLabelDelete(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
-
-	_, err := login.Client().DeleteLabel(owner, repo, ctx.Int64("id"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
 }
