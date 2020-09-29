@@ -7,6 +7,9 @@ package utils
 import (
 	"errors"
 	"os"
+	"os/user"
+	"path/filepath"
+	"strings"
 )
 
 // PathExists returns whether the given file or directory exists or not
@@ -34,4 +37,19 @@ func FileExist(fileName string) (bool, error) {
 		return false, errors.New("A directory with the same name exists")
 	}
 	return true, nil
+}
+
+// AbsPathWithExpansion expand path beginning with "~/" to absolute path
+func AbsPathWithExpansion(p string) (string, error) {
+	u, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	if p == "~" {
+		return u.HomeDir, nil
+	} else if strings.HasPrefix(p, "~/") {
+		return filepath.Join(u.HomeDir, p[2:]), nil
+	} else {
+		return filepath.Abs(p)
+	}
 }
