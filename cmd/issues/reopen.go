@@ -5,8 +5,9 @@
 package issues
 
 import (
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
+
+	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
