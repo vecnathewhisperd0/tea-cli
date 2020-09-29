@@ -22,7 +22,7 @@ func formatDuration(seconds int64, outputType string) string {
 	return time.Duration(1e9 * seconds).String()
 }
 
-// TrackedTimesList
+// TrackedTimesList print list of tracked times to stdout
 func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {
 	var outputValues [][]string
 	var totalDuration int64
