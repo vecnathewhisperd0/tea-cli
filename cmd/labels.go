@@ -14,6 +14,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
+	"github.com/muesli/termenv"
 	"github.com/urfave/cli/v2"
 )
 
@@ -34,6 +35,8 @@ var CmdLabels = cli.Command{
 			Aliases: []string{"s"},
 			Usage:   "Save all the labels as a file",
 		},
+		&PaginationPageFlag,
+		&PaginationLimitFlag,
 	}, AllDefaultFlags...),
 }
 
@@ -49,7 +52,7 @@ func runLabels(ctx *cli.Context) error {
 
 	var values [][]string
 
-	labels, _, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{})
+	labels, _, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{ListOptions: getListOptions(ctx)})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,6 +61,8 @@ func runLabels(ctx *cli.Context) error {
 		Output(outputValue, headers, values)
 		return nil
 	}
+
+	p := termenv.ColorProfile()
 
 	fPath := ctx.String("save")
 	if len(fPath) > 0 {
@@ -72,11 +77,13 @@ func runLabels(ctx *cli.Context) error {
 		}
 	} else {
 		for _, label := range labels {
+			color := termenv.String(label.Color)
+
 			values = append(
 				values,
 				[]string{
 					strconv.FormatInt(label.ID, 10),
-					label.Color,
+					fmt.Sprint(color.Background(p.Color("#" + label.Color))),
 					label.Name,
 					label.Description,
 				},

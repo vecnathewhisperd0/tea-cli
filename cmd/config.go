@@ -21,6 +21,8 @@ import (
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
+	"github.com/muesli/termenv"
+	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,7 +31,7 @@ type Login struct {
 	Name    string `yaml:"name"`
 	URL     string `yaml:"url"`
 	Token   string `yaml:"token"`
-	Active  bool   `yaml:"active"`
+	Default bool   `yaml:"default"`
 	SSHHost string `yaml:"ssh_host"`
 	// optional path to the private key
 	SSHKey   string `yaml:"ssh_key"`
@@ -100,6 +102,13 @@ func init() {
 	yamlConfigPath = filepath.Join(dir, "tea.yml")
 }
 
+func getGlamourTheme() string {
+	if termenv.HasDarkBackground() {
+		return "dark"
+	}
+	return "light"
+}
+
 func getOwnerAndRepo(repoPath, user string) (string, string) {
 	if len(repoPath) == 0 {
 		return "", ""
@@ -111,12 +120,12 @@ func getOwnerAndRepo(repoPath, user string) (string, string) {
 	return user, repoPath
 }
 
-func getActiveLogin() (*Login, error) {
+func getDefaultLogin() (*Login, error) {
 	if len(config.Logins) == 0 {
 		return nil, errors.New("No available login")
 	}
 	for _, l := range config.Logins {
-		if l.Active {
+		if l.Default {
 			return &l, nil
 		}
 	}
@@ -262,4 +271,16 @@ func curGitRepoPath(path string) (*Login, string, error) {
 	}
 
 	return nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
+}
+
+func getListOptions(ctx *cli.Context) gitea.ListOptions {
+	page := ctx.Int("page")
+	limit := ctx.Int("limit")
+	if limit != 0 && page == 0 {
+		page = 1
+	}
+	return gitea.ListOptions{
+		Page:     page,
+		PageSize: limit,
+	}
 }

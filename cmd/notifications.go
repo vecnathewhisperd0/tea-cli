@@ -15,8 +15,8 @@ import (
 // CmdNotifications is the main command to operate with notifications
 var CmdNotifications = cli.Command{
 	Name:        "notifications",
-	Usage:       "show notifications",
-	Description: "show notifications, by default based of the current repo and unread one",
+	Usage:       "Show notifications",
+	Description: "Show notifications, by default based of the current repo and unread one",
 	Action:      runNotifications,
 	Flags: append([]cli.Flag{
 		&cli.BoolFlag{
@@ -34,17 +34,8 @@ var CmdNotifications = cli.Command{
 			Aliases: []string{"pd"},
 			Usage:   "show pinned notifications instead unread",
 		},
-		&cli.IntFlag{
-			Name:    "page",
-			Aliases: []string{"p"},
-			Usage:   "specify page, default is 1",
-			Value:   1,
-		},
-		&cli.IntFlag{
-			Name:    "limit",
-			Aliases: []string{"lm"},
-			Usage:   "specify limit of items per page",
-		},
+		&PaginationPageFlag,
+		&PaginationLimitFlag,
 	}, AllDefaultFlags...),
 }
 
@@ -52,9 +43,9 @@ func runNotifications(ctx *cli.Context) error {
 	var news []*gitea.NotificationThread
 	var err error
 
-	listOpts := gitea.ListOptions{
-		Page:     ctx.Int("page"),
-		PageSize: ctx.Int("limit"),
+	listOpts := getListOptions(ctx)
+	if listOpts.Page == 0 {
+		listOpts.Page = 1
 	}
 
 	var status []gitea.NotifyStatus

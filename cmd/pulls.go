@@ -13,6 +13,7 @@ import (
 	local_git "code.gitea.io/tea/modules/git"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/charmbracelet/glamour"
 	"github.com/go-git/go-git/v5"
 	git_config "github.com/go-git/go-git/v5/config"
 	"github.com/urfave/cli/v2"
@@ -22,17 +23,13 @@ import (
 var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Aliases:     []string{"pull", "pr"},
-	Usage:       "List open pull requests",
-	Description: `List open pull requests`,
+	Usage:       "List, create, checkout and clean pull requests",
+	Description: `List, create, checkout and clean pull requests`,
+	ArgsUsage:   "[<pull index>]",
 	Action:      runPulls,
-	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by PR state (all|open|closed)",
-			DefaultText: "open",
-		},
-	}, AllDefaultFlags...),
+	Flags:       IssuePRFlags,
 	Subcommands: []*cli.Command{
+		&CmdPullsList,
 		&CmdPullsCheckout,
 		&CmdPullsClean,
 		&CmdPullsCreate,
@@ -40,6 +37,44 @@ var CmdPulls = cli.Command{
 }
 
 func runPulls(ctx *cli.Context) error {
+	if ctx.Args().Len() == 1 {
+		return runPullDetail(ctx, ctx.Args().First())
+	}
+	return runPullsList(ctx)
+}
+
+// CmdPullsList represents a sub command of issues to list pulls
+var CmdPullsList = cli.Command{
+	Name:        "ls",
+	Usage:       "List pull requests of the repository",
+	Description: `List pull requests of the repository`,
+	Action:      runPullsList,
+	Flags:       IssuePRFlags,
+}
+
+func runPullDetail(ctx *cli.Context, index string) error {
+	login, owner, repo := initCommand()
+
+	idx, err := argToIndex(index)
+	if err != nil {
+		return err
+	}
+	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
+	if err != nil {
+		return err
+	}
+
+	// TODO: use glamour once #181 is merged
+	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", pr.Index,
+		pr.Title,
+		pr.Poster.UserName,
+		pr.Created.Format("2006-01-02 15:04:05"),
+		pr.Body,
+	)
+	return nil
+}
+
+func runPullsList(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
 	state := gitea.StateOpen
@@ -304,15 +339,22 @@ func runPullsCreate(ctx *cli.Context) error {
 	login, ownerArg, repoArg := initCommand()
 	client := login.Client()
 
-	repo, _, err := login.Client().GetRepo(ownerArg, repoArg)
+	repo, _, err := client.GetRepo(ownerArg, repoArg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("could not fetch repo meta: ", err)
 	}
 
 	// open local git repo
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("could not open local repo: ", err)
+	}
+
+	// push if possible
+	log.Println("git push")
+	err = localRepo.Push(&git.PushOptions{})
+	if err != nil && err != git.NoErrAlreadyUpToDate {
+		log.Printf("Error occurred during 'git push':\n%s\n", err.Error())
 	}
 
 	base := ctx.String("base")
@@ -324,10 +366,35 @@ func runPullsCreate(ctx *cli.Context) error {
 	head := ctx.String("head")
 	// default is current one
 	if len(head) == 0 {
-		head, err = localRepo.TeaGetCurrentBranchName()
+		headBranch, err := localRepo.Head()
 		if err != nil {
 			log.Fatal(err)
 		}
+		sha := headBranch.Hash().String()
+
+		remote, err := localRepo.TeaFindBranchRemote("", sha)
+		if err != nil {
+			log.Fatal("could not determine remote for current branch: ", err)
+		}
+
+		if remote == nil {
+			// if no remote branch is found for the local hash, we abort:
+			// user has probably not configured a remote for the local branch,
+			// or local branch does not represent remote state.
+			log.Fatal("no matching remote found for this branch. try git push -u <remote> <branch>")
+		}
+
+		branchName, err := localRepo.TeaGetCurrentBranchName()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		url, err := local_git.ParseURL(remote.Config().URLs[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		owner, _ := getOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
+		head = fmt.Sprintf("%s:%s", owner, branchName)
 	}
 
 	title := ctx.String("title")
@@ -347,12 +414,6 @@ func runPullsCreate(ctx *cli.Context) error {
 		return nil
 	}
 
-	// push if possible
-	err = localRepo.Push(&git.PushOptions{})
-	if err != nil {
-		fmt.Printf("Error occurred during 'git push':\n%s\n", err.Error())
-	}
-
 	pr, _, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
 		Head:  head,
 		Base:  base,
@@ -361,19 +422,21 @@ func runPullsCreate(ctx *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("could not create PR from %s to %s:%s: %s", head, ownerArg, base, err)
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n", pr.Index,
+	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", pr.Index,
 		pr.Title,
+		pr.State,
 		pr.Poster.UserName,
 		pr.Created.Format("2006-01-02 15:04:05"),
+		pr.Body,
 	)
-	if len(pr.Body) != 0 {
-		fmt.Printf("\n%s\n", pr.Body)
-	}
+	out, err := glamour.Render(in, getGlamourTheme())
+	fmt.Print(out)
+
 	fmt.Println(pr.HTMLURL)
-	return nil
+	return err
 }
 
 func argToIndex(arg string) (int64, error) {

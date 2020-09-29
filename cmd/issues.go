@@ -10,15 +10,15 @@ import (
 	"strconv"
 
 	"code.gitea.io/sdk/gitea"
-
+	"github.com/charmbracelet/glamour"
 	"github.com/urfave/cli/v2"
 )
 
 // CmdIssues represents to login a gitea server.
 var CmdIssues = cli.Command{
 	Name:        "issues",
-	Usage:       "List and create issues",
-	Description: `List and create issues`,
+	Usage:       "List, create and update issues",
+	Description: "List, create and update issues",
 	ArgsUsage:   "[<issue index>]",
 	Action:      runIssues,
 	Subcommands: []*cli.Command{
@@ -27,7 +27,7 @@ var CmdIssues = cli.Command{
 		&CmdIssuesReopen,
 		&CmdIssuesClose,
 	},
-	Flags: AllDefaultFlags,
+	Flags: IssuePRFlags,
 }
 
 // CmdIssuesList represents a sub command of issues to list issues
@@ -36,13 +36,7 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      runIssuesList,
-	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by issue state (all|open|closed)",
-			DefaultText: "open",
-		},
-	}, AllDefaultFlags...),
+	Flags:       IssuePRFlags,
 }
 
 func runIssues(ctx *cli.Context) error {
@@ -64,12 +58,15 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 		return err
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", issue.Index,
+	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", issue.Index,
 		issue.Title,
+		issue.State,
 		issue.Poster.UserName,
 		issue.Created.Format("2006-01-02 15:04:05"),
 		issue.Body,
 	)
+	out, err := glamour.Render(in, getGlamourTheme())
+	fmt.Print(out)
 	return nil
 }
 
@@ -87,8 +84,9 @@ func runIssuesList(ctx *cli.Context) error {
 	}
 
 	issues, _, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		State: state,
-		Type:  gitea.IssueTypeIssue,
+		ListOptions: getListOptions(ctx),
+		State:       state,
+		Type:        gitea.IssueTypeIssue,
 	})
 
 	if err != nil {

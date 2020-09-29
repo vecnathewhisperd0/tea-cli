@@ -15,10 +15,10 @@ You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
 Distribution packages exist for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** and **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
 
-To install from source, go 1.12 or newer is required.
+To install from source, go 1.13 or newer is required.
 
 - Build static binary using git & make:
-	```
+	```sh
 	git clone https://gitea.com/gitea/tea
 	make install
 	```
@@ -51,12 +51,14 @@ Detailed usage information is available via `tea <command> --help`.
 login            Log in to a Gitea server
 logout           Log out from a Gitea server
 issues           List, create and update issues
-pulls            List, checkout and clean pull requests
-releases         Create releases
+pulls            List, create, checkout and clean pull requests
+releases         List, create, update and delete releases
 repos            Operate with repositories
 labels           Manage issue labels
 times            Operate on tracked times of a repositorys issues and pulls
 open             Open something of the repository on web browser
+notifications    Show notifications
+milestones       List and create milestones
 ```
 
 To fetch issues from different repos, use the `--remote` flag (when inside a gitea repository directory) or `--login` & `--repo` flags.
