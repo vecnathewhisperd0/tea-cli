@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -41,7 +41,7 @@ var CmdLabelUpdate = cli.Command{
 }
 
 func runLabelUpdate(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
 	id := ctx.Int64("id")
 	var pName, pColor, pDescription *string

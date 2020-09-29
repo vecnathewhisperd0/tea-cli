@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
@@ -30,7 +30,7 @@ var CmdIssuesClose = cli.Command{
 
 // editIssueState abstracts the arg parsing to edit the given issue
 func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	if ctx.Args().Len() == 0 {
 		log.Fatal(ctx.Command.ArgsUsage)
 	}

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -61,13 +61,13 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if ctx.Bool("all") {
-		login := intern.InitCommandLoginOnly(flags.GlobalLoginValue)
+		login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
 		news, _, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
 		})
 	} else {
-		login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+		login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 		news, _, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,

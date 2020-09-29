@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 
 	"github.com/urfave/cli/v2"
 )
@@ -28,7 +28,7 @@ var CmdLabelDelete = cli.Command{
 }
 
 func runLabelDelete(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
 	_, err := login.Client().DeleteLabel(owner, repo, ctx.Int64("id"))
 	if err != nil {

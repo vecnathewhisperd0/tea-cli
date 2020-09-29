@@ -9,8 +9,8 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
-	"code.gitea.io/tea/modules/intern"
 	"code.gitea.io/tea/modules/utils"
 
 	"github.com/go-git/go-git/v5"
@@ -28,7 +28,7 @@ var CmdPullsCheckout = cli.Command{
 }
 
 func runPullsCheckout(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	if ctx.Args().Len() != 1 {
 		log.Fatal("Must specify a PR index")
 	}

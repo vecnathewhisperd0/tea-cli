@@ -6,7 +6,7 @@ package login
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 
 	"github.com/skratchdot/open-golang/open"
 	"github.com/urfave/cli/v2"
@@ -22,5 +22,5 @@ var CmdLoginEdit = cli.Command{
 }
 
 func runLoginEdit(ctx *cli.Context) error {
-	return open.Start(intern.GetConfigPath())
+	return open.Start(config.GetConfigPath())
 }

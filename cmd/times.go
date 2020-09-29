@@ -13,7 +13,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/times"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -57,7 +57,7 @@ var CmdTrackedTimes = cli.Command{
 }
 
 func runTrackedTimes(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {

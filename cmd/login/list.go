@@ -9,7 +9,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
 
 	"github.com/urfave/cli/v2"
@@ -25,7 +25,7 @@ var CmdLoginList = cli.Command{
 }
 
 func runLoginList(ctx *cli.Context) error {
-	err := intern.LoadConfig()
+	err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func runLoginList(ctx *cli.Context) error {
 
 	var values [][]string
 
-	for _, l := range intern.Config.Logins {
+	for _, l := range config.Config.Logins {
 		values = append(values, []string{
 			l.Name,
 			l.URL,

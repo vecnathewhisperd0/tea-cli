@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
-	"code.gitea.io/tea/modules/intern"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -49,7 +49,7 @@ var CmdPullsCreate = cli.Command{
 }
 
 func runPullsCreate(ctx *cli.Context) error {
-	login, ownerArg, repoArg := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, ownerArg, repoArg := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	repo, _, err := client.GetRepo(ownerArg, repoArg)
@@ -106,7 +106,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		owner, _ := intern.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
+		owner, _ := config.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
 		head = fmt.Sprintf("%s:%s", owner, branchName)
 	}
 

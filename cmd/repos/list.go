@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -53,7 +53,7 @@ var CmdReposList = cli.Command{
 
 // RunReposList list repositories
 func RunReposList(ctx *cli.Context) error {
-	login := intern.InitCommandLoginOnly(flags.GlobalLoginValue)
+	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
 	client := login.Client()
 
 	var ownerID int64

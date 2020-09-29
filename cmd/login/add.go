@@ -5,8 +5,8 @@
 package login
 
 import (
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/interact"
-	"code.gitea.io/tea/modules/intern"
 
 	"github.com/urfave/cli/v2"
 )
@@ -66,7 +66,7 @@ var CmdLoginAdd = cli.Command{
 
 func runLoginAdd(ctx *cli.Context) error {
 	// TODO: if no args -> interactive
-	return intern.AddLogin(
+	return config.AddLogin(
 		ctx.String("name"),
 		ctx.String("token"),
 		ctx.String("user"),

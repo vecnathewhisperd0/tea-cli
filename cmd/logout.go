@@ -9,7 +9,7 @@ import (
 	"log"
 	"os"
 
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 
 	"github.com/urfave/cli/v2"
 )
@@ -39,21 +39,21 @@ func runLogout(ctx *cli.Context) error {
 		return errors.New("Please specify a login name")
 	}
 
-	err := intern.LoadConfig()
+	err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var idx = -1
-	for i, l := range intern.Config.Logins {
+	for i, l := range config.Config.Logins {
 		if l.Name == name {
 			idx = i
 			break
 		}
 	}
 	if idx > -1 {
-		intern.Config.Logins = append(intern.Config.Logins[:idx], intern.Config.Logins[idx+1:]...)
-		err = intern.SaveConfig()
+		config.Config.Logins = append(config.Config.Logins[:idx], config.Config.Logins[idx+1:]...)
+		err = config.SaveConfig()
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 
 	"github.com/urfave/cli/v2"
 )
@@ -24,11 +24,11 @@ var CmdLoginSetDefault = cli.Command{
 }
 
 func runLoginSetDefault(ctx *cli.Context) error {
-	if err := intern.LoadConfig(); err != nil {
+	if err := config.LoadConfig(); err != nil {
 		return err
 	}
 	if ctx.Args().Len() == 0 {
-		l, err := intern.GetDefaultLogin()
+		l, err := config.GetDefaultLogin()
 		if err != nil {
 			return err
 		}
@@ -36,10 +36,10 @@ func runLoginSetDefault(ctx *cli.Context) error {
 		return nil
 	}
 	loginExist := false
-	for i := range intern.Config.Logins {
-		intern.Config.Logins[i].Default = false
-		if intern.Config.Logins[i].Name == ctx.Args().First() {
-			intern.Config.Logins[i].Default = true
+	for i := range config.Config.Logins {
+		config.Config.Logins[i].Default = false
+		if config.Config.Logins[i].Name == ctx.Args().First() {
+			config.Config.Logins[i].Default = true
 			loginExist = true
 		}
 	}
@@ -48,5 +48,5 @@ func runLoginSetDefault(ctx *cli.Context) error {
 		return fmt.Errorf("login '%s' not found", ctx.Args().First())
 	}
 
-	return intern.SaveConfig()
+	return config.SaveConfig()
 }

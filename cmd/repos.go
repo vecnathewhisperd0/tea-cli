@@ -7,7 +7,7 @@ package cmd
 import (
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/repos"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -36,9 +36,9 @@ func runRepos(ctx *cli.Context) error {
 }
 
 func runRepoDetail(path string) error {
-	login := intern.InitCommandLoginOnly(flags.GlobalLoginValue)
+	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
 	client := login.Client()
-	repoOwner, repoName := intern.GetOwnerAndRepo(path, login.User)
+	repoOwner, repoName := config.GetOwnerAndRepo(path, login.User)
 	repo, _, err := client.GetRepo(repoOwner, repoName)
 	if err != nil {
 		return err

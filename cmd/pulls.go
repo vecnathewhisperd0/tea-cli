@@ -9,7 +9,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/pulls"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/utils"
 
 	"github.com/urfave/cli/v2"
@@ -40,7 +40,7 @@ func runPulls(ctx *cli.Context) error {
 }
 
 func runPullDetail(index string) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
 	idx, err := utils.ArgToIndex(index)
 	if err != nil {

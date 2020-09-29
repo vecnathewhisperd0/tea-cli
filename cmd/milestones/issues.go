@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -67,7 +67,7 @@ var CmdMilestoneRemoveIssue = cli.Command{
 }
 
 func runMilestoneIssueList(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	state := gitea.StateOpen
@@ -147,7 +147,7 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 }
 
 func runMilestoneIssueAdd(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")
@@ -173,7 +173,7 @@ func runMilestoneIssueAdd(ctx *cli.Context) error {
 }
 
 func runMilestoneIssueRemove(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")

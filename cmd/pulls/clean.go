@@ -8,8 +8,8 @@ import (
 	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
-	"code.gitea.io/tea/modules/intern"
 	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
@@ -33,7 +33,7 @@ var CmdPullsClean = cli.Command{
 }
 
 func runPullsClean(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	if ctx.Args().Len() != 1 {
 		return fmt.Errorf("Must specify a PR index")
 	}

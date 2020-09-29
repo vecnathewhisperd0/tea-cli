@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 )
 
 // CreateLogin create an login interactive
@@ -83,5 +83,5 @@ func CreateLogin() error {
 		insecure = len(stdin) != 0 && strings.ToLower(stdin[:1]) == "y"
 	}
 
-	return intern.AddLogin(name, token, user, passwd, sshKey, giteaURL, insecure)
+	return config.AddLogin(name, token, user, passwd, sshKey, giteaURL, insecure)
 }

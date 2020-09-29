@@ -6,7 +6,7 @@ package milestones
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/config"
 
 	"github.com/urfave/cli/v2"
 )
@@ -23,7 +23,7 @@ var CmdMilestonesDelete = cli.Command{
 }
 
 func deleteMilestone(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	_, err := client.DeleteMilestoneByName(owner, repo, ctx.Args().First())
