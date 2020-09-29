@@ -5,10 +5,11 @@
 package cmd
 
 import (
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/milestones"
 	"code.gitea.io/tea/modules/intern"
 	"code.gitea.io/tea/modules/print"
 
-	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -21,25 +22,25 @@ var CmdMilestones = cli.Command{
 	ArgsUsage:   "[<milestone name>]",
 	Action:      runMilestones,
 	Subcommands: []*cli.Command{
-		&CmdMilestonesList,
-		&CmdMilestonesCreate,
-		&CmdMilestonesClose,
-		&CmdMilestonesDelete,
-		&CmdMilestonesReopen,
-		&CmdMilestonesIssues,
+		&milestones.CmdMilestonesList,
+		&milestones.CmdMilestonesCreate,
+		&milestones.CmdMilestonesClose,
+		&milestones.CmdMilestonesDelete,
+		&milestones.CmdMilestonesReopen,
+		&milestones.CmdMilestonesIssues,
 	},
-	Flags: AllDefaultFlags,
+	Flags: flags.AllDefaultFlags,
 }
 
 func runMilestones(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
 		return runMilestoneDetail(ctx.Args().First())
 	}
-	return runMilestonesList(ctx)
+	return milestones.RunMilestonesList(ctx)
 }
 
 func runMilestoneDetail(name string) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
+	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	milestone, _, err := client.GetMilestoneByName(owner, repo, name)
@@ -49,20 +50,4 @@ func runMilestoneDetail(name string) error {
 
 	print.MilestoneDetails(milestone)
 	return nil
-}
-
-func editMilestoneStatus(ctx *cli.Context, close bool) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
-	client := login.Client()
-
-	state := gitea.StateOpen
-	if close {
-		state = gitea.StateClosed
-	}
-	_, _, err := client.EditMilestoneByName(owner, repo, ctx.Args().First(), gitea.EditMilestoneOption{
-		State: &state,
-		Title: ctx.Args().First(),
-	})
-
-	return err
 }

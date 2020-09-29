@@ -5,9 +5,9 @@
 package cmd
 
 import (
-	"fmt"
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/releases"
 
-	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -18,30 +18,12 @@ var CmdReleases = cli.Command{
 	Aliases:     []string{"releases"},
 	Usage:       "Manage releases",
 	Description: "Manage releases",
-	Action:      runReleasesList,
+	Action:      releases.RunReleasesList,
 	Subcommands: []*cli.Command{
-		&CmdReleaseList,
-		&CmdReleaseCreate,
-		&CmdReleaseDelete,
-		&CmdReleaseEdit,
+		&releases.CmdReleaseList,
+		&releases.CmdReleaseCreate,
+		&releases.CmdReleaseDelete,
+		&releases.CmdReleaseEdit,
 	},
-	Flags: AllDefaultFlags,
-}
-
-func getReleaseByTag(owner, repo, tag string, client *gitea.Client) (*gitea.Release, error) {
-	rl, _, err := client.ListReleases(owner, repo, gitea.ListReleasesOptions{})
-	if err != nil {
-		return nil, err
-	}
-	if len(rl) == 0 {
-		fmt.Println("Repo does not have any release")
-		return nil, nil
-	}
-	for _, r := range rl {
-		if r.TagName == tag {
-			return r, nil
-		}
-	}
-	fmt.Println("Release tag does not exist")
-	return nil, nil
+	Flags: flags.AllDefaultFlags,
 }

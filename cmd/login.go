@@ -5,6 +5,8 @@
 package cmd
 
 import (
+	"code.gitea.io/tea/cmd/login"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -13,11 +15,11 @@ var CmdLogin = cli.Command{
 	Name:        "login",
 	Usage:       "Log in to a Gitea server",
 	Description: `Log in to a Gitea server`,
-	Action:      runLoginAddInteractive, // TODO show list if no arg & detail if login as arg
+	Action:      login.RunLoginAddInteractive, // TODO show list if no arg & detail if login as arg
 	Subcommands: []*cli.Command{
-		&cmdLoginList,
-		&cmdLoginAdd,
-		&cmdLoginEdit,
-		&cmdLoginSetDefault,
+		&login.CmdLoginList,
+		&login.CmdLoginAdd,
+		&login.CmdLoginEdit,
+		&login.CmdLoginSetDefault,
 	},
 }

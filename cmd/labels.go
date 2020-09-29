@@ -9,9 +9,11 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/labels"
 	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/muesli/termenv"
@@ -25,9 +27,9 @@ var CmdLabels = cli.Command{
 	Description: `Manage issue labels`,
 	Action:      runLabels,
 	Subcommands: []*cli.Command{
-		&CmdLabelCreate,
-		&CmdLabelUpdate,
-		&CmdLabelDelete,
+		&labels.CmdLabelCreate,
+		&labels.CmdLabelUpdate,
+		&labels.CmdLabelDelete,
 	},
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -35,13 +37,13 @@ var CmdLabels = cli.Command{
 			Aliases: []string{"s"},
 			Usage:   "Save all the labels as a file",
 		},
-		&PaginationPageFlag,
-		&PaginationLimitFlag,
-	}, AllDefaultFlags...),
+		&flags.PaginationPageFlag,
+		&flags.PaginationLimitFlag,
+	}, flags.AllDefaultFlags...),
 }
 
 func runLabels(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
+	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
 	headers := []string{
 		"Index",
@@ -52,13 +54,13 @@ func runLabels(ctx *cli.Context) error {
 
 	var values [][]string
 
-	labels, _, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{ListOptions: getListOptions(ctx)})
+	labels, _, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{ListOptions: flags.GetListOptions(ctx)})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	if len(labels) == 0 {
-		Output(globalOutputValue, headers, values)
+		print.OutputList(flags.GlobalOutputValue, headers, values)
 		return nil
 	}
 
@@ -89,29 +91,8 @@ func runLabels(ctx *cli.Context) error {
 				},
 			)
 		}
-		Output(globalOutputValue, headers, values)
+		print.OutputList(flags.GlobalOutputValue, headers, values)
 	}
 
 	return nil
-}
-
-func splitLabelLine(line string) (string, string, string) {
-	fields := strings.SplitN(line, ";", 2)
-	var color, name, description string
-	if len(fields) < 1 {
-		return "", "", ""
-	} else if len(fields) >= 2 {
-		description = strings.TrimSpace(fields[1])
-	}
-	fields = strings.Fields(fields[0])
-	if len(fields) <= 0 {
-		return "", "", ""
-	}
-	color = fields[0]
-	if len(fields) == 2 {
-		name = fields[1]
-	} else if len(fields) > 2 {
-		name = strings.Join(fields[1:], " ")
-	}
-	return color, name, description
 }

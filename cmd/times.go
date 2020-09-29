@@ -11,7 +11,11 @@ import (
 	"strings"
 	"time"
 
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/times"
 	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/araddon/dateparse"
@@ -29,9 +33,9 @@ var CmdTrackedTimes = cli.Command{
 	ArgsUsage: "[username | #issue]",
 	Action:    runTrackedTimes,
 	Subcommands: []*cli.Command{
-		&CmdTrackedTimesAdd,
-		&CmdTrackedTimesDelete,
-		&CmdTrackedTimesReset,
+		&times.CmdTrackedTimesAdd,
+		&times.CmdTrackedTimesDelete,
+		&times.CmdTrackedTimesReset,
 	},
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -49,11 +53,11 @@ var CmdTrackedTimes = cli.Command{
 			Aliases: []string{"t"},
 			Usage:   "Print the total duration at the end",
 		},
-	}, AllDefaultFlags...),
+	}, flags.AllDefaultFlags...),
 }
 
 func runTrackedTimes(ctx *cli.Context) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
+	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
@@ -70,7 +74,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 		times, _, err = client.GetRepoTrackedTimes(owner, repo)
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
-		issue, err := argToIndex(user)
+		issue, err := utils.ArgToIndex(user)
 		if err != nil {
 			return err
 		}
@@ -98,7 +102,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 		}
 	}
 
-	printTrackedTimes(times, globalOutputValue, from, until, ctx.Bool("total"))
+	printTrackedTimes(times, flags.GlobalOutputValue, from, until, ctx.Bool("total"))
 	return nil
 }
 
@@ -153,5 +157,5 @@ func printTrackedTimes(times []*gitea.TrackedTime, outputType string, from, unti
 		"User",
 		"Duration",
 	}
-	Output(outputType, headers, outputValues)
+	print.OutputList(outputType, headers, outputValues)
 }

@@ -6,10 +6,12 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/pulls"
 	"code.gitea.io/tea/modules/intern"
+	"code.gitea.io/tea/modules/utils"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -21,12 +23,12 @@ var CmdPulls = cli.Command{
 	Description: `List, create, checkout and clean pull requests`,
 	ArgsUsage:   "[<pull index>]",
 	Action:      runPulls,
-	Flags:       IssuePRFlags,
+	Flags:       flags.IssuePRFlags,
 	Subcommands: []*cli.Command{
-		&CmdPullsList,
-		&CmdPullsCheckout,
-		&CmdPullsClean,
-		&CmdPullsCreate,
+		&pulls.CmdPullsList,
+		&pulls.CmdPullsCheckout,
+		&pulls.CmdPullsClean,
+		&pulls.CmdPullsCreate,
 	},
 }
 
@@ -34,13 +36,13 @@ func runPulls(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
 		return runPullDetail(ctx.Args().First())
 	}
-	return runPullsList(ctx)
+	return pulls.RunPullsList(ctx)
 }
 
 func runPullDetail(index string) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
+	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
-	idx, err := argToIndex(index)
+	idx, err := utils.ArgToIndex(index)
 	if err != nil {
 		return err
 	}
@@ -57,11 +59,4 @@ func runPullDetail(index string) error {
 		pr.Body,
 	)
 	return nil
-}
-
-func argToIndex(arg string) (int64, error) {
-	if strings.HasPrefix(arg, "#") {
-		arg = arg[1:]
-	}
-	return strconv.ParseInt(arg, 10, 64)
 }

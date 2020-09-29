@@ -5,12 +5,12 @@
 package cmd
 
 import (
-	"log"
-
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/issues"
 	"code.gitea.io/tea/modules/intern"
 	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/utils"
 
-	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -22,25 +22,25 @@ var CmdIssues = cli.Command{
 	ArgsUsage:   "[<issue index>]",
 	Action:      runIssues,
 	Subcommands: []*cli.Command{
-		&CmdIssuesList,
-		&CmdIssuesCreate,
-		&CmdIssuesReopen,
-		&CmdIssuesClose,
+		&issues.CmdIssuesList,
+		&issues.CmdIssuesCreate,
+		&issues.CmdIssuesReopen,
+		&issues.CmdIssuesClose,
 	},
-	Flags: IssuePRFlags,
+	Flags: flags.IssuePRFlags,
 }
 
 func runIssues(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
 		return runIssueDetail(ctx.Args().First())
 	}
-	return runIssuesList(ctx)
+	return issues.RunIssuesList(ctx)
 }
 
 func runIssueDetail(index string) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
+	login, owner, repo := intern.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
-	idx, err := argToIndex(index)
+	idx, err := utils.ArgToIndex(index)
 	if err != nil {
 		return err
 	}
@@ -50,21 +50,4 @@ func runIssueDetail(index string) error {
 	}
 	print.IssueDetails(issue)
 	return nil
-}
-
-// editIssueState abstracts the arg parsing to edit the given issue
-func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
-	login, owner, repo := intern.InitCommand(globalRepoValue, globalLoginValue, globalRemoteValue)
-	if ctx.Args().Len() == 0 {
-		log.Fatal(ctx.Command.ArgsUsage)
-	}
-
-	index, err := argToIndex(ctx.Args().First())
-	if err != nil {
-		return err
-	}
-
-	_, _, err = login.Client().EditIssue(owner, repo, index, opts)
-	// TODO: print (short)IssueDetails
-	return err
 }

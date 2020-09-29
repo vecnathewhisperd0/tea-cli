@@ -5,6 +5,8 @@
 package cmd
 
 import (
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/repos"
 	"code.gitea.io/tea/modules/intern"
 	"code.gitea.io/tea/modules/print"
 
@@ -20,21 +22,21 @@ var CmdRepos = cli.Command{
 	ArgsUsage:   "[<repo owner>/<repo name>]",
 	Action:      runRepos,
 	Subcommands: []*cli.Command{
-		&CmdReposList,
-		&CmdRepoCreate,
+		&repos.CmdReposList,
+		&repos.CmdRepoCreate,
 	},
-	Flags: LoginOutputFlags,
+	Flags: flags.LoginOutputFlags,
 }
 
 func runRepos(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
 		return runRepoDetail(ctx.Args().First())
 	}
-	return runReposList(ctx)
+	return repos.RunReposList(ctx)
 }
 
 func runRepoDetail(path string) error {
-	login := intern.InitCommandLoginOnly(globalLoginValue)
+	login := intern.InitCommandLoginOnly(flags.GlobalLoginValue)
 	client := login.Client()
 	repoOwner, repoName := intern.GetOwnerAndRepo(path, login.User)
 	repo, _, err := client.GetRepo(repoOwner, repoName)
