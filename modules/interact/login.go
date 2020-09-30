@@ -6,10 +6,10 @@ package interact
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/utils"
 )
 
 // CreateLogin create an login interactive
@@ -27,7 +27,7 @@ func CreateLogin() error {
 		return nil
 	}
 
-	parsedURL, err := url.Parse(giteaURL)
+	parsedURL, err := utils.NormalizeURL(giteaURL, insecure)
 	if err != nil {
 		return err
 	}
