@@ -28,3 +28,16 @@ func NormalizeURL(raw string, insecure bool) (*url.URL, error) {
 	}
 	return url.Parse(prefix + raw)
 }
+
+// GetOwnerAndRepo return repoOwner and repoName
+// based on relative path and default owner (if not in path)
+func GetOwnerAndRepo(repoPath, user string) (string, string) {
+	if len(repoPath) == 0 {
+		return "", ""
+	}
+	p := strings.Split(repoPath, "/")
+	if len(p) >= 2 {
+		return p[0], p[1]
+	}
+	return user, repoPath
+}

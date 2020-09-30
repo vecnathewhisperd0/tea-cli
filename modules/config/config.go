@@ -145,16 +145,3 @@ func curGitRepoPath(repoValue, remoteValue string) (*Login, string, error) {
 
 	return nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
 }
-
-// GetOwnerAndRepo return repoOwner and repoName
-// based on relative path and default owner (if not in path)
-func GetOwnerAndRepo(repoPath, user string) (string, string) {
-	if len(repoPath) == 0 {
-		return "", ""
-	}
-	p := strings.Split(repoPath, "/")
-	if len(p) >= 2 {
-		return p[0], p[1]
-	}
-	return user, repoPath
-}

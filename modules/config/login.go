@@ -248,7 +248,7 @@ func InitCommand(repoValue, loginValue, remoteValue string) (*Login, string, str
 		}
 	}
 
-	owner, repo := GetOwnerAndRepo(repoValue, login.User)
+	owner, repo := utils.GetOwnerAndRepo(repoValue, login.User)
 	return login, owner, repo
 }
 
