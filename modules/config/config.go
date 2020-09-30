@@ -56,7 +56,6 @@ func LoadConfig() error {
 	ymlPath := GetConfigPath()
 	exist, _ := utils.FileExist(ymlPath)
 	if exist {
-		fmt.Println("Found config file", ymlPath)
 		bs, err := ioutil.ReadFile(ymlPath)
 		if err != nil {
 			return err
