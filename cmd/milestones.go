@@ -16,7 +16,7 @@ import (
 // CmdMilestones represents to operate repositories milestones.
 var CmdMilestones = cli.Command{
 	Name:        "milestones",
-	Aliases:     []string{"ms", "mile"},
+	Aliases:     []string{"milestone", "ms", "mile"},
 	Usage:       "List and create milestones",
 	Description: `List and create milestones`,
 	ArgsUsage:   "[<milestone name>]",
