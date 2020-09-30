@@ -153,7 +153,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	if len(token) == 0 {
 		login.Token, err = login.GenerateToken(user, passwd)
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
 	}
 
@@ -163,13 +163,10 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	}
 	login.User = u.UserName
 
-	if len(name) == 0 {
-		name = strings.ReplaceAll(strings.Title(serverURL.Host), ".", "")
-		for _, l := range Config.Logins {
-			if l.Name == name {
-				name += "_" + u.UserName
-				break
-			}
+	if len(login.Name) == 0 {
+		login.Name, err = GenerateLoginName(giteaURL, login.User)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 
@@ -183,9 +180,30 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Login as %s on %s successful. Added this login as %s\n", u.UserName, giteaURL, name)
+	fmt.Printf("Login as %s on %s successful. Added this login as %s\n", login.User, login.URL, login.Name)
 
 	return nil
+}
+
+// GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
+func GenerateLoginName(url, user string) (string, error) {
+	parsedURL, err := utils.NormalizeURL(url, false)
+	if err != nil {
+		return "", err
+	}
+	name := strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
+
+	// append user name if login name already exists
+	if len(user) != 0 {
+		for _, l := range Config.Logins {
+			if l.Name == name {
+				name += "_" + user
+				break
+			}
+		}
+	}
+
+	return name, nil
 }
 
 // addLoginToConfig add a login to global Config var
@@ -198,18 +216,18 @@ func addLoginToConfig(login Login) error {
 			return errors.New("Login name has already been used")
 		}
 		if l.URL == login.URL && l.Token == login.Token {
-			return errors.New("URL has been added")
+			return errors.New("Login for this URL and token already exists")
 		}
 	}
 
-	u, err := url.Parse(login.URL)
-	if err != nil {
-		return err
-	}
-
-	if login.SSHHost == "" {
+	if len(login.SSHHost) == 0 {
+		u, err := url.Parse(login.URL)
+		if err != nil {
+			return err
+		}
 		login.SSHHost = u.Hostname()
 	}
+
 	Config.Logins = append(Config.Logins, login)
 
 	return nil

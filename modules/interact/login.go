@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/modules/config"
-	"code.gitea.io/tea/modules/utils"
 )
 
 // CreateLogin create an login interactive
@@ -27,11 +26,10 @@ func CreateLogin() error {
 		return nil
 	}
 
-	parsedURL, err := utils.NormalizeURL(giteaURL, insecure)
+	name, err := config.GenerateLoginName(giteaURL, "")
 	if err != nil {
 		return err
 	}
-	name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
 
 	fmt.Print("Name of new Login [" + name + "]: ")
 	if _, err := fmt.Scanln(&stdin); err != nil {
