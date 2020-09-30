@@ -131,7 +131,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		log.Fatal("No user set")
 	}
 
-	serverURL, err := utils.NormalizeURL(giteaURL, insecure)
+	serverURL, err := utils.NormalizeURL(giteaURL)
 	if err != nil {
 		log.Fatal("Unable to parse URL", err)
 	}
@@ -186,7 +186,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 
 // GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
 func GenerateLoginName(url, user string) (string, error) {
-	parsedURL, err := utils.NormalizeURL(url, false)
+	parsedURL, err := utils.NormalizeURL(url)
 	if err != nil {
 		return "", err
 	}

@@ -19,12 +19,10 @@ func ArgToIndex(arg string) (int64, error) {
 }
 
 // NormalizeURL normalizes the input with a protocol
-func NormalizeURL(raw string, insecure bool) (*url.URL, error) {
-	prefix := "https://"
-	if strings.HasPrefix(raw, "http") {
-		prefix = ""
-	} else if insecure {
-		prefix = "http://"
+func NormalizeURL(raw string) (*url.URL, error) {
+	var prefix string
+	if !strings.HasPrefix(raw, "http") {
+		prefix = "https://"
 	}
 	return url.Parse(prefix + raw)
 }
