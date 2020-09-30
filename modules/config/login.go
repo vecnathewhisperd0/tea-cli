@@ -13,7 +13,6 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"code.gitea.io/tea/modules/utils"
@@ -191,7 +190,7 @@ func GenerateLoginName(url, user string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	name := strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
+	name := parsedURL.Host
 
 	// append user name if login name already exists
 	if len(user) != 0 {
