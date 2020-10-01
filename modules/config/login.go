@@ -184,6 +184,27 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	return nil
 }
 
+// DeleteLogin delete a login by name
+func DeleteLogin(name string) error {
+	var idx = -1
+	for i, l := range Config.Logins {
+		if l.Name == name {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
+		return fmt.Errorf("can not delte login '%s', do not exist", name)
+	}
+
+	Config.Logins = append(Config.Logins[:idx], Config.Logins[idx+1:]...)
+	if err := SaveConfig(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
 func GenerateLoginName(url, user string) (string, error) {
 	parsedURL, err := utils.NormalizeURL(url)
