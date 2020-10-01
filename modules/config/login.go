@@ -198,11 +198,8 @@ func DeleteLogin(name string) error {
 	}
 
 	Config.Logins = append(Config.Logins[:idx], Config.Logins[idx+1:]...)
-	if err := SaveConfig(); err != nil {
-		return err
-	}
 
-	return nil
+	return SaveConfig()
 }
 
 // GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
