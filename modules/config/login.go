@@ -194,7 +194,7 @@ func DeleteLogin(name string) error {
 		}
 	}
 	if idx == -1 {
-		return fmt.Errorf("can not delte login '%s', do not exist", name)
+		return fmt.Errorf("can not delete login '%s', does not exist", name)
 	}
 
 	Config.Logins = append(Config.Logins[:idx], Config.Logins[idx+1:]...)
