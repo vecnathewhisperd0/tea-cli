@@ -16,7 +16,8 @@ import (
 
 // CmdLogin represents to login a gitea server.
 var CmdLogin = cli.Command{
-	Name:        "login",
+	Name:        "logins",
+	Aliases:     []string{"login"},
 	Usage:       "Log in to a Gitea server",
 	Description: `Log in to a Gitea server`,
 	ArgsUsage:   "[<login name>]",
