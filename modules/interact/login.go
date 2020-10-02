@@ -6,7 +6,6 @@ package interact
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 
 	"code.gitea.io/tea/modules/config"
@@ -29,11 +28,10 @@ func CreateLogin() error {
 		return nil
 	}
 
-	parsedURL, err := url.Parse(giteaURL)
+	name, err := config.GenerateLoginName(giteaURL, "")
 	if err != nil {
 		return err
 	}
-	name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
 
 	promptI = &survey.Input{Message: "Name of new Login [" + name + "]: "}
 	if err := survey.AskOne(promptI, &name); err != nil {
@@ -42,7 +40,7 @@ func CreateLogin() error {
 
 	var hasToken bool
 	promptYN := &survey.Confirm{
-		Message: fmt.Sprintf("Access token (get it from %s/user/settings/applications)", giteaURL),
+		Message: "Do you have an access token?",
 		Default: false,
 	}
 	if err = survey.AskOne(promptYN, &hasToken); err != nil {
@@ -60,7 +58,7 @@ func CreateLogin() error {
 			return err
 		}
 
-		promptPW := &survey.Password{Message: "Password"}
+		promptPW := &survey.Password{Message: "Password: "}
 		if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
 			return err
 		}
@@ -68,7 +66,7 @@ func CreateLogin() error {
 
 	var optSettings bool
 	promptYN = &survey.Confirm{
-		Message: "Set Optional settings",
+		Message: "Set Optional settings: ",
 		Default: false,
 	}
 	if err = survey.AskOne(promptYN, &optSettings); err != nil {
@@ -81,7 +79,7 @@ func CreateLogin() error {
 		}
 
 		promptYN = &survey.Confirm{
-			Message: "Allow Insecure connections",
+			Message: "Allow Insecure connections: ",
 			Default: false,
 		}
 		if err = survey.AskOne(promptYN, &insecure); err != nil {
