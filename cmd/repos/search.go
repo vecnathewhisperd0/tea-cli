@@ -55,6 +55,7 @@ var CmdReposSearch = cli.Command{
 			Required: false,
 			Usage:    "Filter archived repos (true|false)",
 		},
+		&printFieldsFlag,
 		&flags.PaginationPageFlag,
 		&flags.PaginationLimitFlag,
 	}, flags.LoginOutputFlags...),
@@ -132,6 +133,6 @@ func runReposSearch(ctx *cli.Context) error {
 		return err
 	}
 
-	print.ReposList(rps)
+	print.ReposList(rps, getFields(ctx))
 	return nil
 }
