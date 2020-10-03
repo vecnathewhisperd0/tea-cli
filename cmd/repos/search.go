@@ -112,6 +112,11 @@ func runReposSearch(ctx *cli.Context) error {
 		keyword = strings.Join(ctx.Args().Slice(), " ")
 	}
 
+	user, _, err := client.GetMyUserInfo()
+	if err != nil {
+		return err
+	}
+
 	rps, _, err := client.SearchRepos(gitea.SearchRepoOptions{
 		ListOptions:          flags.GetListOptions(ctx),
 		OwnerID:              ownerID,
@@ -121,6 +126,7 @@ func runReposSearch(ctx *cli.Context) error {
 		Keyword:              keyword,
 		KeywordInDescription: true,
 		KeywordIsTopic:       ctx.Bool("topic"),
+		PrioritizedByOwnerID: user.ID,
 	})
 	if err != nil {
 		return err
