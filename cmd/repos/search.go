@@ -34,10 +34,10 @@ var CmdReposSearch = cli.Command{
 			Usage:    "Search for term in repo topics instead of name",
 		},
 		&cli.StringFlag{
-			Name:     "mode",
-			Aliases:  []string{"m"},
+			Name:     "type",
+			Aliases:  []string{"T"},
 			Required: false,
-			Usage:    "Filter by mode: fork, mirror, source",
+			Usage:    "Filter by type: fork, mirror, source",
 		},
 		&cli.StringFlag{
 			Name:     "owner",
@@ -98,7 +98,7 @@ func runReposSearch(ctx *cli.Context) error {
 	}
 
 	mode := gitea.RepoTypeNone
-	switch ctx.String("mode") {
+	switch ctx.String("type") {
 	case "fork":
 		mode = gitea.RepoTypeFork
 	case "mirror":
