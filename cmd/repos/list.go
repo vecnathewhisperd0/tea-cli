@@ -21,6 +21,12 @@ var CmdReposListFlags = append([]cli.Flag{
 		Required: false,
 		Usage:    "List your watched repos instead",
 	},
+	&cli.BoolFlag{
+		Name:     "starred",
+		Aliases:  []string{"s"},
+		Required: false,
+		Usage:    "List your starred repos instead",
+	},
 	&flags.PaginationPageFlag,
 	&flags.PaginationLimitFlag,
 }, flags.LoginOutputFlags...)
@@ -42,7 +48,16 @@ func RunReposList(ctx *cli.Context) error {
 
 	var rps []*gitea.Repository
 	var err error
-	if ctx.Bool("watched") {
+	if ctx.Bool("starred") {
+		user, _, err := client.GetMyUserInfo()
+		if err != nil {
+			return err
+		}
+		rps, _, err = client.SearchRepos(gitea.SearchRepoOptions{
+			ListOptions:     flags.GetListOptions(ctx),
+			StarredByUserID: user.ID,
+		})
+	} else if ctx.Bool("watched") {
 		rps, _, err = client.GetMyWatchedRepos() // TODO: this does not expose pagination..
 	} else {
 		rps, _, err = client.ListMyRepos(gitea.ListReposOptions{
