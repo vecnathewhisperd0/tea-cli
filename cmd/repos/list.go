@@ -74,10 +74,8 @@ func RunReposList(ctx *cli.Context) error {
 		return err
 	}
 
-	var reposFiltered []*gitea.Repository
-	if typeFilter == gitea.RepoTypeNone {
-		reposFiltered = rps
-	} else {
+	reposFiltered := rps
+	if typeFilter != gitea.RepoTypeNone {
 		reposFiltered = filterReposByType(rps, typeFilter)
 	}
 
