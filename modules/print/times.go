@@ -45,7 +45,7 @@ func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until
 		outputValues = append(
 			outputValues,
 			[]string{
-				t.Created.In(localLoc).Format("2006-01-02 15:04:05"),
+				FormatTime(t.Created.In(localLoc)),
 				"#" + strconv.FormatInt(t.Issue.Index, 10),
 				t.UserName,
 				formatDuration(t.Time, outputType),
