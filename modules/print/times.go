@@ -6,7 +6,6 @@ package print
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -27,11 +26,6 @@ func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until
 	var outputValues [][]string
 	var totalDuration int64
 
-	localLoc, err := time.LoadLocation("Local") // local timezone for time formatting
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, t := range times {
 		if !from.IsZero() && from.After(t.Created) {
 			continue
@@ -45,7 +39,7 @@ func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until
 		outputValues = append(
 			outputValues,
 			[]string{
-				FormatTime(t.Created.In(localLoc)),
+				FormatTime(t.Created),
 				"#" + strconv.FormatInt(t.Issue.Index, 10),
 				t.UserName,
 				formatDuration(t.Time, outputType),
