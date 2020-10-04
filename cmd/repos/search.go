@@ -33,12 +33,7 @@ var CmdReposSearch = cli.Command{
 			Required: false,
 			Usage:    "Search for term in repo topics instead of name",
 		},
-		&cli.StringFlag{
-			Name:     "type",
-			Aliases:  []string{"T"},
-			Required: false,
-			Usage:    "Filter by type: fork, mirror, source",
-		},
+		&typeFilterFlag,
 		&cli.StringFlag{
 			Name:     "owner",
 			Aliases:  []string{"O"},
@@ -97,14 +92,9 @@ func runReposSearch(ctx *cli.Context) error {
 		isArchived = &private
 	}
 
-	mode := gitea.RepoTypeNone
-	switch ctx.String("type") {
-	case "fork":
-		mode = gitea.RepoTypeFork
-	case "mirror":
-		mode = gitea.RepoTypeMirror
-	case "source":
-		mode = gitea.RepoTypeSource
+	mode, err := getTypeFilter(ctx)
+	if err != nil {
+		return err
 	}
 
 	var keyword string
