@@ -11,16 +11,6 @@ import (
 	"github.com/muesli/termenv"
 )
 
-var (
-	location *time.Location
-)
-
-func init() {
-	// get local timezone for time formatting. we ignore the error
-	// and handle that case in FormatTime().
-	location, _ = time.LoadLocation("Local")
-}
-
 func getGlamourTheme() string {
 	if termenv.HasDarkBackground() {
 		return "dark"
@@ -46,7 +36,8 @@ func formatSize(kb int64) string {
 
 // FormatTime give a date-time in local timezone if available
 func FormatTime(t time.Time) string {
-	if location == nil {
+	location, err := time.LoadLocation("Local")
+	if err != nil {
 		return t.Format("2006-01-02 15:04 UTC")
 	}
 	return t.In(location).Format("2006-01-02 15:04")
