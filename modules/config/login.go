@@ -131,7 +131,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 
 	err := LoadConfig()
 	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
+		log.Fatal("Unable to load config file: ", GetConfigPath())
 	}
 
 	for _, l := range Config.Logins {
@@ -253,7 +253,7 @@ func InitCommand(repoValue, loginValue, remoteValue string) (*Login, string, str
 
 	err := LoadConfig()
 	if err != nil {
-		log.Fatal("load config file failed ", yamlConfigPath)
+		log.Fatal("load config file failed: ", GetConfigPath())
 	}
 
 	if login, err = GetDefaultLogin(); err != nil {
@@ -287,7 +287,7 @@ func InitCommand(repoValue, loginValue, remoteValue string) (*Login, string, str
 func InitCommandLoginOnly(loginValue string) *Login {
 	err := LoadConfig()
 	if err != nil {
-		log.Fatal("load config file failed ", yamlConfigPath)
+		log.Fatal("load config file failed: ", GetConfigPath())
 	}
 
 	var login *Login

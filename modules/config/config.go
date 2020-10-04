@@ -16,6 +16,7 @@ import (
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
+	"github.com/adrg/xdg"
 	"gopkg.in/yaml.v2"
 )
 
@@ -26,29 +27,25 @@ type LocalConfig struct {
 
 var (
 	// Config contain if loaded local tea config
-	Config         LocalConfig
-	yamlConfigPath string
+	Config LocalConfig
 )
-
-// TODO: do not use init function to detect the tea configuration, use GetConfigPath()
-func init() {
-	homeDir, err := utils.Home()
-	if err != nil {
-		log.Fatal("Retrieve home dir failed")
-	}
-
-	dir := filepath.Join(homeDir, ".tea")
-	err = os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		log.Fatal("Init tea config dir " + dir + " failed")
-	}
-
-	yamlConfigPath = filepath.Join(dir, "tea.yml")
-}
 
 // GetConfigPath return path to tea config file
 func GetConfigPath() string {
-	return yamlConfigPath
+	configFilePath, err := xdg.ConfigFile("tea/config.yml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	exists, err := utils.PathExists(configFilePath)
+	if err != nil {
+		log.Fatal("Getting fallback config Path failed")
+	}
+	if !exists {
+		configFilePath = getFallbackPath()
+	}
+
+	return configFilePath
 }
 
 // LoadConfig load config into global Config var
@@ -78,6 +75,16 @@ func SaveConfig() error {
 		return err
 	}
 	return ioutil.WriteFile(ymlPath, bs, 0660)
+}
+
+func getFallbackPath() string {
+	dir := filepath.Join(xdg.Home, ".tea")
+	err := os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		log.Fatal("Init tea config dir " + dir + " failed")
+	}
+
+	return filepath.Join(dir, "tea.yml")
 }
 
 func curGitRepoPath(repoValue, remoteValue string) (*Login, string, error) {
