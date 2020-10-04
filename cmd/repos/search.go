@@ -89,7 +89,7 @@ func runReposSearch(ctx *cli.Context) error {
 	var isPrivate *bool
 	if ctx.IsSet("private") {
 		private := strings.ToLower(ctx.String("private"))[:1] == "t"
-		isArchived = &private
+		isPrivate = &private
 	}
 
 	mode, err := getTypeFilter(ctx)
