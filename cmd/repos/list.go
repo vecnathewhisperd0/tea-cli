@@ -27,6 +27,7 @@ var CmdReposListFlags = append([]cli.Flag{
 		Required: false,
 		Usage:    "List your starred repos instead",
 	},
+	&typeFilterFlag,
 	&printFieldsFlag,
 	&flags.PaginationPageFlag,
 	&flags.PaginationLimitFlag,
@@ -47,8 +48,12 @@ func RunReposList(ctx *cli.Context) error {
 	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
 	client := login.Client()
 
+	typeFilter, err := getTypeFilter(ctx)
+	if err != nil {
+		return err
+	}
+
 	var rps []*gitea.Repository
-	var err error
 	if ctx.Bool("starred") {
 		user, _, err := client.GetMyUserInfo()
 		if err != nil {
@@ -70,6 +75,34 @@ func RunReposList(ctx *cli.Context) error {
 		return err
 	}
 
-	print.ReposList(rps, getFields(ctx))
+	reposFiltered := rps
+	if typeFilter != gitea.RepoTypeNone {
+		reposFiltered = filterReposByType(rps, typeFilter)
+	}
+
+	print.ReposList(reposFiltered, getFields(ctx))
 	return nil
+}
+
+func filterReposByType(repos []*gitea.Repository, t gitea.RepoType) []*gitea.Repository {
+	var filtered []*gitea.Repository
+	for _, r := range repos {
+		switch t {
+		case gitea.RepoTypeFork:
+			if !r.Fork {
+				continue
+			}
+		case gitea.RepoTypeMirror:
+			if !r.Mirror {
+				continue
+			}
+		case gitea.RepoTypeSource:
+			if r.Fork || r.Mirror {
+				continue
+			}
+		}
+
+		filtered = append(filtered, r)
+	}
+	return filtered
 }
