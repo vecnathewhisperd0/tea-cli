@@ -12,7 +12,6 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
-	"github.com/charmbracelet/glamour"
 )
 
 type rp = *gitea.Repository
@@ -155,7 +154,7 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 		tops = fmt.Sprintf("- Topics:\t%s\n", strings.Join(topics, ", "))
 	}
 
-	in := fmt.Sprintf(
+	OutputMarkdown(fmt.Sprintf(
 		"%s%s\n%s\n%s%s%s%s",
 		title,
 		desc,
@@ -164,13 +163,5 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 		urls,
 		perm,
 		tops,
-	)
-
-	out, err := glamour.Render(in, getGlamourTheme())
-	if err != nil {
-		// TODO: better Error handling
-		fmt.Printf("Error:\n%v\n\n", err)
-		return
-	}
-	fmt.Print(out)
+	))
 }
