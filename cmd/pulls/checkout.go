@@ -47,26 +47,6 @@ func runPullsCheckout(ctx *cli.Context) error {
 	remoteURLSSH := pr.Head.Repository.SSHURL
 	remoteBranchName := pr.Head.Ref
 
-	// open local git repo
-	localRepo, err := local_git.RepoForWorkdir()
-	if err != nil {
-		return nil
-	}
-
-	// verify related remote is in local repo, otherwise add it
-	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
-	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, remoteURLSSH, newRemoteName)
-	if err != nil {
-		return err
-	}
-
-	localRemoteName := localRemote.Config().Name
-	localBranchName := fmt.Sprintf("pulls/%v-%v", idx, remoteBranchName)
-
-	// fetch remote
-	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
-		idx, remoteURL, remoteBranchName, localRemoteName)
-
 	fetchURL := remoteURL
 	keys, _, err := login.Client().ListMyPublicKeys(gitea.ListPublicKeysOptions{})
 	if err != nil {
@@ -76,6 +56,26 @@ func runPullsCheckout(ctx *cli.Context) error {
 		fetchURL = remoteURLSSH
 	}
 
+	// open local git repo
+	localRepo, err := local_git.RepoForWorkdir()
+	if err != nil {
+		return nil
+	}
+
+	// verify related remote is in local repo, otherwise add it
+	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
+	localRemote, err := localRepo.GetOrCreateRemote(fetchURL, newRemoteName)
+	if err != nil {
+		return err
+	}
+
+	localRemoteName := localRemote.Config().Name
+	localBranchName := fmt.Sprintf("pulls/%v-%v", idx, remoteBranchName)
+
+	// fetch remote
+	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
+		idx, fetchURL, remoteBranchName, localRemoteName)
+
 	url, err := local_git.ParseURL(fetchURL)
 	if err != nil {
 		return err
@@ -84,8 +84,6 @@ func runPullsCheckout(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-
-	// FIXME: we need to set fetchURL here, blocked by https://github.com/go-git/go-git/issues/173
 	err = localRemote.Fetch(&git.FetchOptions{Auth: auth})
 	if err == git.NoErrAlreadyUpToDate {
 		fmt.Println(err)
