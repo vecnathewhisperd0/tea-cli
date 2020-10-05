@@ -7,7 +7,8 @@ package cmd
 import (
 	"errors"
 	"log"
-	"os"
+
+	"code.gitea.io/tea/modules/config"
 
 	"github.com/urfave/cli/v2"
 )
@@ -28,34 +29,22 @@ var CmdLogout = cli.Command{
 }
 
 func runLogout(ctx *cli.Context) error {
+	err := config.LoadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var name string
-	if len(os.Args) == 3 {
-		name = os.Args[2]
-	} else if ctx.IsSet("name") {
+
+	if ctx.IsSet("name") {
 		name = ctx.String("name")
+	} else if len(ctx.Args().First()) != 0 {
+		name = ctx.Args().First()
+	} else if len(config.Config.Logins) == 1 {
+		name = config.Config.Logins[0].Name
 	} else {
 		return errors.New("Please specify a login name")
 	}
 
-	err := loadConfig(yamlConfigPath)
-	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
-	}
-
-	var idx = -1
-	for i, l := range config.Logins {
-		if l.Name == name {
-			idx = i
-			break
-		}
-	}
-	if idx > -1 {
-		config.Logins = append(config.Logins[:idx], config.Logins[idx+1:]...)
-		err = saveConfig(yamlConfigPath)
-		if err != nil {
-			log.Fatal("Unable to save config file " + yamlConfigPath)
-		}
-	}
-
-	return nil
+	return config.DeleteLogin(name)
 }

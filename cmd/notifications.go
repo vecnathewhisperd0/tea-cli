@@ -8,6 +8,10 @@ import (
 	"log"
 	"strings"
 
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
@@ -15,8 +19,9 @@ import (
 // CmdNotifications is the main command to operate with notifications
 var CmdNotifications = cli.Command{
 	Name:        "notifications",
-	Usage:       "show notifications",
-	Description: "show notifications, by default based of the current repo and unread one",
+	Aliases:     []string{"notification", "notif"},
+	Usage:       "Show notifications",
+	Description: "Show notifications, by default based of the current repo and unread one",
 	Action:      runNotifications,
 	Flags: append([]cli.Flag{
 		&cli.BoolFlag{
@@ -34,27 +39,18 @@ var CmdNotifications = cli.Command{
 			Aliases: []string{"pd"},
 			Usage:   "show pinned notifications instead unread",
 		},
-		&cli.IntFlag{
-			Name:    "page",
-			Aliases: []string{"p"},
-			Usage:   "specify page, default is 1",
-			Value:   1,
-		},
-		&cli.IntFlag{
-			Name:    "limit",
-			Aliases: []string{"lm"},
-			Usage:   "specify limit of items per page",
-		},
-	}, AllDefaultFlags...),
+		&flags.PaginationPageFlag,
+		&flags.PaginationLimitFlag,
+	}, flags.AllDefaultFlags...),
 }
 
 func runNotifications(ctx *cli.Context) error {
 	var news []*gitea.NotificationThread
 	var err error
 
-	listOpts := gitea.ListOptions{
-		Page:     ctx.Int("page"),
-		PageSize: ctx.Int("limit"),
+	listOpts := flags.GetListOptions(ctx)
+	if listOpts.Page == 0 {
+		listOpts.Page = 1
 	}
 
 	var status []gitea.NotifyStatus
@@ -66,13 +62,13 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if ctx.Bool("all") {
-		login := initCommandLoginOnly()
+		login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
 		news, _, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
 		})
 	} else {
-		login, owner, repo := initCommand()
+		login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 		news, _, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
@@ -116,7 +112,7 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if len(values) != 0 {
-		Output(outputValue, headers, values)
+		print.OutputList(flags.GlobalOutputValue, headers, values)
 	}
 	return nil
 }

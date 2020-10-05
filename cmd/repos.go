@@ -5,128 +5,51 @@
 package cmd
 
 import (
-	"log"
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/repos"
+	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
-
 	"github.com/urfave/cli/v2"
 )
 
 // CmdRepos represents to login a gitea server.
 var CmdRepos = cli.Command{
 	Name:        "repos",
-	Usage:       "Operate with repositories",
-	Description: `Operate with repositories`,
-	Action:      runReposList,
+	Aliases:     []string{"repo"},
+	Usage:       "Show repository details",
+	Description: "Show repository details",
+	ArgsUsage:   "[<repo owner>/<repo name>]",
+	Action:      runRepos,
 	Subcommands: []*cli.Command{
-		&CmdReposList,
+		&repos.CmdReposList,
+		&repos.CmdRepoCreate,
 	},
-	Flags: LoginOutputFlags,
+	Flags: flags.LoginOutputFlags,
 }
 
-// CmdReposList represents a sub command of issues to list issues
-var CmdReposList = cli.Command{
-	Name:        "ls",
-	Usage:       "List available repositories",
-	Description: `List available repositories`,
-	Action:      runReposList,
-	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:  "mode",
-			Usage: "Filter listed repositories based on mode, optional - fork, mirror, source",
-		},
-		&cli.StringFlag{
-			Name:  "org",
-			Usage: "Filter listed repositories based on organization, optional",
-		},
-		&cli.StringFlag{
-			Name:  "user",
-			Usage: "Filter listed repositories absed on user, optional",
-		},
-	}, LoginOutputFlags...),
-}
-
-// runReposList list repositories
-func runReposList(ctx *cli.Context) error {
-	login := initCommandLoginOnly()
-
-	mode := ctx.String("mode")
-	org := ctx.String("org")
-	user := ctx.String("user")
-
-	var rps []*gitea.Repository
-	var err error
-
-	if org != "" {
-		rps, _, err = login.Client().ListOrgRepos(org, gitea.ListOrgReposOptions{})
-	} else if user != "" {
-		rps, _, err = login.Client().ListUserRepos(user, gitea.ListReposOptions{})
-	} else {
-		rps, _, err = login.Client().ListMyRepos(gitea.ListReposOptions{})
+func runRepos(ctx *cli.Context) error {
+	if ctx.Args().Len() == 1 {
+		return runRepoDetail(ctx.Args().First())
 	}
+	return repos.RunReposList(ctx)
+}
+
+func runRepoDetail(path string) error {
+	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
+	client := login.Client()
+	repoOwner, repoName := utils.GetOwnerAndRepo(path, login.User)
+	repo, _, err := client.GetRepo(repoOwner, repoName)
 	if err != nil {
-		log.Fatal(err)
+		return err
+	}
+	topics, _, err := client.ListRepoTopics(repo.Owner.UserName, repo.Name, gitea.ListRepoTopicsOptions{})
+	if err != nil {
+		return err
 	}
 
-	var repos []*gitea.Repository
-	if mode == "" {
-		repos = rps
-	} else if mode == "fork" {
-		for _, rp := range rps {
-			if rp.Fork == true {
-				repos = append(repos, rp)
-			}
-		}
-	} else if mode == "mirror" {
-		for _, rp := range rps {
-			if rp.Mirror == true {
-				repos = append(repos, rp)
-			}
-		}
-	} else if mode == "source" {
-		for _, rp := range rps {
-			if rp.Mirror != true && rp.Fork != true {
-				repos = append(repos, rp)
-			}
-		}
-	} else {
-		log.Fatal("Unknown mode: ", mode, "\nUse one of the following:\n- fork\n- mirror\n- source\n")
-		return nil
-	}
-
-	if len(rps) == 0 {
-		log.Fatal("No repositories found", rps)
-		return nil
-	}
-
-	headers := []string{
-		"Name",
-		"Type",
-		"SSH",
-		"Owner",
-	}
-	var values [][]string
-
-	for _, rp := range repos {
-		var mode = "source"
-		if rp.Fork {
-			mode = "fork"
-		}
-		if rp.Mirror {
-			mode = "mirror"
-		}
-
-		values = append(
-			values,
-			[]string{
-				rp.FullName,
-				mode,
-				rp.SSHURL,
-				rp.Owner.UserName,
-			},
-		)
-	}
-	Output(outputValue, headers, values)
-
+	print.RepoDetails(repo, topics)
 	return nil
 }
