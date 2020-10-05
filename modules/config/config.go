@@ -40,6 +40,7 @@ func GetConfigPath() string {
 		exists, _ = utils.PathExists(configFilePath)
 	}
 
+	// fallback to old config if no new one exists
 	if !exists {
 		file := filepath.Join(xdg.Home, ".tea", "tea.yml")
 		exists, _ = utils.PathExists(file)
