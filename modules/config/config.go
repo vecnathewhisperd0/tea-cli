@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -33,16 +32,22 @@ var (
 // GetConfigPath return path to tea config file
 func GetConfigPath() string {
 	configFilePath, err := xdg.ConfigFile("tea/config.yml")
+
+	var exists bool
 	if err != nil {
-		log.Fatal(err)
+		exists = false
+	} else {
+		exists, _ = utils.PathExists(configFilePath)
 	}
 
-	exists, err := utils.PathExists(configFilePath)
-	if err != nil {
-		log.Fatal("Getting fallback config Path failed")
-	}
 	if !exists {
-		configFilePath = getFallbackPath()
+		file := filepath.Join(xdg.Home, ".tea", "tea.yml")
+		exists, _ = utils.PathExists(file)
+		if exists {
+			configFilePath = file
+		} else {
+			log.Fatal("unable to get or create config file")
+		}
 	}
 
 	return configFilePath
@@ -55,12 +60,12 @@ func LoadConfig() error {
 	if exist {
 		bs, err := ioutil.ReadFile(ymlPath)
 		if err != nil {
-			return err
+			return fmt.Errorf("Failed to read config file: %s", ymlPath)
 		}
 
 		err = yaml.Unmarshal(bs, &Config)
 		if err != nil {
-			return err
+			return fmt.Errorf("Failed to parse contents of config file: %s", ymlPath)
 		}
 	}
 
@@ -75,16 +80,6 @@ func SaveConfig() error {
 		return err
 	}
 	return ioutil.WriteFile(ymlPath, bs, 0660)
-}
-
-func getFallbackPath() string {
-	dir := filepath.Join(xdg.Home, ".tea")
-	err := os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		log.Fatal("Init tea config dir " + dir + " failed")
-	}
-
-	return filepath.Join(dir, "tea.yml")
 }
 
 func curGitRepoPath(repoValue, remoteValue string) (*Login, string, error) {
