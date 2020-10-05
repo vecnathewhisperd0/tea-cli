@@ -33,50 +33,32 @@ func runPullsCheckout(ctx *cli.Context) error {
 	if ctx.Args().Len() != 1 {
 		log.Fatal("Must specify a PR index")
 	}
-
-	// fetch PR source-repo & -branch from gitea
 	idx, err := utils.ArgToIndex(ctx.Args().First())
 	if err != nil {
 		return err
 	}
-	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
+
+	localBranchName, remoteBranchName, newRemoteName, remoteURL, err :=
+		gitConfigForPR(login, owner, repo, idx)
 	if err != nil {
 		return err
-	}
-	remoteURL := pr.Head.Repository.CloneURL
-	remoteURLSSH := pr.Head.Repository.SSHURL
-	remoteBranchName := pr.Head.Ref
-
-	fetchURL := remoteURL
-	keys, _, err := login.Client().ListMyPublicKeys(gitea.ListPublicKeysOptions{})
-	if err != nil {
-		return err
-	}
-	if len(keys) != 0 {
-		fetchURL = remoteURLSSH
-	}
-
-	// open local git repo
-	localRepo, err := local_git.RepoForWorkdir()
-	if err != nil {
-		return nil
 	}
 
 	// verify related remote is in local repo, otherwise add it
-	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
-	localRemote, err := localRepo.GetOrCreateRemote(fetchURL, newRemoteName)
+	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
 		return err
 	}
-
+	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, newRemoteName)
+	if err != nil {
+		return err
+	}
 	localRemoteName := localRemote.Config().Name
-	localBranchName := fmt.Sprintf("pulls/%v-%v", idx, remoteBranchName)
 
-	// fetch remote
+	// get auth & fetch remote
 	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
-		idx, fetchURL, remoteBranchName, localRemoteName)
-
-	url, err := local_git.ParseURL(fetchURL)
+		idx, remoteURL, remoteBranchName, localRemoteName)
+	url, err := local_git.ParseURL(remoteURL)
 	if err != nil {
 		return err
 	}
@@ -104,4 +86,27 @@ func runPullsCheckout(ctx *cli.Context) error {
 	err = localRepo.TeaCheckout(localBranchName)
 
 	return err
+}
+
+func gitConfigForPR(login *config.Login, owner, repo string, idx int64) (localBranch, remoteBranch, remoteName, remoteURL string, err error) {
+	// fetch PR source-repo & -branch from gitea
+	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
+	if err != nil {
+		return
+	}
+
+	// test if we can pull via SSH, and configure git remote accordingly
+	remoteURL = pr.Head.Repository.CloneURL
+	keys, _, err := login.Client().ListMyPublicKeys(gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return
+	}
+	if len(keys) != 0 {
+		remoteURL = pr.Head.Repository.SSHURL
+	}
+
+	localBranch = fmt.Sprintf("pulls/%v-%v", idx, pr.Head.Ref)
+	remoteBranch = pr.Head.Ref
+	remoteName = fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
+	return
 }
