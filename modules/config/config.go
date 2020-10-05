@@ -44,10 +44,12 @@ func GetConfigPath() string {
 		file := filepath.Join(xdg.Home, ".tea", "tea.yml")
 		exists, _ = utils.PathExists(file)
 		if exists {
-			configFilePath = file
-		} else {
-			log.Fatal("unable to get or create config file")
+			return file
 		}
+	}
+
+	if err != nil {
+		log.Fatal("unable to get or create config file")
 	}
 
 	return configFilePath
