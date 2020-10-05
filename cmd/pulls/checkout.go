@@ -38,17 +38,18 @@ func runPullsCheckout(ctx *cli.Context) error {
 		return err
 	}
 
+	localRepo, err := local_git.RepoForWorkdir()
+	if err != nil {
+		return err
+	}
+
 	localBranchName, remoteBranchName, newRemoteName, remoteURL, err :=
-		gitConfigForPR(login, owner, repo, idx)
+		gitConfigForPR(localRepo, login, owner, repo, idx)
 	if err != nil {
 		return err
 	}
 
 	// verify related remote is in local repo, otherwise add it
-	localRepo, err := local_git.RepoForWorkdir()
-	if err != nil {
-		return err
-	}
 	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, newRemoteName)
 	if err != nil {
 		return err
@@ -88,9 +89,9 @@ func runPullsCheckout(ctx *cli.Context) error {
 	return err
 }
 
-func gitConfigForPR(login *config.Login, owner, repo string, idx int64) (localBranch, remoteBranch, remoteName, remoteURL string, err error) {
+func gitConfigForPR(repo *local_git.TeaRepo, login *config.Login, owner, repoName string, idx int64) (localBranch, remoteBranch, remoteName, remoteURL string, err error) {
 	// fetch PR source-repo & -branch from gitea
-	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
+	pr, _, err := login.Client().GetPullRequest(owner, repoName, idx)
 	if err != nil {
 		return
 	}
@@ -105,7 +106,12 @@ func gitConfigForPR(login *config.Login, owner, repo string, idx int64) (localBr
 		remoteURL = pr.Head.Repository.SSHURL
 	}
 
+	// try to find a matching existing branch, otherwise return branch in pulls/ namespace
 	localBranch = fmt.Sprintf("pulls/%v-%v", idx, pr.Head.Ref)
+	if b, _ := repo.TeaFindBranchBySha(pr.Head.Sha, remoteURL); b != nil {
+		localBranch = b.Name
+	}
+
 	remoteBranch = pr.Head.Ref
 	remoteName = fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
 	return
