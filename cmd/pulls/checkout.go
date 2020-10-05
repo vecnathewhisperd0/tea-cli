@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"log"
 
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/go-git/go-git/v5"
 	"github.com/urfave/cli/v2"
 )
