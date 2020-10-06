@@ -78,15 +78,12 @@ func runPullsCheckout(ctx *cli.Context) error {
 	fmt.Printf("Creating branch '%s'\n", localBranchName)
 	err = localRepo.TeaCreateBranch(localBranchName, remoteBranchName, localRemoteName)
 	if err == git.ErrBranchExists {
-		fmt.Println(err)
+		fmt.Println("There may be changes since you last checked out, run `git pull` to get them.")
 	} else if err != nil {
 		return err
 	}
 
-	fmt.Printf("Checking out PR %v\n", idx)
-	err = localRepo.TeaCheckout(localBranchName)
-
-	return err
+	return localRepo.TeaCheckout(localBranchName)
 }
 
 func gitConfigForPR(repo *local_git.TeaRepo, login *config.Login, owner, repoName string, idx int64) (localBranch, remoteBranch, remoteName, remoteURL string, err error) {
