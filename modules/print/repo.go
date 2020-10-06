@@ -33,7 +33,7 @@ func init() {
 		"owner":       func(r rp) string { return r.Owner.UserName },
 		"stars":       func(r rp) string { return fmt.Sprintf("%d", r.Stars) },
 		"ssh":         func(r rp) string { return r.SSHURL },
-		"updated":     func(r rp) string { return r.Updated.Format("2006-01-02 15:04") },
+		"updated":     func(r rp) string { return FormatTime(r.Updated) },
 		"url":         func(r rp) string { return r.HTMLURL },
 		"permission": func(r rp) string {
 			var p string
