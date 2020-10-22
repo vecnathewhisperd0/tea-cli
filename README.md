@@ -76,6 +76,8 @@ Fork -> Patch -> Push -> Pull Request
 - `make vendor` when adding new dependencies
 - ... (for other development tasks, check the `Makefile`)
 
+**Please** read the [CONTRIBUTING](CONTRIBUTING.md) documentation, it will tell you about internal structures and concepts.
+
 ## License
 
 This project is under the MIT License. See the [LICENSE](LICENSE) file for the
