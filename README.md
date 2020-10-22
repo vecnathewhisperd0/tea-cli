@@ -76,11 +76,6 @@ Fork -> Patch -> Push -> Pull Request
 - `make vendor` when adding new dependencies
 - ... (for other development tasks, check the `Makefile`)
 
-## Authors
-
-- [Maintainers](https://github.com/orgs/go-gitea/people)
-- [Contributors](https://github.com/go-gitea/tea/graphs/contributors)
-
 ## License
 
 This project is under the MIT License. See the [LICENSE](LICENSE) file for the
