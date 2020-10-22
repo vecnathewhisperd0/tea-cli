@@ -111,10 +111,31 @@ Some of the key points:
 - Commands should accept nouns as singular & plural by making use of the `Aliases` field.
 - The default action without a verb is `list`.
 - `list` commands always apply pagination where provided by the API.
-- Try to reuse as many flag definitions as possible, see `cmd/flags.go`.
+- Try to reuse as many flag definitions as possible, see `cmd/flags/flags.go`.
 - Always make sure that the help texts are properly set, and as concise as possible.
 
-### Code style
+### Generell Concepts
+- subcomands without args list objects (list issues/pulls/releases)
+- subsubcomand `ls` list obects with lots of filter options
+- subsubcomand `create/edit` without arguments ask user interactively
+- subsubcomand `create/edit` with arguments is controled fully by flags
+- subsubcomand `delete` show info what is deleted and ask user again, if force flag`-y` is not set
+
+if subsubcomand refer to objects again, just follow subsubsub comand style as abouve
+
+### Internal Structure
+
+- cmd <- only contain comand/flag options for urafen
+  - subcomands are in a subpackage named after its parent comand
+- modules/task <- contain func for doing something with gitea
+  (e.g. create token by user/passwd)
+- modules/print <- contain all functions that print to stdout
+- modules/config <- config tea & login things
+- modules/interact <- contain functions who interact with user by prompts (use survey?)
+- modules/git <- do git related stuff (get info/push/pull/checout/...)
+- modules/utils <- helper functions used by other functions
+
+### Code Style
 Use `make fmt`, check with `make lint`.
 For imports you should use the following format (_without_ the comments)
 ```go
