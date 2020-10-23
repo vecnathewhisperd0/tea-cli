@@ -95,7 +95,7 @@ Some of the key points:
 
 ## Styleguide
 
-### Command naming
+### Commands
 - Subcommands should follow the following structure:
     ```
     tea <noun> <verb> [<noun>] [<flags>]
@@ -110,30 +110,23 @@ Some of the key points:
     ```
 - Commands should accept nouns as singular & plural by making use of the `Aliases` field.
 - The default action without a verb is `list`.
-- `list` commands always apply pagination where provided by the API.
+- There is a standard set of verbs: `list/ls`, `create`, `edit`, `delete`
+  - `ls` lists objects with filter options, and applies pagination where available.
+  - `delete` should show info what is deleted and ask user again, if force flag`-y` is not set
+  - Verbs that accept large numbers of flags provide an interactive mode when called without any arguments or flags.
 - Try to reuse as many flag definitions as possible, see `cmd/flags/flags.go`.
 - Always make sure that the help texts are properly set, and as concise as possible.
 
-### Generell Concepts
-- subcomands without args list objects (list issues/pulls/releases)
-- subsubcomand `ls` list obects with lots of filter options
-- subsubcomand `create/edit` without arguments ask user interactively
-- subsubcomand `create/edit` with arguments is controled fully by flags
-- subsubcomand `delete` show info what is deleted and ask user again, if force flag`-y` is not set
-
-if subsubcomand refer to objects again, just follow subsubsub comand style as abouve
-
-### Internal Structure
-
-- cmd <- only contain comand/flag options for urafen
+### Internal Module Structure
+- `cmd`: only contains comand/flag options for `urfave/cli`
   - subcomands are in a subpackage named after its parent comand
-- modules/task <- contain func for doing something with gitea
+- `modules/task`: contain func for doing something with gitea
   (e.g. create token by user/passwd)
-- modules/print <- contain all functions that print to stdout
-- modules/config <- config tea & login things
-- modules/interact <- contain functions who interact with user by prompts (use survey?)
-- modules/git <- do git related stuff (get info/push/pull/checout/...)
-- modules/utils <- helper functions used by other functions
+- `modules/print`: contain all functions that print to stdout
+- `modules/config`: config tea & login things
+- `modules/interact`: contain functions to interact with user by prompts
+- `modules/git`: do git related stuff (get info/push/pull/checkout/...)
+- `modules/utils`: helper functions used by other functions
 
 ### Code Style
 Use `make fmt`, check with `make lint`.
