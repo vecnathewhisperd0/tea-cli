@@ -173,25 +173,7 @@ commit automatically with `git commit -s`.
 
 ## Release Cycle
 
-We adopted a release schedule to streamline the process of working
-on, finishing, and issuing releases. The overall goal is to make a
-minor release every two months, which breaks down into one month of
-general development followed by one month of testing and polishing
-known as the release freeze. All the feature pull requests should be
-merged in the first month of one release period. And, during the frozen
-period, a corresponding release branch is open for fixes backported from
-master. Release candidates are made during this period for user testing to
-obtain a final version that is maintained in this branch. A release is
-maintained by issuing patch releases to only correct critical problems
-such as crashes or security issues.
-
-Major release cycles are bimonthly. They always begin on the 25th and end on
-the 24th (i.e., the 25th of December to February 24th).
-
-During a development cycle, we may also publish any necessary minor releases
-for the previous version. For example, if the latest, published release is
-v1.2, then minor changes for the previous release—e.g., v1.1.0 -> v1.1.1—are
-still possible.
+Before we reach v1 there is no fixed release cycle.
 
 ## Maintainers
 
@@ -217,6 +199,9 @@ https://help.github.com/articles/signing-commits-with-gpg/
 
 ## Owners
 
+This repo is part of the Gitea project and as such part of that project's
+governance.
+
 Since Gitea is a pure community organization without any company support,
 to keep the development healthy we will elect three owners every year. All
 contributors may vote to elect up to three candidates, one of which will
@@ -238,19 +223,6 @@ I'm honored to having been elected an owner of Gitea, I agree with
 [CONTRIBUTING](CONTRIBUTING.md). I will spend part of my time on Gitea
 and lead the development of Gitea.
 ```
-
-To honor the past owners, here's the history of the owners and the time
-they served:
-
-* 2016-11-04 ~ 2017-12-31
-  * [Lunny Xiao](https://github.com/lunny) <xiaolunwen@gmail.com>
-  * [Thomas Boerger](https://github.com/tboerger) <thomas@webhippie.de>
-  * [Kim Carlbäcker](https://github.com/bkcsoft) <kim.carlbacker@gmail.com>
-
-* 2018-01-01 ~ 2018-12-31
-  * [Lunny Xiao](https://github.com/lunny) <xiaolunwen@gmail.com>
-  * [Lauris Bukšis-Haberkorns](https://github.com/lafriks) <lauris@nix.lv>
-  * [Kim Carlbäcker](https://github.com/bkcsoft) <kim.carlbacker@gmail.com>
 
 ## Versions
 
