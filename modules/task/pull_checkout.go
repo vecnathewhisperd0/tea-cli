@@ -18,11 +18,30 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 		return err
 	}
 
-	localBranchName, remoteBranchName, newRemoteName, remoteURL, err :=
-		gitConfigForPR(localRepo, client, repoOwner, repoName, index)
+	// fetch PR source-localRepo & -branch from gitea
+	pr, _, err := client.GetPullRequest(repoOwner, repoName, index)
 	if err != nil {
 		return err
 	}
+
+	// test if we can pull via SSH, and configure git remote accordingly
+	remoteURL := pr.Head.Repository.CloneURL
+	keys, _, err := client.ListMyPublicKeys(gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return err
+	}
+	if len(keys) != 0 {
+		remoteURL = pr.Head.Repository.SSHURL
+	}
+
+	// try to find a matching existing branch, otherwise return branch in pulls/ namespace
+	localBranchName := fmt.Sprintf("pulls/%v-%v", index, pr.Head.Ref)
+	if b, _ := localRepo.TeaFindBranchBySha(pr.Head.Sha, remoteURL); b != nil {
+		localBranchName = b.Name
+	}
+
+	remoteBranchName := pr.Head.Ref
+	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
 
 	// verify related remote is in local repo, otherwise add it
 	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, newRemoteName)
@@ -61,32 +80,4 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 	return localRepo.TeaCheckout(localBranchName)
 
 	return nil
-}
-
-func gitConfigForPR(repo *local_git.TeaRepo, client *gitea.Client, owner, repoName string, idx int64) (localBranch, remoteBranch, remoteName, remoteURL string, err error) {
-	// fetch PR source-repo & -branch from gitea
-	pr, _, err := client.GetPullRequest(owner, repoName, idx)
-	if err != nil {
-		return
-	}
-
-	// test if we can pull via SSH, and configure git remote accordingly
-	remoteURL = pr.Head.Repository.CloneURL
-	keys, _, err := client.ListMyPublicKeys(gitea.ListPublicKeysOptions{})
-	if err != nil {
-		return
-	}
-	if len(keys) != 0 {
-		remoteURL = pr.Head.Repository.SSHURL
-	}
-
-	// try to find a matching existing branch, otherwise return branch in pulls/ namespace
-	localBranch = fmt.Sprintf("pulls/%v-%v", idx, pr.Head.Ref)
-	if b, _ := repo.TeaFindBranchBySha(pr.Head.Sha, remoteURL); b != nil {
-		localBranch = b.Name
-	}
-
-	remoteBranch = pr.Head.Ref
-	remoteName = fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
-	return
 }
