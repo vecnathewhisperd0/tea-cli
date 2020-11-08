@@ -10,6 +10,7 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
+// PullCheckout checkout current workdir to the head branch of specified pull request
 func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) error {
 	client := login.Client()
 
@@ -40,7 +41,6 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 		localBranchName = b.Name
 	}
 
-	remoteBranchName := pr.Head.Ref
 	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
 
 	// verify related remote is in local repo, otherwise add it
@@ -51,8 +51,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 	localRemoteName := localRemote.Config().Name
 
 	// get auth & fetch remote
-	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
-		index, remoteURL, remoteBranchName, localRemoteName)
+	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n", index, remoteURL, pr.Head.Ref, localRemoteName)
 	url, err := local_git.ParseURL(remoteURL)
 	if err != nil {
 		return err
@@ -70,7 +69,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 
 	// checkout local branch
 	fmt.Printf("Creating branch '%s'\n", localBranchName)
-	err = localRepo.TeaCreateBranch(localBranchName, remoteBranchName, localRemoteName)
+	err = localRepo.TeaCreateBranch(localBranchName, pr.Head.Ref, localRemoteName)
 	if err == git.ErrBranchExists {
 		fmt.Println("There may be changes since you last checked out, run `git pull` to get them.")
 	} else if err != nil {
@@ -78,6 +77,4 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 	}
 
 	return localRepo.TeaCheckout(localBranchName)
-
-	return nil
 }
