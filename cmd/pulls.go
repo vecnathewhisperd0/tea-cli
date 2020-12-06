@@ -11,6 +11,7 @@ import (
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -40,16 +41,19 @@ func runPulls(ctx *cli.Context) error {
 
 func runPullDetail(index string) error {
 	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-
 	idx, err := utils.ArgToIndex(index)
 	if err != nil {
 		return err
 	}
-	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
+
+	client := login.Client()
+	pr, _, err := client.GetPullRequest(owner, repo, idx)
 	if err != nil {
 		return err
 	}
 
-	print.PullDetails(pr)
+	reviews, _, _ := client.ListPullReviews(owner, repo, idx, gitea.ListPullReviewsOptions{})
+
+	print.PullDetails(pr, reviews)
 	return nil
 }
