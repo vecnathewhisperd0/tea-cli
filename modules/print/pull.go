@@ -51,7 +51,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 	}
 
 	if pr.State == gitea.StateOpen && pr.Mergeable {
-		out += "\nREADY TO MERGE"
+		out += "\nNo Conflicts"
 	}
 
 	OutputMarkdown(out)
