@@ -5,6 +5,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/pulls"
 	"code.gitea.io/tea/modules/config"
@@ -52,7 +54,10 @@ func runPullDetail(index string) error {
 		return err
 	}
 
-	reviews, _, _ := client.ListPullReviews(owner, repo, idx, gitea.ListPullReviewsOptions{})
+	reviews, _, err := client.ListPullReviews(owner, repo, idx, gitea.ListPullReviewsOptions{})
+	if err != nil {
+		fmt.Printf("error while loading reviews: %v\n", err)
+	}
 
 	print.PullDetails(pr, reviews)
 	return nil
