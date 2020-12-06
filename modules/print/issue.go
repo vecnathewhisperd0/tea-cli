@@ -6,8 +6,10 @@ package print
 
 import (
 	"fmt"
+	"strconv"
 
 	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/cmd/flags"
 )
 
 // IssueDetails print an issue rendered to stdout
@@ -21,4 +23,45 @@ func IssueDetails(issue *gitea.Issue) {
 		FormatTime(issue.Created),
 		issue.Body,
 	))
+}
+
+// IssuesList prints a listing of issues
+func IssuesList(issues []*gitea.Issue) {
+	var values [][]string
+	headers := []string{
+		"Index",
+		"Title",
+		"State",
+		"Author",
+		"Milestone",
+		"Updated",
+	}
+
+	if len(issues) == 0 {
+		OutputList(flags.GlobalOutputValue, headers, values)
+		return
+	}
+
+	for _, issue := range issues {
+		author := issue.Poster.FullName
+		if len(author) == 0 {
+			author = issue.Poster.UserName
+		}
+		mile := ""
+		if issue.Milestone != nil {
+			mile = issue.Milestone.Title
+		}
+		values = append(
+			values,
+			[]string{
+				strconv.FormatInt(issue.Index, 10),
+				issue.Title,
+				string(issue.State),
+				author,
+				mile,
+				FormatTime(issue.Updated),
+			},
+		)
+	}
+	OutputList(flags.GlobalOutputValue, headers, values)
 }
