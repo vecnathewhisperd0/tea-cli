@@ -22,6 +22,10 @@ var CmdOrganizationList = cli.Command{
 	Usage:       "List Organizations",
 	Description: "List users organizations",
 	Action:      RunOrganizationList,
+	Flags: append([]cli.Flag{
+		&flags.PaginationPageFlag,
+		&flags.PaginationLimitFlag,
+	}, flags.AllDefaultFlags...),
 }
 
 // RunOrganizationList list user organizations
@@ -31,7 +35,7 @@ func RunOrganizationList(ctx *cli.Context) error {
 
 	client := login.Client()
 
-	userOrganizations, _, err := client.ListUserOrgs(login.User, gitea.ListOrgsOptions{})
+	userOrganizations, _, err := client.ListUserOrgs(login.User, gitea.ListOrgsOptions{ListOptions: flags.GetListOptions(ctx)})
 	if err != nil {
 		log.Fatal(err)
 	}
