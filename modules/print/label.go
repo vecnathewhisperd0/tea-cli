@@ -14,16 +14,15 @@ import (
 	"github.com/muesli/termenv"
 )
 
-// LabelsList prints a listing of issues
+// LabelsList prints a listing of labels
 func LabelsList(labels []*gitea.Label) {
+	var values [][]string
 	headers := []string{
 		"Index",
 		"Color",
 		"Name",
 		"Description",
 	}
-
-	var values [][]string
 
 	if len(labels) == 0 {
 		OutputList(flags.GlobalOutputValue, headers, values)
