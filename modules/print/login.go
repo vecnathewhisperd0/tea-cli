@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
 )
 
@@ -29,4 +30,28 @@ func LoginDetails(login *config.Login) {
 	in += fmt.Sprintf("\nCreated: %s", time.Unix(login.Created, 0).Format(time.RFC822))
 
 	OutputMarkdown(in)
+}
+
+// LoginsList prints a listing of logins
+func LoginsList(logins []config.Login) {
+	var values [][]string
+	headers := []string{
+		"Name",
+		"URL",
+		"SSHHost",
+		"User",
+		"Default",
+	}
+
+	for _, l := range logins {
+		values = append(values, []string{
+			l.Name,
+			l.URL,
+			l.GetSSHHost(),
+			l.User,
+			fmt.Sprint(l.Default),
+		})
+	}
+
+	OutputList(flags.GlobalOutputValue, headers, values)
 }
