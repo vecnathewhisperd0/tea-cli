@@ -23,7 +23,7 @@ import (
 // necessary.
 func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string) (auth git_transport.AuthMethod, err error) {
 	switch remoteURL.Scheme {
-	case "https":
+	case "http", "https":
 		// gitea supports push/pull via app token as username.
 		auth = &gogit_http.BasicAuth{Password: "", Username: authToken}
 
