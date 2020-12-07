@@ -58,10 +58,6 @@ func runTrackedTimes(ctx *cli.Context) error {
 	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
-	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
-		return err
-	}
-
 	var times []*gitea.TrackedTime
 	var err error
 
