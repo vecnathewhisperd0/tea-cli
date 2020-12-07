@@ -74,7 +74,6 @@ steps:
     event:
     - push
     - tag
-    - pull_request # Test drone
 
 - name: gpg-sign
   pull: always
