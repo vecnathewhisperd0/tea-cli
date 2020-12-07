@@ -12,6 +12,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 )
 
+// LabelsExport save list of labels to disc
 func LabelsExport(labels []*gitea.Label, path string) error {
 	f, err := os.Create(path)
 	if err != nil {
