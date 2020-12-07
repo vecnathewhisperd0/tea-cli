@@ -7,7 +7,6 @@ package task
 import (
 	"fmt"
 
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
 
@@ -29,13 +28,11 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 		return err
 	}
 
-	// test if we can pull via SSH, and configure git remote accordingly
 	remoteURL := pr.Head.Repository.CloneURL
-	keys, _, err := client.ListMyPublicKeys(gitea.ListPublicKeysOptions{})
-	if err != nil {
-		return err
-	}
-	if len(keys) != 0 {
+	if len(login.SSHKey) != 0 {
+		// login.SSHKey is nonempty, if user specified a key manually or we automatically
+		// found a matching private key on this machine during login creation.
+		// this means, we are very likely to have a working ssh setup.
 		remoteURL = pr.Head.Repository.SSHURL
 	}
 
