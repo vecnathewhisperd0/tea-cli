@@ -7,6 +7,8 @@ package print
 import (
 	"fmt"
 
+	"code.gitea.io/tea/cmd/flags"
+
 	"code.gitea.io/sdk/gitea"
 )
 
@@ -21,4 +23,43 @@ func MilestoneDetails(milestone *gitea.Milestone) {
 	if milestone.Deadline != nil && !milestone.Deadline.IsZero() {
 		fmt.Printf("\nDeadline: %s\n", FormatTime(*milestone.Deadline))
 	}
+}
+
+// MilestonesList prints a listing of milestones
+func MilestonesList(miles []*gitea.Milestone, state gitea.StateType) {
+
+	headers := []string{
+		"Title",
+	}
+	if state == gitea.StateAll {
+		headers = append(headers, "State")
+	}
+	headers = append(headers,
+		"Open/Closed Issues",
+		"DueDate",
+	)
+
+	var values [][]string
+
+	for _, m := range miles {
+		var deadline = ""
+
+		if m.Deadline != nil && !m.Deadline.IsZero() {
+			deadline = FormatTime(*m.Deadline)
+		}
+
+		item := []string{
+			m.Title,
+		}
+		if state == gitea.StateAll {
+			item = append(item, string(m.State))
+		}
+		item = append(item,
+			fmt.Sprintf("%d/%d", m.OpenIssues, m.ClosedIssues),
+			deadline,
+		)
+
+		values = append(values, item)
+	}
+	OutputList(flags.GlobalOutputValue, headers, values)
 }
