@@ -61,14 +61,18 @@ func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer
 		return nil, err
 	}
 	sig, err = ssh.ParsePrivateKey(sshKey)
-	if err != nil {
-		pass, err := passwordCallback(keyFile)
-		if err != nil {
-			return nil, err
-		}
-		sig, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(pass))
-		if err != nil {
-			return nil, err
+	if _, ok := err.(*ssh.PassphraseMissingError); ok {
+		// allow for up to 3 password attempts
+		for i := 0; i < 3; i++ {
+			var pass string
+			pass, err = passwordCallback(keyFile)
+			if err != nil {
+				return nil, err
+			}
+			sig, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(pass))
+			if err == nil {
+				break
+			}
 		}
 	}
 	return sig, err
