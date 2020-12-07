@@ -9,8 +9,8 @@ import (
 )
 
 // PromptPassword asks for a password and blocks until input was made.
-func PromptPassword(ctx string) (pass string, err error) {
-	promptPW := &survey.Password{Message: ctx + " password:"}
+func PromptPassword(name string) (pass string, err error) {
+	promptPW := &survey.Password{Message: name + " password:"}
 	err = survey.AskOne(promptPW, &pass, survey.WithValidator(survey.Required))
 	return
 }
