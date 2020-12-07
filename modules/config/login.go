@@ -20,9 +20,9 @@ import (
 	"time"
 
 	"code.gitea.io/tea/modules/utils"
-	"golang.org/x/crypto/ssh"
 
 	"code.gitea.io/sdk/gitea"
+	"golang.org/x/crypto/ssh"
 )
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
