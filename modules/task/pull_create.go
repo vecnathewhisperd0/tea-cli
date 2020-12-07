@@ -82,6 +82,11 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 		}
 	}
 
+	// head & base may not be the same
+	if head == base {
+		return fmt.Errorf("Can't create PR from %s to %s\n", head, base)
+	}
+
 	// default is head branch name
 	if len(title) == 0 {
 		title = head
@@ -94,8 +99,7 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 	}
 	// title is required
 	if len(title) == 0 {
-		fmt.Printf("Title is required")
-		return nil
+		return fmt.Errorf("Title is required")
 	}
 
 	pr, _, err := client.CreatePullRequest(repoOwner, repoName, gitea.CreatePullRequestOption{
