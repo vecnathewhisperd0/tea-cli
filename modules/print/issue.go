@@ -65,3 +65,46 @@ func IssuesList(issues []*gitea.Issue) {
 	}
 	OutputList(flags.GlobalOutputValue, headers, values)
 }
+
+// IssuesPullsList prints a listing of issues & pulls
+// TODO combine with IssuesList
+func IssuesPullsList(issues []*gitea.Issue) {
+	var values [][]string
+	headers := []string{
+		"Index",
+		"State",
+		"Kind",
+		"Author",
+		"Updated",
+		"Title",
+	}
+
+	if len(issues) == 0 {
+		OutputList(flags.GlobalOutputValue, headers, values)
+		return
+	}
+
+	for _, issue := range issues {
+		name := issue.Poster.FullName
+		if len(name) == 0 {
+			name = issue.Poster.UserName
+		}
+		kind := "Issue"
+		if issue.PullRequest != nil {
+			kind = "Pull"
+		}
+		values = append(
+			values,
+			[]string{
+				strconv.FormatInt(issue.Index, 10),
+				string(issue.State),
+				kind,
+				name,
+				FormatTime(issue.Updated),
+				issue.Title,
+			},
+		)
+	}
+
+	OutputList(flags.GlobalOutputValue, headers, values)
+}
