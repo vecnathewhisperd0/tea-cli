@@ -15,23 +15,10 @@ import (
 var CmdNotificationsList = cli.Command{
 	Name:        "ls",
 	Aliases:     []string{"list"},
-	Usage:       "List notifications....",
-	Description: `List notification....`,
+	Usage:       "List notifications",
+	Description: `List notifications`,
 	Action:      RunNotificationsList,
-	Flags: append([]cli.Flag{
-		&cli.BoolFlag{
-			Name:    "all",
-			Aliases: []string{"a"},
-			Usage:   "show all notifications of related gitea instance",
-		},
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by milestone state (all|open|closed)",
-			DefaultText: "open",
-		},
-		&flags.PaginationPageFlag,
-		&flags.PaginationLimitFlag,
-	}, flags.AllDefaultFlags...),
+	Flags:       flags.NotificationFlags,
 }
 
 // RunNotificationsList list notifications

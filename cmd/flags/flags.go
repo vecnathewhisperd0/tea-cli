@@ -91,3 +91,14 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationPageFlag,
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
+
+// NotificationFlags defines flags that should be available on notifications.
+var NotificationFlags = append([]cli.Flag{
+	&cli.BoolFlag{
+		Name:    "all",
+		Aliases: []string{"a"},
+		Usage:   "Show notifications across all your repositories instead of the current repository only",
+	},
+	&PaginationPageFlag,
+	&PaginationLimitFlag,
+}, AllDefaultFlags...)

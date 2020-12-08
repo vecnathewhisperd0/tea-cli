@@ -18,20 +18,7 @@ var CmdNotificationsUnread = cli.Command{
 	Usage:       "show unread notifications",
 	Description: `show unread notifications`,
 	Action:      RunNotificationsUnread,
-	Flags: append([]cli.Flag{
-		&cli.BoolFlag{
-			Name:    "all",
-			Aliases: []string{"a"},
-			Usage:   "show all notifications of related gitea instance",
-		},
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by milestone state (all|open|closed)",
-			DefaultText: "open",
-		},
-		&flags.PaginationPageFlag,
-		&flags.PaginationLimitFlag,
-	}, flags.AllDefaultFlags...),
+	Flags:       flags.NotificationFlags,
 }
 
 // RunNotificationsUnread will show notifications with status unread.

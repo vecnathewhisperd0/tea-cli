@@ -14,24 +14,11 @@ import (
 // CmdNotificationsPinned represents a sub command of notifications to list pinned notifications
 var CmdNotificationsPinned = cli.Command{
 	Name:        "pinned",
-	Aliases:     []string{"pin"},
+	Aliases:     []string{"pd"},
 	Usage:       "show pinned notifications",
 	Description: `show pinned notifications`,
 	Action:      RunNotificationsPinned,
-	Flags: append([]cli.Flag{
-		&cli.BoolFlag{
-			Name:    "all",
-			Aliases: []string{"a"},
-			Usage:   "show all notifications of related gitea instance",
-		},
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by milestone state (all|open|closed)",
-			DefaultText: "open",
-		},
-		&flags.PaginationPageFlag,
-		&flags.PaginationLimitFlag,
-	}, flags.AllDefaultFlags...),
+	Flags:       flags.NotificationFlags,
 }
 
 // RunNotificationsPinned will show notifications with status pinned.

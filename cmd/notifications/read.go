@@ -18,20 +18,7 @@ var CmdNotificationsRead = cli.Command{
 	Usage:       "show read notifications instead",
 	Description: `show read notifications instead`,
 	Action:      RunNotificationsRead,
-	Flags: append([]cli.Flag{
-		&cli.BoolFlag{
-			Name:    "all",
-			Aliases: []string{"a"},
-			Usage:   "show all notifications of related gitea instance",
-		},
-		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "Filter by milestone state (all|open|closed)",
-			DefaultText: "open",
-		},
-		&flags.PaginationPageFlag,
-		&flags.PaginationLimitFlag,
-	}, flags.AllDefaultFlags...),
+	Flags:       flags.NotificationFlags,
 }
 
 // RunNotificationsRead will show notifications with status read.
