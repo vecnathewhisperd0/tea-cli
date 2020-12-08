@@ -104,7 +104,7 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 		return err
 	}
 
-	print.IssuesPullsList(issues)
+	print.IssuesPullsList(issues, flags.GlobalOutputValue)
 	return nil
 }
 

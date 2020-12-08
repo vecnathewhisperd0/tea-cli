@@ -5,13 +5,11 @@
 package print
 
 import (
-	"code.gitea.io/tea/cmd/flags"
-
 	"code.gitea.io/sdk/gitea"
 )
 
 // ReleasesList prints a listing of releases
-func ReleasesList(releases []*gitea.Release) {
+func ReleasesList(releases []*gitea.Release, output string) {
 	var values [][]string
 	headers := []string{
 		"Tag-Name",
@@ -22,7 +20,7 @@ func ReleasesList(releases []*gitea.Release) {
 	}
 
 	if len(releases) == 0 {
-		outputList(flags.GlobalOutputValue, headers, values)
+		outputList(output, headers, values)
 		return
 	}
 
@@ -45,5 +43,5 @@ func ReleasesList(releases []*gitea.Release) {
 		)
 	}
 
-	outputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }

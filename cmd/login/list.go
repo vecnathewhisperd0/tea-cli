@@ -31,6 +31,6 @@ func RunLoginList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.LoginsList(config.Config.Logins)
+	print.LoginsList(config.Config.Logins, flags.GlobalOutputValue)
 	return nil
 }

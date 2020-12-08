@@ -54,6 +54,6 @@ func RunMilestonesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.MilestonesList(milestones, state)
+	print.MilestonesList(milestones, flags.GlobalOutputValue, state)
 	return nil
 }

@@ -7,8 +7,6 @@ package print
 import (
 	"fmt"
 
-	"code.gitea.io/tea/cmd/flags"
-
 	"code.gitea.io/sdk/gitea"
 )
 
@@ -26,7 +24,7 @@ func MilestoneDetails(milestone *gitea.Milestone) {
 }
 
 // MilestonesList prints a listing of milestones
-func MilestonesList(miles []*gitea.Milestone, state gitea.StateType) {
+func MilestonesList(miles []*gitea.Milestone, output string, state gitea.StateType) {
 
 	headers := []string{
 		"Title",
@@ -61,5 +59,5 @@ func MilestonesList(miles []*gitea.Milestone, state gitea.StateType) {
 
 		values = append(values, item)
 	}
-	outputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }

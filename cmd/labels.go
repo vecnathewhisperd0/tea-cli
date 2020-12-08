@@ -52,6 +52,6 @@ func runLabels(ctx *cli.Context) error {
 		return task.LabelsExport(labels, ctx.String("save"))
 	}
 
-	print.LabelsList(labels)
+	print.LabelsList(labels, flags.GlobalOutputValue)
 	return nil
 }

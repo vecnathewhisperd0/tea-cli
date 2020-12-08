@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"code.gitea.io/tea/cmd/flags"
-
 	"code.gitea.io/sdk/gitea"
 )
 
@@ -61,7 +59,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 }
 
 // PullsList prints a listing of pulls
-func PullsList(prs []*gitea.PullRequest) {
+func PullsList(prs []*gitea.PullRequest, output string) {
 	var values [][]string
 	headers := []string{
 		"Index",
@@ -73,7 +71,7 @@ func PullsList(prs []*gitea.PullRequest) {
 	}
 
 	if len(prs) == 0 {
-		outputList(flags.GlobalOutputValue, headers, values)
+		outputList(output, headers, values)
 		return
 	}
 
@@ -102,5 +100,5 @@ func PullsList(prs []*gitea.PullRequest) {
 		)
 	}
 
-	outputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }

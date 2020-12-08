@@ -77,6 +77,6 @@ func runNotifications(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.NotificationsList(news, ctx.Bool("all"))
+	print.NotificationsList(news, flags.GlobalOutputValue, ctx.Bool("all"))
 	return nil
 }

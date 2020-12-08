@@ -7,13 +7,11 @@ package print
 import (
 	"strings"
 
-	"code.gitea.io/tea/cmd/flags"
-
 	"code.gitea.io/sdk/gitea"
 )
 
 // NotificationsList prints a listing of notification threads
-func NotificationsList(news []*gitea.NotificationThread, showRepository bool) {
+func NotificationsList(news []*gitea.NotificationThread, output string, showRepository bool) {
 	var values [][]string
 	headers := []string{
 		"Type",
@@ -47,7 +45,7 @@ func NotificationsList(news []*gitea.NotificationThread, showRepository bool) {
 	}
 
 	if len(values) != 0 {
-		outputList(flags.GlobalOutputValue, headers, values)
+		outputList(output, headers, values)
 	}
 	return
 }

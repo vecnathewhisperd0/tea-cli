@@ -38,7 +38,7 @@ func RunReleasesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.ReleasesList(releases)
+	print.ReleasesList(releases, flags.GlobalOutputValue)
 	return nil
 }
 

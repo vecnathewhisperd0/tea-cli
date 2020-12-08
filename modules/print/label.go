@@ -8,14 +8,12 @@ import (
 	"fmt"
 	"strconv"
 
-	"code.gitea.io/tea/cmd/flags"
-
 	"code.gitea.io/sdk/gitea"
 	"github.com/muesli/termenv"
 )
 
 // LabelsList prints a listing of labels
-func LabelsList(labels []*gitea.Label) {
+func LabelsList(labels []*gitea.Label, output string) {
 	var values [][]string
 	headers := []string{
 		"Index",
@@ -25,7 +23,7 @@ func LabelsList(labels []*gitea.Label) {
 	}
 
 	if len(labels) == 0 {
-		outputList(flags.GlobalOutputValue, headers, values)
+		outputList(output, headers, values)
 		return
 	}
 
@@ -44,5 +42,5 @@ func LabelsList(labels []*gitea.Label) {
 			},
 		)
 	}
-	outputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }

@@ -49,6 +49,6 @@ func RunIssuesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.IssuesList(issues)
+	print.IssuesList(issues, flags.GlobalOutputValue)
 	return nil
 }

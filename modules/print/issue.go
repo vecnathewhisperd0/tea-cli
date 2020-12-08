@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"code.gitea.io/sdk/gitea"
-	"code.gitea.io/tea/cmd/flags"
 )
 
 // IssueDetails print an issue rendered to stdout
@@ -26,7 +25,7 @@ func IssueDetails(issue *gitea.Issue) {
 }
 
 // IssuesList prints a listing of issues
-func IssuesList(issues []*gitea.Issue) {
+func IssuesList(issues []*gitea.Issue, output string) {
 	var values [][]string
 	headers := []string{
 		"Index",
@@ -38,7 +37,7 @@ func IssuesList(issues []*gitea.Issue) {
 	}
 
 	if len(issues) == 0 {
-		outputList(flags.GlobalOutputValue, headers, values)
+		outputList(output, headers, values)
 		return
 	}
 
@@ -63,12 +62,12 @@ func IssuesList(issues []*gitea.Issue) {
 			},
 		)
 	}
-	outputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }
 
 // IssuesPullsList prints a listing of issues & pulls
 // TODO combine with IssuesList
-func IssuesPullsList(issues []*gitea.Issue) {
+func IssuesPullsList(issues []*gitea.Issue, output string) {
 	var values [][]string
 	headers := []string{
 		"Index",
@@ -80,7 +79,7 @@ func IssuesPullsList(issues []*gitea.Issue) {
 	}
 
 	if len(issues) == 0 {
-		outputList(flags.GlobalOutputValue, headers, values)
+		outputList(output, headers, values)
 		return
 	}
 
@@ -106,5 +105,5 @@ func IssuesPullsList(issues []*gitea.Issue) {
 		)
 	}
 
-	outputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }

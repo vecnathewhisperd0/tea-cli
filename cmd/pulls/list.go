@@ -47,6 +47,6 @@ func RunPullsList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.PullsList(prs)
+	print.PullsList(prs, flags.GlobalOutputValue)
 	return nil
 }

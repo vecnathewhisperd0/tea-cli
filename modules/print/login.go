@@ -9,12 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
 )
 
 // LoginDetails print login entry to stdout
-func LoginDetails(login *config.Login) {
+func LoginDetails(login *config.Login, output string) {
 	in := fmt.Sprintf("# %s\n\n[@%s](%s/%s)\n",
 		login.Name,
 		login.User,
@@ -33,7 +32,7 @@ func LoginDetails(login *config.Login) {
 }
 
 // LoginsList prints a listing of logins
-func LoginsList(logins []config.Login) {
+func LoginsList(logins []config.Login, output string) {
 	var values [][]string
 	headers := []string{
 		"Name",
@@ -53,5 +52,5 @@ func LoginsList(logins []config.Login) {
 		})
 	}
 
-	outputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }
