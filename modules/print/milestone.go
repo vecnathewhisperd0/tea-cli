@@ -58,6 +58,6 @@ func MilestonesList(miles []*gitea.Milestone, output string, state gitea.StateTy
 		t.addRowSlice(item)
 	}
 
-	t.sort(0, false)
+	t.sort(0, true)
 	t.print(output)
 }
