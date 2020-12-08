@@ -70,29 +70,6 @@ func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner st
 	return
 }
 
-// InitCommandLoginOnly return *Login based on flags
-func InitCommandLoginOnly(loginValue string) *Login {
-	err := LoadConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var login *Login
-	if loginValue == "" {
-		login, err = GetDefaultLogin()
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		login = GetLoginByName(loginValue)
-		if login == nil {
-			log.Fatal("Login name " + loginValue + " does not exist")
-		}
-	}
-
-	return login
-}
-
 func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error) {
 	repo, err := git.RepoFromPath(repoValue)
 	if err != nil {
