@@ -7,6 +7,7 @@ package print
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -33,6 +34,23 @@ func (t *table) addRow(row ...string) {
 // it's the callers responsibility to ensure row length is equal to header length!
 func (t *table) addRowSlice(row []string) {
 	t.values = append(t.values, row)
+}
+
+func (t *table) sort(column uint, desc bool) {
+	t.sortColumn = column
+	t.sortDesc = desc
+	sort.Stable(t) // stable to allow multiple calls to sort
+}
+
+// sortable interface
+func (t table) Len() int      { return len(t.values) }
+func (t table) Swap(i, j int) { t.values[i], t.values[j] = t.values[j], t.values[i] }
+func (t table) Less(i, j int) bool {
+	const column = 0
+	if t.sortDesc {
+		i, j = j, i
+	}
+	return t.values[i][t.sortColumn] < t.values[j][t.sortColumn]
 }
 
 func (t *table) print(output string) {
