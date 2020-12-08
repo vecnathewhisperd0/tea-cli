@@ -91,7 +91,7 @@ func ReposList(repos []*gitea.Repository, fields []string) {
 		}
 	}
 
-	OutputList(flags.GlobalOutputValue, fields, values)
+	outputList(flags.GlobalOutputValue, fields, values)
 }
 
 // RepoDetails print an repo formatted to stdout

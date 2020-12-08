@@ -25,7 +25,7 @@ func LabelsList(labels []*gitea.Label) {
 	}
 
 	if len(labels) == 0 {
-		OutputList(flags.GlobalOutputValue, headers, values)
+		outputList(flags.GlobalOutputValue, headers, values)
 		return
 	}
 
@@ -44,5 +44,5 @@ func LabelsList(labels []*gitea.Label) {
 			},
 		)
 	}
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }

@@ -47,7 +47,7 @@ func NotificationsList(news []*gitea.NotificationThread, showRepository bool) {
 	}
 
 	if len(values) != 0 {
-		OutputList(flags.GlobalOutputValue, headers, values)
+		outputList(flags.GlobalOutputValue, headers, values)
 	}
 	return
 }

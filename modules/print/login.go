@@ -53,5 +53,5 @@ func LoginsList(logins []config.Login) {
 		})
 	}
 
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }

@@ -39,7 +39,7 @@ func PullsList(prs []*gitea.PullRequest) {
 	}
 
 	if len(prs) == 0 {
-		OutputList(flags.GlobalOutputValue, headers, values)
+		outputList(flags.GlobalOutputValue, headers, values)
 		return
 	}
 
@@ -68,5 +68,5 @@ func PullsList(prs []*gitea.PullRequest) {
 		)
 	}
 
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }

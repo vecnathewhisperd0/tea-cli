@@ -41,5 +41,5 @@ func OrganizationsList(organizations []*gitea.Organization) {
 		)
 	}
 
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }

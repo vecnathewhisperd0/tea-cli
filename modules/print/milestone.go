@@ -61,5 +61,5 @@ func MilestonesList(miles []*gitea.Milestone, state gitea.StateType) {
 
 		values = append(values, item)
 	}
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }

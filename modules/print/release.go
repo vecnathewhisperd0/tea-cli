@@ -22,7 +22,7 @@ func ReleasesList(releases []*gitea.Release) {
 	}
 
 	if len(releases) == 0 {
-		OutputList(flags.GlobalOutputValue, headers, values)
+		outputList(flags.GlobalOutputValue, headers, values)
 		return
 	}
 
@@ -45,5 +45,5 @@ func ReleasesList(releases []*gitea.Release) {
 		)
 	}
 
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }

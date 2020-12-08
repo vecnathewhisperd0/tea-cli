@@ -38,7 +38,7 @@ func IssuesList(issues []*gitea.Issue) {
 	}
 
 	if len(issues) == 0 {
-		OutputList(flags.GlobalOutputValue, headers, values)
+		outputList(flags.GlobalOutputValue, headers, values)
 		return
 	}
 
@@ -63,7 +63,7 @@ func IssuesList(issues []*gitea.Issue) {
 			},
 		)
 	}
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }
 
 // IssuesPullsList prints a listing of issues & pulls
@@ -80,7 +80,7 @@ func IssuesPullsList(issues []*gitea.Issue) {
 	}
 
 	if len(issues) == 0 {
-		OutputList(flags.GlobalOutputValue, headers, values)
+		outputList(flags.GlobalOutputValue, headers, values)
 		return
 	}
 
@@ -106,5 +106,5 @@ func IssuesPullsList(issues []*gitea.Issue) {
 		)
 	}
 
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(flags.GlobalOutputValue, headers, values)
 }
