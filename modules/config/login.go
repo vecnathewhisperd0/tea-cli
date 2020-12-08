@@ -262,7 +262,6 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 
 	if len(sshKey) == 0 {
 		login.SSHKey, err = login.FindSSHKey()
-		fmt.Println(login.SSHKey)
 		if err != nil {
 			fmt.Printf("Warning: problem while finding a SSH key: %s\n", err)
 		}
