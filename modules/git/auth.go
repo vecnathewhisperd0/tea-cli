@@ -32,12 +32,14 @@ func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallba
 		// try to select right key via ssh-agent. if it fails, try to read a key manually
 		user := remoteURL.User.Username()
 		auth, err = gogit_ssh.DefaultAuthBuilder(user)
-		if err != nil {
+		if err != nil && passwordCallback != nil {
 			signer, err := readSSHPrivKey(keyFile, passwordCallback)
 			if err != nil {
 				return nil, err
 			}
 			auth = &gogit_ssh.PublicKeys{User: user, Signer: signer}
+		} else {
+			return nil, err
 		}
 
 	default:
