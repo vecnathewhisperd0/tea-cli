@@ -1,4 +1,4 @@
-// Copyright 2018 The Gitea Authors. All rights reserved.
+// Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -12,6 +12,45 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 )
+
+// table provides infrastructure to easily print (sorted) lists in different formats
+type table struct {
+	headers    []string
+	values     [][]string
+	sortDesc   bool // used internally by sortable interface
+	sortColumn uint // ↑
+}
+
+func tableWithHeader(header ...string) table {
+	return table{headers: header}
+}
+
+// it's the callers responsibility to ensure row length is equal to header length!
+func (t *table) addRow(row ...string) {
+	t.addRowSlice(row)
+}
+
+// it's the callers responsibility to ensure row length is equal to header length!
+func (t *table) addRowSlice(row []string) {
+	t.values = append(t.values, row)
+}
+
+func (t *table) print(output string) {
+	switch {
+	case output == "" || output == "table":
+		outputtable(t.headers, t.values)
+	case output == "csv":
+		outputdsv(t.headers, t.values, ",")
+	case output == "simple":
+		outputsimple(t.headers, t.values)
+	case output == "tsv":
+		outputdsv(t.headers, t.values, "\t")
+	case output == "yaml":
+		outputyaml(t.headers, t.values)
+	default:
+		fmt.Printf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
+	}
+}
 
 // outputtable prints structured data as table
 func outputtable(headers []string, values [][]string) {
@@ -60,24 +99,5 @@ func outputyaml(headers []string, values [][]string) {
 				fmt.Printf("    %s: '%s'\n", headers[j], val)
 			}
 		}
-	}
-}
-
-// outputList provides general function to convert given list of items
-// into several outputs (table, csv, simple, tsv, yaml)
-func outputList(output string, headers []string, values [][]string) {
-	switch {
-	case output == "" || output == "table":
-		outputtable(headers, values)
-	case output == "csv":
-		outputdsv(headers, values, ",")
-	case output == "simple":
-		outputsimple(headers, values)
-	case output == "tsv":
-		outputdsv(headers, values, "\t")
-	case output == "yaml":
-		outputyaml(headers, values)
-	default:
-		fmt.Printf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
 	}
 }

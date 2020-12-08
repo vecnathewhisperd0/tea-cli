@@ -26,18 +26,17 @@ func IssueDetails(issue *gitea.Issue) {
 
 // IssuesList prints a listing of issues
 func IssuesList(issues []*gitea.Issue, output string) {
-	var values [][]string
-	headers := []string{
+	t := tableWithHeader(
 		"Index",
 		"Title",
 		"State",
 		"Author",
 		"Milestone",
 		"Updated",
-	}
+	)
 
 	if len(issues) == 0 {
-		outputList(output, headers, values)
+		t.print(output)
 		return
 	}
 
@@ -50,36 +49,32 @@ func IssuesList(issues []*gitea.Issue, output string) {
 		if issue.Milestone != nil {
 			mile = issue.Milestone.Title
 		}
-		values = append(
-			values,
-			[]string{
-				strconv.FormatInt(issue.Index, 10),
-				issue.Title,
-				string(issue.State),
-				author,
-				mile,
-				FormatTime(issue.Updated),
-			},
+		t.addRow(
+			strconv.FormatInt(issue.Index, 10),
+			issue.Title,
+			string(issue.State),
+			author,
+			mile,
+			FormatTime(issue.Updated),
 		)
 	}
-	outputList(output, headers, values)
+	t.print(output)
 }
 
 // IssuesPullsList prints a listing of issues & pulls
 // TODO combine with IssuesList
 func IssuesPullsList(issues []*gitea.Issue, output string) {
-	var values [][]string
-	headers := []string{
+	t := tableWithHeader(
 		"Index",
 		"State",
 		"Kind",
 		"Author",
 		"Updated",
 		"Title",
-	}
+	)
 
 	if len(issues) == 0 {
-		outputList(output, headers, values)
+		t.print(output)
 		return
 	}
 
@@ -92,18 +87,15 @@ func IssuesPullsList(issues []*gitea.Issue, output string) {
 		if issue.PullRequest != nil {
 			kind = "Pull"
 		}
-		values = append(
-			values,
-			[]string{
-				strconv.FormatInt(issue.Index, 10),
-				string(issue.State),
-				kind,
-				name,
-				FormatTime(issue.Updated),
-				issue.Title,
-			},
+		t.addRow(
+			strconv.FormatInt(issue.Index, 10),
+			string(issue.State),
+			kind,
+			name,
+			FormatTime(issue.Updated),
+			issue.Title,
 		)
 	}
 
-	outputList(output, headers, values)
+	t.print(output)
 }
