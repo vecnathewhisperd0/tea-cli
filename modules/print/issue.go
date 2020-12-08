@@ -35,11 +35,6 @@ func IssuesList(issues []*gitea.Issue, output string) {
 		"Updated",
 	)
 
-	if len(issues) == 0 {
-		t.print(output)
-		return
-	}
-
 	for _, issue := range issues {
 		author := issue.Poster.FullName
 		if len(author) == 0 {
@@ -72,11 +67,6 @@ func IssuesPullsList(issues []*gitea.Issue, output string) {
 		"Updated",
 		"Title",
 	)
-
-	if len(issues) == 0 {
-		t.print(output)
-		return
-	}
 
 	for _, issue := range issues {
 		name := issue.Poster.FullName
