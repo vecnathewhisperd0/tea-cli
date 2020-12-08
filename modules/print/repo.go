@@ -150,7 +150,7 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 		tops = fmt.Sprintf("- Topics:\t%s\n", strings.Join(topics, ", "))
 	}
 
-	OutputMarkdown(fmt.Sprintf(
+	outputMarkdown(fmt.Sprintf(
 		"%s%s\n%s\n%s%s%s%s",
 		title,
 		desc,

@@ -57,7 +57,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 		out += "\nNo Conflicts"
 	}
 
-	OutputMarkdown(out)
+	outputMarkdown(out)
 }
 
 // PullsList prints a listing of pulls
