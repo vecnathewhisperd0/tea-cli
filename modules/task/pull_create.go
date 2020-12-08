@@ -18,7 +18,7 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
-// PullCreate creates a PR in the given repo and prints the result
+// CreatePull creates a PR in the given repo and prints the result
 func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, description string) error {
 
 	// open local git repo
@@ -54,7 +54,7 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 
 	// head & base may not be the same
 	if head == base {
-		return fmt.Errorf("Can't create PR from %s to %s\n", head, base)
+		return fmt.Errorf("can't create PR from %s to %s", head, base)
 	}
 
 	// default is head branch name
@@ -84,6 +84,7 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 	return err
 }
 
+// GetDefaultPRBase retrieves the default base branch for the given repo
 func GetDefaultPRBase(login *config.Login, owner, repo string) (string, error) {
 	meta, _, err := login.Client().GetRepo(owner, repo)
 	if err != nil {
@@ -129,14 +130,15 @@ func GetDefaultPRHead(localRepo *local_git.TeaRepo) (owner, branch string, err e
 	return
 }
 
+// GetHeadSpec creates a head string as expected by gitea API
 func GetHeadSpec(owner, branch, baseOwner string) string {
 	if len(owner) != 0 && owner != baseOwner {
 		return fmt.Sprintf("%s:%s", owner, branch)
-	} else {
-		return branch
 	}
+	return branch
 }
 
+// GetDefaultPRTitle transforms a string like a branchname to a readable text
 func GetDefaultPRTitle(head string) string {
 	title := head
 	if strings.Contains(title, ":") {
