@@ -22,6 +22,11 @@ var CmdReleaseDelete = cli.Command{
 	Action:      runReleaseDelete,
 	Flags: append([]cli.Flag{
 		&cli.BoolFlag{
+			Name:    "confirm",
+			Aliases: []string{"y"},
+			Usage:   "Confirm deletion (required)",
+		},
+		&cli.BoolFlag{
 			Name:  "delete-tag",
 			Usage: "Also delete the git tag for this release",
 		},
@@ -35,6 +40,11 @@ func runReleaseDelete(ctx *cli.Context) error {
 	tag := ctx.Args().First()
 	if len(tag) == 0 {
 		fmt.Println("Release tag needed to delete")
+		return nil
+	}
+
+	if !ctx.Bool("confirm") {
+		fmt.Println("Are you sure? Please confirm with -y or --confirm.")
 		return nil
 	}
 
