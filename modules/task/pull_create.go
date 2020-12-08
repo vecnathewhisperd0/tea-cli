@@ -20,12 +20,6 @@ import (
 
 // PullCreate creates a PR in the given repo and prints the result
 func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, description string) error {
-	client := login.Client()
-
-	repo, _, err := client.GetRepo(repoOwner, repoName)
-	if err != nil {
-		log.Fatal("could not fetch repo meta: ", err)
-	}
 
 	// open local git repo
 	localRepo, err := local_git.RepoForWorkdir()
@@ -42,44 +36,20 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 
 	// default is default branch
 	if len(base) == 0 {
-		base = repo.DefaultBranch
+		base, err = GetDefaultPRBase(login, repoOwner, repoName)
+		if err != nil {
+			return err
+		}
 	}
 
 	// default is current one
 	if len(head) == 0 {
-		headBranch, err := localRepo.Head()
+		headOwner, headBranch, err := GetDefaultPRHead(localRepo)
 		if err != nil {
-			log.Fatal(err)
-		}
-		sha := headBranch.Hash().String()
-
-		remote, err := localRepo.TeaFindBranchRemote("", sha)
-		if err != nil {
-			log.Fatal("could not determine remote for current branch: ", err)
+			return err
 		}
 
-		if remote == nil {
-			// if no remote branch is found for the local hash, we abort:
-			// user has probably not configured a remote for the local branch,
-			// or local branch does not represent remote state.
-			log.Fatal("no matching remote found for this branch. try git push -u <remote> <branch>")
-		}
-
-		branchName, err := localRepo.TeaGetCurrentBranchName()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		url, err := local_git.ParseURL(remote.Config().URLs[0])
-		if err != nil {
-			log.Fatal(err)
-		}
-		owner, _ := utils.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
-		if owner != repo.Owner.UserName {
-			head = fmt.Sprintf("%s:%s", owner, branchName)
-		} else {
-			head = branchName
-		}
+		head = GetHeadSpec(headOwner, headBranch, repoOwner)
 	}
 
 	// head & base may not be the same
@@ -89,20 +59,14 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 
 	// default is head branch name
 	if len(title) == 0 {
-		title = head
-		if strings.Contains(title, ":") {
-			title = strings.SplitN(title, ":", 2)[1]
-		}
-		title = strings.Replace(title, "-", " ", -1)
-		title = strings.Replace(title, "_", " ", -1)
-		title = strings.Title(strings.ToLower(title))
+		title = GetDefaultPRTitle(head)
 	}
 	// title is required
 	if len(title) == 0 {
 		return fmt.Errorf("Title is required")
 	}
 
-	pr, _, err := client.CreatePullRequest(repoOwner, repoName, gitea.CreatePullRequestOption{
+	pr, _, err := login.Client().CreatePullRequest(repoOwner, repoName, gitea.CreatePullRequestOption{
 		Head:  head,
 		Base:  base,
 		Title: title,
@@ -118,4 +82,68 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 	fmt.Println(pr.HTMLURL)
 
 	return err
+}
+
+func GetDefaultPRBase(login *config.Login, owner, repo string) (string, error) {
+	meta, _, err := login.Client().GetRepo(owner, repo)
+	if err != nil {
+		return "", fmt.Errorf("could not fetch repo meta: %s", err)
+	}
+	return meta.DefaultBranch, nil
+}
+
+// GetDefaultPRHead uses the currently checked out branch, checks if
+// a remote currently holds the commit it points to, extracts the owner
+// from its URL, and assembles the result to a valid head spec for gitea.
+func GetDefaultPRHead(localRepo *local_git.TeaRepo) (owner, branch string, err error) {
+	headBranch, err := localRepo.Head()
+	if err != nil {
+		return
+	}
+	sha := headBranch.Hash().String()
+
+	remote, err := localRepo.TeaFindBranchRemote("", sha)
+	if err != nil {
+		err = fmt.Errorf("could not determine remote for current branch: ", err)
+		return
+	}
+
+	if remote == nil {
+		// if no remote branch is found for the local hash, we abort:
+		// user has probably not configured a remote for the local branch,
+		// or local branch does not represent remote state.
+		err = fmt.Errorf("no matching remote found for this branch. try git push -u <remote> <branch>")
+		return
+	}
+
+	branch, err = localRepo.TeaGetCurrentBranchName()
+	if err != nil {
+		return
+	}
+
+	url, err := local_git.ParseURL(remote.Config().URLs[0])
+	if err != nil {
+		return
+	}
+	owner, _ = utils.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
+	return
+}
+
+func GetHeadSpec(owner, branch, baseOwner string) string {
+	if len(owner) != 0 && owner != baseOwner {
+		return fmt.Sprintf("%s:%s", owner, branch)
+	} else {
+		return branch
+	}
+}
+
+func GetDefaultPRTitle(head string) string {
+	title := head
+	if strings.Contains(title, ":") {
+		title = strings.SplitN(title, ":", 2)[1]
+	}
+	title = strings.Replace(title, "-", " ", -1)
+	title = strings.Replace(title, "_", " ", -1)
+	title = strings.Title(strings.ToLower(title))
+	return title
 }
