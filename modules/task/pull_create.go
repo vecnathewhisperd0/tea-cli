@@ -104,7 +104,7 @@ func GetDefaultPRHead(localRepo *local_git.TeaRepo) (owner, branch string, err e
 
 	remote, err := localRepo.TeaFindBranchRemote("", sha)
 	if err != nil {
-		err = fmt.Errorf("could not determine remote for current branch: ", err)
+		err = fmt.Errorf("could not determine remote for current branch: %s", err)
 		return
 	}
 
