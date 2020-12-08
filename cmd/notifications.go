@@ -5,7 +5,9 @@
 package cmd
 
 import (
-	"code.gitea.io/tea/cmd/flags"
+	"log"
+
+	"code.gitea.io/tea/cmd/notifications"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
@@ -18,27 +20,21 @@ var CmdNotifications = cli.Command{
 	Name:        "notifications",
 	Aliases:     []string{"notification", "n"},
 	Usage:       "Show notifications",
-	Description: "Show notifications, by default based of the current repo and unread one",
+	Description: "Show notifications, by default based of the current repo",
 	Action:      runNotifications,
+	Subcommands: []*cli.Command{
+		&notifications.CmdNotificationsList,
+		&notifications.CmdNotificationsPinned,
+		&notifications.CmdNotificationsRead,
+		&notifications.CmdNotificationsUnread,
+	},
 	Flags: append([]cli.Flag{
 		&cli.BoolFlag{
 			Name:    "all",
 			Aliases: []string{"a"},
 			Usage:   "show all notifications of related gitea instance",
 		},
-		&cli.BoolFlag{
-			Name:    "read",
-			Aliases: []string{"rd"},
-			Usage:   "show read notifications instead unread",
-		},
-		&cli.BoolFlag{
-			Name:    "pinned",
-			Aliases: []string{"pd"},
-			Usage:   "show pinned notifications instead unread",
-		},
-		&flags.PaginationPageFlag,
-		&flags.PaginationLimitFlag,
-	}, flags.AllDefaultFlags...),
+	}),
 }
 
 func runNotifications(cmd *cli.Context) error {
@@ -78,5 +74,10 @@ func runNotifications(cmd *cli.Context) error {
 	}
 
 	print.NotificationsList(news, ctx.Output, ctx.Bool("all"))
+	return nil
+}
+
+func runNotificationsDetails(ctx *cli.Context) error {
+	log.Fatal("Not yet implemented.")
 	return nil
 }
