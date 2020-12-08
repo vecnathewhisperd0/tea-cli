@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type pwCallback = func(ctx string) (string, error)
+type pwCallback = func(string) (string, error)
 
 // GetAuthForURL returns the appropriate AuthMethod to be used in Push() / Pull()
 // operations depending on the protocol, and prompts the user for credentials if
