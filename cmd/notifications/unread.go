@@ -34,7 +34,7 @@ var CmdNotificationsUnread = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-// RunNotificationsList list notifications
+// RunNotificationsUnread will show notifications with status unread.
 func RunNotificationsUnread(ctx *cli.Context) error {
 	var statuses = []gitea.NotifyStatus{gitea.NotifyStatusUnread}
 	return task.ListNotifications(ctx, statuses)

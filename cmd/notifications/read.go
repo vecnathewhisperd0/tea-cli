@@ -34,7 +34,7 @@ var CmdNotificationsRead = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-// RunNotificationsList list notifications
+// RunNotificationsRead will show notifications with status read.
 func RunNotificationsRead(ctx *cli.Context) error {
 	var statuses = []gitea.NotifyStatus{gitea.NotifyStatusRead}
 	return task.ListNotifications(ctx, statuses)
