@@ -13,15 +13,6 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-var (
-	showLog bool
-)
-
-// errorf printf content as an error information
-func errorf(format string, a ...interface{}) {
-	fmt.Printf(format, a...)
-}
-
 // outputtable prints structured data as table
 func outputtable(headers []string, values [][]string) {
 	table := tablewriter.NewWriter(os.Stdout)
@@ -87,6 +78,6 @@ func outputList(output string, headers []string, values [][]string) {
 	case output == "yaml":
 		outputyaml(headers, values)
 	default:
-		errorf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
+		fmt.Printf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
 	}
 }
