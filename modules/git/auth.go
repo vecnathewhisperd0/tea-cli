@@ -33,20 +33,18 @@ func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallba
 		user := remoteURL.User.Username()
 		auth, err = gogit_ssh.DefaultAuthBuilder(user)
 		if err != nil && passwordCallback != nil {
-			signer, err := readSSHPrivKey(keyFile, passwordCallback)
-			if err != nil {
-				return nil, err
+			signer, err2 := readSSHPrivKey(keyFile, passwordCallback)
+			if err2 != nil {
+				return nil, err2
 			}
 			auth = &gogit_ssh.PublicKeys{User: user, Signer: signer}
-		} else {
-			return nil, err
 		}
 
 	default:
 		return nil, fmt.Errorf("don't know how to handle url scheme %v", remoteURL.Scheme)
 	}
 
-	return auth, nil
+	return
 }
 
 func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer, err error) {
