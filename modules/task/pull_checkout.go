@@ -15,7 +15,7 @@ import (
 )
 
 // PullCheckout checkout current workdir to the head branch of specified pull request
-func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) error {
+func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, callback func(string) (string, error)) error {
 	client := login.Client()
 
 	localRepo, err := local_git.RepoForWorkdir()
@@ -60,7 +60,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.User, login.SSHKey)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
 	if err != nil {
 		return err
 	}

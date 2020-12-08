@@ -5,12 +5,9 @@
 package git
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"net/url"
-	"os"
-	"strings"
 
 	"code.gitea.io/tea/modules/utils"
 
@@ -18,42 +15,27 @@ import (
 	gogit_http "github.com/go-git/go-git/v5/plumbing/transport/http"
 	gogit_ssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
 )
+
+type pwCallback = func(string) (string, error)
 
 // GetAuthForURL returns the appropriate AuthMethod to be used in Push() / Pull()
 // operations depending on the protocol, and prompts the user for credentials if
 // necessary.
-func GetAuthForURL(remoteURL *url.URL, httpUser, keyFile string) (auth git_transport.AuthMethod, err error) {
-	user := remoteURL.User.Username()
-
+func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallback pwCallback) (auth git_transport.AuthMethod, err error) {
 	switch remoteURL.Scheme {
-	case "https":
-		if httpUser != "" {
-			user = httpUser
-		}
-		if user == "" {
-			user, err = promptUser(remoteURL.Host)
-			if err != nil {
-				return nil, err
-			}
-		}
-		pass, isSet := remoteURL.User.Password()
-		if !isSet {
-			pass, err = promptPass(remoteURL.Host)
-			if err != nil {
-				return nil, err
-			}
-		}
-		auth = &gogit_http.BasicAuth{Password: pass, Username: user}
+	case "http", "https":
+		// gitea supports push/pull via app token as username.
+		auth = &gogit_http.BasicAuth{Password: "", Username: authToken}
 
 	case "ssh":
 		// try to select right key via ssh-agent. if it fails, try to read a key manually
+		user := remoteURL.User.Username()
 		auth, err = gogit_ssh.DefaultAuthBuilder(user)
-		if err != nil {
-			signer, err := readSSHPrivKey(keyFile)
-			if err != nil {
-				return nil, err
+		if err != nil && passwordCallback != nil {
+			signer, err2 := readSSHPrivKey(keyFile, passwordCallback)
+			if err2 != nil {
+				return nil, err2
 			}
 			auth = &gogit_ssh.PublicKeys{User: user, Signer: signer}
 		}
@@ -62,10 +44,10 @@ func GetAuthForURL(remoteURL *url.URL, httpUser, keyFile string) (auth git_trans
 		return nil, fmt.Errorf("don't know how to handle url scheme %v", remoteURL.Scheme)
 	}
 
-	return auth, nil
+	return
 }
 
-func readSSHPrivKey(keyFile string) (sig ssh.Signer, err error) {
+func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer, err error) {
 	if keyFile != "" {
 		keyFile, err = utils.AbsPathWithExpansion(keyFile)
 	} else {
@@ -79,28 +61,19 @@ func readSSHPrivKey(keyFile string) (sig ssh.Signer, err error) {
 		return nil, err
 	}
 	sig, err = ssh.ParsePrivateKey(sshKey)
-	if err != nil {
-		pass, err := promptPass(keyFile)
-		if err != nil {
-			return nil, err
-		}
-		sig, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(pass))
-		if err != nil {
-			return nil, err
+	if _, ok := err.(*ssh.PassphraseMissingError); ok {
+		// allow for up to 3 password attempts
+		for i := 0; i < 3; i++ {
+			var pass string
+			pass, err = passwordCallback(keyFile)
+			if err != nil {
+				return nil, err
+			}
+			sig, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(pass))
+			if err == nil {
+				break
+			}
 		}
 	}
 	return sig, err
-}
-
-func promptUser(domain string) (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("%s username: ", domain)
-	username, err := reader.ReadString('\n')
-	return strings.TrimSpace(username), err
-}
-
-func promptPass(domain string) (string, error) {
-	fmt.Printf("%s password: ", domain)
-	pass, err := terminal.ReadPassword(0)
-	return string(pass), err
 }
