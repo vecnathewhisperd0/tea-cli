@@ -12,42 +12,62 @@ import (
 
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
+
+	gogit "github.com/go-git/go-git/v5"
 )
 
-// InitCommand returns repository and *Login based on flags
-func InitCommand(repoValue, loginValue, remoteValue string) (*Login, string, string) {
-	var login *Login
-
+// InitCommand resolves the application context, and returns the active login, and if
+// available the repo slug. It does this by reading the config file for logins, parsing
+// the remotes of the .git repo in $PWD, and using overrides from command flags.
+// If PWD is not a git repo, no repo slug values are unset.
+// TODO: func InitCommandNew(ctx *cli.Context) TeaContext
+func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner string, reponame string) {
 	err := LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if login, err = GetDefaultLogin(); err != nil {
-		log.Fatal(err.Error())
-	}
+	var repoSlug string
+	var repoPath string // empty means PWD
+	var repoFlagPathExists bool
 
-	exist, err := utils.PathExists(repoValue)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	if exist || len(repoValue) == 0 {
-		login, repoValue, err = curGitRepoPath(repoValue, remoteValue)
+	// check if repoFlag can be interpreted as path to local repo.
+	if len(repoFlag) != 0 {
+		repoFlagPathExists, err = utils.PathExists(repoFlag)
 		if err != nil {
+			log.Fatal(err.Error())
+		}
+		if repoFlagPathExists {
+			repoPath = repoFlag
+		}
+	}
+
+	// try to read git repo & extract context, ignoring if PWD is not a repo
+	login, repoSlug, err = contextFromLocalRepo(repoPath, remoteFlag)
+	if err != nil && err != gogit.ErrRepositoryNotExists {
+		log.Fatal(err.Error())
+	}
+
+	// if repoFlag is not a path, use it to override repoSlug
+	if len(repoFlag) != 0 && !repoFlagPathExists {
+		repoSlug = repoFlag
+	}
+
+	// override login from flag, or use default login if repo based detection failed
+	if loginFlag != "" {
+		login = GetLoginByName(loginFlag)
+		if login == nil {
+			log.Fatalf("Login name '%s' does not exist", loginFlag)
+		}
+	} else if login == nil {
+		if login, err = GetDefaultLogin(); err != nil {
 			log.Fatal(err.Error())
 		}
 	}
 
-	if loginValue != "" {
-		login = GetLoginByName(loginValue)
-		if login == nil {
-			log.Fatal("Login name " + loginValue + " does not exist")
-		}
-	}
-
-	owner, repo := utils.GetOwnerAndRepo(repoValue, login.User)
-	return login, owner, repo
+	// parse reposlug (owner falling back to login owner if reposlug contains only repo name)
+	owner, reponame = utils.GetOwnerAndRepo(repoSlug, login.User)
+	return
 }
 
 // InitCommandLoginOnly return *Login based on flags
@@ -73,14 +93,8 @@ func InitCommandLoginOnly(loginValue string) *Login {
 	return login
 }
 
-func curGitRepoPath(repoValue, remoteValue string) (*Login, string, error) {
-	var err error
-	var repo *git.TeaRepo
-	if len(repoValue) == 0 {
-		repo, err = git.RepoForWorkdir()
-	} else {
-		repo, err = git.RepoFromPath(repoValue)
-	}
+func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error) {
+	repo, err := git.RepoFromPath(repoValue)
 	if err != nil {
 		return nil, "", err
 	}
