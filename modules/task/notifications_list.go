@@ -15,6 +15,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+//ListNotifications will get the notifications based on status
 func ListNotifications(ctx *cli.Context, status []gitea.NotifyStatus) error {
 
 	//TODO: What is the purpose of the following?
