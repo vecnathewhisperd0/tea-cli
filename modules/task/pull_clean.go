@@ -33,8 +33,6 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 		return fmt.Errorf("PR is still open, won't delete branches")
 	}
 
-	// IDEA: abort if PR.Head.Repository.CloneURL does not match login.URL?
-
 	// if remote head branch is already deleted, pr.Head.Ref points to "pulls/<idx>/head"
 	remoteBranch := pr.Head.Ref
 	remoteDeleted := remoteBranch == fmt.Sprintf("refs/pull/%d/head", pr.Index)
@@ -82,19 +80,22 @@ call me again with the --ignore-sha flag`, remoteBranch)
 
 	// remove local & remote branch
 	fmt.Printf("Deleting local branch %s\n", branch.Name)
-	url, err := r.TeaRemoteURL(branch.Remote)
-	if err != nil {
-		return err
-	}
 	err = r.TeaDeleteLocalBranch(branch)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Deleting remote branch %s\n", remoteBranch)
-	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
-	if err != nil {
-		return err
+	if !remoteDeleted && pr.Head.Repository.Permissions.Push {
+		fmt.Printf("Deleting remote branch %s\n", remoteBranch)
+		url, err := r.TeaRemoteURL(branch.Remote)
+		if err != nil {
+			return err
+		}
+		auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
+		if err != nil {
+			return err
+		}
+		err = r.TeaDeleteRemoteBranch(branch.Remote, remoteBranch, auth)
 	}
-	return r.TeaDeleteRemoteBranch(branch.Remote, remoteBranch, auth)
+	return err
 }
