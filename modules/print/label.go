@@ -14,7 +14,6 @@ import (
 
 // LabelsList prints a listing of labels
 func LabelsList(labels []*gitea.Label, output string) {
-
 	t := tableWithHeader(
 		"Index",
 		"Color",
