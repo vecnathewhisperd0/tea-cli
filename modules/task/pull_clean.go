@@ -81,14 +81,20 @@ call me again with the --ignore-sha flag`, remoteBranch)
 	}
 
 	// remove local & remote branch
-	fmt.Printf("Deleting local branch %s and remote branch %s\n", branch.Name, remoteBranch)
+	fmt.Printf("Deleting local branch %s\n", branch.Name)
 	url, err := r.TeaRemoteURL(branch.Remote)
 	if err != nil {
 		return err
 	}
+	err = r.TeaDeleteLocalBranch(branch)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Deleting remote branch %s\n", remoteBranch)
 	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
 	if err != nil {
 		return err
 	}
-	return r.TeaDeleteBranch(branch, remoteBranch, auth)
+	return r.TeaDeleteRemoteBranch(branch.Remote, remoteBranch, auth)
 }
