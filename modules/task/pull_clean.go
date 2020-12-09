@@ -19,6 +19,9 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 	client := login.Client()
 
 	repo, _, err := client.GetRepo(repoOwner, repoName)
+	if err != nil {
+		return err
+	}
 	defaultBranch := repo.DefaultBranch
 	if len(defaultBranch) == 0 {
 		defaultBranch = "master"
