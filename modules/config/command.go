@@ -18,9 +18,8 @@ import (
 
 // InitCommand resolves the application context, and returns the active login, and if
 // available the repo slug. It does this by reading the config file for logins, parsing
-// the remotes of the .git repo in $PWD, and using overrides from command flags.
-// If PWD is not a git repo, no repo slug values are unset.
-// TODO: func InitCommandNew(ctx *cli.Context) TeaContext
+// the remotes of the .git repo specified in repoFlag or $PWD, and using overrides from
+// command flags. If a local git repo can't be found, repo slug values are unset.
 func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner string, reponame string) {
 	err := LoadConfig()
 	if err != nil {
@@ -54,7 +53,7 @@ func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner st
 	}
 
 	// override login from flag, or use default login if repo based detection failed
-	if loginFlag != "" {
+	if len(loginFlag) != 0 {
 		login = GetLoginByName(loginFlag)
 		if login == nil {
 			log.Fatalf("Login name '%s' does not exist", loginFlag)
@@ -70,6 +69,7 @@ func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner st
 	return
 }
 
+// discovers login & repo slug from the default branch remote of the given local repo
 func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error) {
 	repo, err := git.RepoFromPath(repoValue)
 	if err != nil {
