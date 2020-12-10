@@ -7,7 +7,6 @@ package notifications
 import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/task"
 	"github.com/urfave/cli/v2"
 )
 
@@ -24,5 +23,5 @@ var CmdNotificationsPinned = cli.Command{
 // RunNotificationsPinned will show notifications with status pinned.
 func RunNotificationsPinned(ctx *cli.Context) error {
 	var statuses = []gitea.NotifyStatus{gitea.NotifyStatusPinned}
-	return task.ListNotifications(ctx, statuses)
+	return listNotifications(ctx, statuses)
 }

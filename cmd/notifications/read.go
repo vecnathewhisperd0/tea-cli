@@ -7,7 +7,6 @@ package notifications
 import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/task"
 	"github.com/urfave/cli/v2"
 )
 
@@ -24,5 +23,5 @@ var CmdNotificationsRead = cli.Command{
 // RunNotificationsRead will show notifications with status read.
 func RunNotificationsRead(ctx *cli.Context) error {
 	var statuses = []gitea.NotifyStatus{gitea.NotifyStatusRead}
-	return task.ListNotifications(ctx, statuses)
+	return listNotifications(ctx, statuses)
 }

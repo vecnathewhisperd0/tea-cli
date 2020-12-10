@@ -7,7 +7,6 @@ package notifications
 import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/task"
 	"github.com/urfave/cli/v2"
 )
 
@@ -24,5 +23,5 @@ var CmdNotificationsUnread = cli.Command{
 // RunNotificationsUnread will show notifications with status unread.
 func RunNotificationsUnread(ctx *cli.Context) error {
 	var statuses = []gitea.NotifyStatus{gitea.NotifyStatusUnread}
-	return task.ListNotifications(ctx, statuses)
+	return listNotifications(ctx, statuses)
 }
