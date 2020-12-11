@@ -65,7 +65,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	}
 
 	if len(token) == 0 {
-		login.Token, err = GenerateToken(login.Client(), user, passwd)
+		login.Token, err = generateToken(login.Client(), user, passwd)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -103,8 +103,8 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	return nil
 }
 
-// GenerateToken creates a new token when given BasicAuth credentials
-func GenerateToken(client *gitea.Client, user, pass string) (string, error) {
+// generateToken creates a new token when given BasicAuth credentials
+func generateToken(client *gitea.Client, user, pass string) (string, error) {
 	gitea.SetBasicAuth(user, pass)(client)
 
 	host, _ := os.Hostname()
