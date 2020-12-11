@@ -69,7 +69,7 @@ func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner st
 	return
 }
 
-// discovers login & repo slug from the default branch remote of the given local repo
+// contextFromLocalRepo discovers login & repo slug from the default branch remote of the given local repo
 func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error) {
 	repo, err := git.RepoFromPath(repoValue)
 	if err != nil {
