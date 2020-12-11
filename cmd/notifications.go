@@ -34,6 +34,11 @@ var CmdNotifications = cli.Command{
 			Aliases: []string{"a"},
 			Usage:   "show all notifications of related gitea instance",
 		},
+		&cli.StringFlag{
+			Name:        "state",
+			Usage:       "set milestone state (default is open)",
+			DefaultText: "open",
+		},
 	}),
 }
 
@@ -78,6 +83,6 @@ func runNotifications(cmd *cli.Context) error {
 }
 
 func runNotificationsDetails(ctx *cli.Context) error {
-	log.Fatal("Not yet implemented.")
+	log.Fatal("Use tea notif --help to see all available commands.")
 	return nil
 }

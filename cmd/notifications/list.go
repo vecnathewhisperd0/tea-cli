@@ -6,7 +6,7 @@ package notifications
 
 import (
 	"code.gitea.io/sdk/gitea"
-	"code.gitea.io/tea/cmd/flags"
+	"fmt"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,10 +17,45 @@ var CmdNotificationsList = cli.Command{
 	Usage:       "List notifications",
 	Description: `List notifications`,
 	Action:      RunNotificationsList,
-	Flags:       flags.NotificationFlags,
+	//	Flags:       flags.NotificationFlags,
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:    "all",
+			Aliases: []string{"a"},
+			Usage:   "show all notifications of related gitea instance",
+		},
+		&cli.StringFlag{
+			Name:        "state",
+			Usage:       "set notification state (default is all), pinned,read,unread",
+			DefaultText: "xxx",
+		},
+	}),
 }
+
+// notif ls
+// notif ls --state all
+// notif ls --state pinned
+// notif ls --state read
+// notif ls --state unread
 
 // RunNotificationsList list notifications
 func RunNotificationsList(ctx *cli.Context) error {
-	return listNotifications(ctx, []gitea.NotifyStatus{})
+	// --states all
+
+	states := []gitea.NotifyStatus{gitea.NotifyStatusRead, gitea.NotifyStatusPinned}
+
+	switch ctx.String("state") {
+	case "all":
+		states = []gitea.NotifyStatus{gitea.NotifyStatusPinned, gitea.NotifyStatusRead, gitea.NotifyStatusUnread}
+	case "pinned":
+		states = []gitea.NotifyStatus{gitea.NotifyStatusPinned}
+	case "read":
+		states = []gitea.NotifyStatus{gitea.NotifyStatusRead}
+	case "unread":
+		states = []gitea.NotifyStatus{gitea.NotifyStatusUnread}
+	default:
+		return fmt.Errorf("invalid notification state type '%s'. valid: all, pinned,read,unread", ctx.String("state"))
+	}
+
+	return listNotifications(ctx, states)
 }

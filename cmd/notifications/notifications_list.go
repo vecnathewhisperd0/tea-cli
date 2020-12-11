@@ -5,6 +5,7 @@
 package notifications
 
 import (
+	"fmt"
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
@@ -28,14 +29,17 @@ func listNotifications(ctx *cli.Context, status []gitea.NotifyStatus) error {
 	var err error
 
 	var allRelated = ctx.Bool("all")
+	fmt.Printf("allRelated: %t\n", allRelated)
+
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	if allRelated {
-		login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
+		fmt.Printf("login: %s owner: %s repo:%s\n", login.Name, owner, repo)
 		news, _, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
 		})
 	} else {
-		login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+		fmt.Printf("login: %s owner: %s repo:%s\n", login.Name, owner, repo)
 		news, _, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
