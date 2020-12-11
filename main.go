@@ -6,7 +6,7 @@
 package main // import "code.gitea.io/tea"
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strings"
 
@@ -44,7 +44,7 @@ func main() {
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatalf("Failed to run app with %s: %v", os.Args, err)
+		fmt.Printf("Error: %v\n", err)
 	}
 }
 
