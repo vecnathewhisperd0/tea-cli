@@ -5,38 +5,16 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
 	"code.gitea.io/tea/modules/utils"
+
+	"code.gitea.io/sdk/gitea"
 )
-
-// GetDefaultLogin return the default login
-func GetDefaultLogin() (*Login, error) {
-	if len(Config.Logins) == 0 {
-		return nil, errors.New("No available login")
-	}
-	for _, l := range Config.Logins {
-		if l.Default {
-			return &l, nil
-		}
-	}
-
-	return &Config.Logins[0], nil
-}
-
-// GetLoginByName get login by name
-func GetLoginByName(name string) *Login {
-	for _, l := range Config.Logins {
-		if l.Name == name {
-			return &l
-		}
-	}
-	return nil
-}
 
 // AddLogin add login to config ( global var & file)
 func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
@@ -87,7 +65,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	}
 
 	if len(token) == 0 {
-		login.Token, err = login.GenerateToken(user, passwd)
+		login.Token, err = GenerateToken(login.Client(), user, passwd)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -125,41 +103,24 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	return nil
 }
 
-// DeleteLogin delete a login by name
-func DeleteLogin(name string) error {
-	var idx = -1
-	for i, l := range Config.Logins {
-		if l.Name == name {
-			idx = i
-			break
-		}
-	}
-	if idx == -1 {
-		return fmt.Errorf("can not delete login '%s', does not exist", name)
-	}
+// GenerateToken creates a new token when given BasicAuth credentials
+func GenerateToken(client *gitea.Client, user, pass string) (string, error) {
+	gitea.SetBasicAuth(user, pass)(client)
 
-	Config.Logins = append(Config.Logins[:idx], Config.Logins[idx+1:]...)
-
-	return SaveConfig()
-}
-
-// GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
-func GenerateLoginName(url, user string) (string, error) {
-	parsedURL, err := utils.NormalizeURL(url)
+	host, _ := os.Hostname()
+	tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
 	if err != nil {
 		return "", err
 	}
-	name := parsedURL.Host
+	tokenName := host + "-tea"
 
-	// append user name if login name already exists
-	if len(user) != 0 {
-		for _, l := range Config.Logins {
-			if l.Name == name {
-				name += "_" + user
-				break
-			}
+	for i := range tl {
+		if tl[i].Name == tokenName {
+			tokenName += time.Now().Format("2006-01-02_15-04-05")
+			break
 		}
 	}
 
-	return name, nil
+	t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
+	return t.Token, err
 }
