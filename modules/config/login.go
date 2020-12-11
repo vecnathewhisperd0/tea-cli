@@ -12,8 +12,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-
-	"code.gitea.io/tea/modules/utils"
+	"strings"
 
 	"code.gitea.io/sdk/gitea"
 )
@@ -48,35 +47,24 @@ func GetDefaultLogin() (*Login, error) {
 	return &Config.Logins[0], nil
 }
 
-// GetLoginByName get login by name
+// GetLoginByName get login by name (case insensitive)
 func GetLoginByName(name string) *Login {
 	for _, l := range Config.Logins {
-		if l.Name == name {
+		if strings.ToLower(l.Name) == strings.ToLower(name) {
 			return &l
 		}
 	}
 	return nil
 }
 
-// GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
-func GenerateLoginName(url, user string) (string, error) {
-	parsedURL, err := utils.NormalizeURL(url)
-	if err != nil {
-		return "", err
-	}
-	name := parsedURL.Host
-
-	// append user name if login name already exists
-	if len(user) != 0 {
-		for _, l := range Config.Logins {
-			if l.Name == name {
-				name += "_" + user
-				break
-			}
+// GetLoginByToken get login by token
+func GetLoginByToken(token string) *Login {
+	for _, l := range Config.Logins {
+		if l.Token == token {
+			return &l
 		}
 	}
-
-	return name, nil
+	return nil
 }
 
 // DeleteLogin delete a login by name

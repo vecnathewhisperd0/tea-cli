@@ -2,42 +2,40 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package config
+package task
 
 import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"time"
 
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
 )
 
-// AddLogin add login to config ( global var & file)
-func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
+// CreateLogin create a login to be stored in config
+func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
 	// checks ...
 	// ... if we have a url
 	if len(giteaURL) == 0 {
 		log.Fatal("You have to input Gitea server URL")
 	}
 
-	err := LoadConfig()
+	err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, l := range Config.Logins {
-		// ... if there already exist a login with same name
-		if strings.ToLower(l.Name) == strings.ToLower(name) {
-			return fmt.Errorf("login name '%s' has already been used", l.Name)
-		}
-		// ... if we already use this token
-		if l.Token == token {
-			return fmt.Errorf("token already been used, delete login '%s' first", l.Name)
-		}
+	// ... if there already exist a login with same name
+	if login := config.GetLoginByName(name); login != nil {
+		return fmt.Errorf("login name '%s' has already been used", login.Name)
+	}
+	// ... if we already use this token
+	if login := config.GetLoginByToken(token); login != nil {
+		return fmt.Errorf("token already been used, delete login '%s' first", login.Name)
 	}
 
 	// .. if we have enough information to authenticate
@@ -55,7 +53,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		log.Fatal("Unable to parse URL", err)
 	}
 
-	login := Login{
+	login := config.Login{
 		Name:     name,
 		URL:      serverURL.String(),
 		Token:    token,
@@ -90,10 +88,10 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	login.SSHHost = serverURL.Hostname()
 
 	// save login to global var
-	Config.Logins = append(Config.Logins, login)
+	config.Config.Logins = append(config.Config.Logins, login)
 
 	// save login to config file
-	err = SaveConfig()
+	err = config.SaveConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -123,4 +121,22 @@ func generateToken(client *gitea.Client, user, pass string) (string, error) {
 
 	t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
 	return t.Token, err
+}
+
+// GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
+func GenerateLoginName(url, user string) (string, error) {
+	parsedURL, err := utils.NormalizeURL(url)
+	if err != nil {
+		return "", err
+	}
+	name := parsedURL.Host
+
+	// append user name if login name already exists
+	if len(user) != 0 {
+		if login := config.GetLoginByName(name); login != nil {
+			return name + "_" + user, nil
+		}
+	}
+
+	return name, nil
 }
