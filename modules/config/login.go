@@ -59,7 +59,7 @@ func GetDefaultLogin() (*Login, error) {
 	return &config.Logins[0], nil
 }
 
-// SetDefaultLogin set the default login by name
+// SetDefaultLogin set the default login by name (case insensitive)
 func SetDefaultLogin(name string) error {
 	if err := loadConfig(); err != nil {
 		return err
@@ -68,7 +68,7 @@ func SetDefaultLogin(name string) error {
 	loginExist := false
 	for i := range config.Logins {
 		config.Logins[i].Default = false
-		if config.Logins[i].Name == name {
+		if strings.ToLower(config.Logins[i].Name) == strings.ToLower(name) {
 			config.Logins[i].Default = true
 			loginExist = true
 		}
