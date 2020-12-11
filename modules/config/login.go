@@ -35,6 +35,10 @@ type Login struct {
 
 // GetDefaultLogin return the default login
 func GetDefaultLogin() (*Login, error) {
+	if err := LoadConfig(); err != nil {
+		return nil, err
+	}
+
 	if len(Config.Logins) == 0 {
 		return nil, errors.New("No available login")
 	}
@@ -45,6 +49,28 @@ func GetDefaultLogin() (*Login, error) {
 	}
 
 	return &Config.Logins[0], nil
+}
+
+// SetDefaultLogin set the default login by name
+func SetDefaultLogin(name string) error {
+	if err := LoadConfig(); err != nil {
+		return err
+	}
+
+	loginExist := false
+	for i := range Config.Logins {
+		Config.Logins[i].Default = false
+		if Config.Logins[i].Name == name {
+			Config.Logins[i].Default = true
+			loginExist = true
+		}
+	}
+
+	if !loginExist {
+		return fmt.Errorf("login '%s' not found", name)
+	}
+
+	return SaveConfig()
 }
 
 // GetLoginByName get login by name (case insensitive)

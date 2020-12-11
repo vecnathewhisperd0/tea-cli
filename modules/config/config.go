@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"path/filepath"
+	"sync"
 
 	"code.gitea.io/tea/modules/utils"
 
@@ -23,7 +24,8 @@ type LocalConfig struct {
 
 var (
 	// Config contain if loaded local tea config
-	Config LocalConfig
+	Config         LocalConfig
+	loadConfigOnce sync.Once
 )
 
 // GetConfigPath return path to tea config file
@@ -54,22 +56,23 @@ func GetConfigPath() string {
 }
 
 // LoadConfig load config into global Config var
-func LoadConfig() error {
-	ymlPath := GetConfigPath()
-	exist, _ := utils.FileExist(ymlPath)
-	if exist {
-		bs, err := ioutil.ReadFile(ymlPath)
-		if err != nil {
-			return fmt.Errorf("Failed to read config file: %s", ymlPath)
-		}
+func LoadConfig() (err error) {
+	loadConfigOnce.Do(func() {
+		ymlPath := GetConfigPath()
+		exist, _ := utils.FileExist(ymlPath)
+		if exist {
+			bs, err := ioutil.ReadFile(ymlPath)
+			if err != nil {
+				err = fmt.Errorf("Failed to read config file: %s", ymlPath)
+			}
 
-		err = yaml.Unmarshal(bs, &Config)
-		if err != nil {
-			return fmt.Errorf("Failed to parse contents of config file: %s", ymlPath)
+			err = yaml.Unmarshal(bs, &Config)
+			if err != nil {
+				err = fmt.Errorf("Failed to parse contents of config file: %s", ymlPath)
+			}
 		}
-	}
-
-	return nil
+	})
+	return
 }
 
 // SaveConfig save config from global Config var into config file
