@@ -24,11 +24,6 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 		log.Fatal("You have to input Gitea server URL")
 	}
 
-	err := config.LoadConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// ... if there already exist a login with same name
 	if login := config.GetLoginByName(name); login != nil {
 		return fmt.Errorf("login name '%s' has already been used", login.Name)
@@ -87,11 +82,7 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 	// so we just use the hostname
 	login.SSHHost = serverURL.Hostname()
 
-	// save login to global var
-	config.Config.Logins = append(config.Config.Logins, login)
-
-	// save login to config file
-	err = config.SaveConfig()
+	err = config.AddLogin(&login)
 	if err != nil {
 		log.Fatal(err)
 	}

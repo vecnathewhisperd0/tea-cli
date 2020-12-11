@@ -21,7 +21,7 @@ import (
 // the remotes of the .git repo specified in repoFlag or $PWD, and using overrides from
 // command flags. If a local git repo can't be found, repo slug values are unset.
 func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner string, reponame string) {
-	err := LoadConfig()
+	err := loadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}

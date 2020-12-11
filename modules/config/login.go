@@ -33,9 +33,17 @@ type Login struct {
 	Created int64 `yaml:"created"`
 }
 
+// GetLogins return all login available by config
+func GetLogins() ([]Login, error) {
+	if err := loadConfig(); err != nil {
+		return nil, err
+	}
+	return Config.Logins, nil
+}
+
 // GetDefaultLogin return the default login
 func GetDefaultLogin() (*Login, error) {
-	if err := LoadConfig(); err != nil {
+	if err := loadConfig(); err != nil {
 		return nil, err
 	}
 
@@ -53,7 +61,7 @@ func GetDefaultLogin() (*Login, error) {
 
 // SetDefaultLogin set the default login by name
 func SetDefaultLogin(name string) error {
-	if err := LoadConfig(); err != nil {
+	if err := loadConfig(); err != nil {
 		return err
 	}
 
@@ -70,11 +78,16 @@ func SetDefaultLogin(name string) error {
 		return fmt.Errorf("login '%s' not found", name)
 	}
 
-	return SaveConfig()
+	return saveConfig()
 }
 
 // GetLoginByName get login by name (case insensitive)
 func GetLoginByName(name string) *Login {
+	err := loadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for _, l := range Config.Logins {
 		if strings.ToLower(l.Name) == strings.ToLower(name) {
 			return &l
@@ -85,6 +98,11 @@ func GetLoginByName(name string) *Login {
 
 // GetLoginByToken get login by token
 func GetLoginByToken(token string) *Login {
+	err := loadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for _, l := range Config.Logins {
 		if l.Token == token {
 			return &l
@@ -93,7 +111,7 @@ func GetLoginByToken(token string) *Login {
 	return nil
 }
 
-// DeleteLogin delete a login by name
+// DeleteLogin delete a login by name from config
 func DeleteLogin(name string) error {
 	var idx = -1
 	for i, l := range Config.Logins {
@@ -108,7 +126,20 @@ func DeleteLogin(name string) error {
 
 	Config.Logins = append(Config.Logins[:idx], Config.Logins[idx+1:]...)
 
-	return SaveConfig()
+	return saveConfig()
+}
+
+// AddLogin save a login to config
+func AddLogin(login *Login) error {
+	if err := loadConfig(); err != nil {
+		return err
+	}
+
+	// save login to global var
+	Config.Logins = append(Config.Logins, *login)
+
+	// save login to config file
+	return saveConfig()
 }
 
 // Client returns a client to operate Gitea API

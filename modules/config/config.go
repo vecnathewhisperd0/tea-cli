@@ -55,8 +55,8 @@ func GetConfigPath() string {
 	return configFilePath
 }
 
-// LoadConfig load config into global Config var
-func LoadConfig() (err error) {
+// loadConfig load config into global Config var
+func loadConfig() (err error) {
 	loadConfigOnce.Do(func() {
 		ymlPath := GetConfigPath()
 		exist, _ := utils.FileExist(ymlPath)
@@ -75,8 +75,8 @@ func LoadConfig() (err error) {
 	return
 }
 
-// SaveConfig save config from global Config var into config file
-func SaveConfig() error {
+// saveConfig save config from global Config var into config file
+func saveConfig() error {
 	ymlPath := GetConfigPath()
 	bs, err := yaml.Marshal(Config)
 	if err != nil {
