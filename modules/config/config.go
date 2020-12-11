@@ -23,8 +23,8 @@ type LocalConfig struct {
 }
 
 var (
-	// Config contain if loaded local tea config
-	Config         LocalConfig
+	// config contain if loaded local tea config
+	config         LocalConfig
 	loadConfigOnce sync.Once
 )
 
@@ -55,7 +55,7 @@ func GetConfigPath() string {
 	return configFilePath
 }
 
-// loadConfig load config into global Config var
+// loadConfig load config into global config var
 func loadConfig() (err error) {
 	loadConfigOnce.Do(func() {
 		ymlPath := GetConfigPath()
@@ -66,7 +66,7 @@ func loadConfig() (err error) {
 				err = fmt.Errorf("Failed to read config file: %s", ymlPath)
 			}
 
-			err = yaml.Unmarshal(bs, &Config)
+			err = yaml.Unmarshal(bs, &config)
 			if err != nil {
 				err = fmt.Errorf("Failed to parse contents of config file: %s", ymlPath)
 			}
@@ -75,10 +75,10 @@ func loadConfig() (err error) {
 	return
 }
 
-// saveConfig save config from global Config var into config file
+// saveConfig save config from global config var into config file
 func saveConfig() error {
 	ymlPath := GetConfigPath()
-	bs, err := yaml.Marshal(Config)
+	bs, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}

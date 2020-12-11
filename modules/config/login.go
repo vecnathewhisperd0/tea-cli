@@ -38,7 +38,7 @@ func GetLogins() ([]Login, error) {
 	if err := loadConfig(); err != nil {
 		return nil, err
 	}
-	return Config.Logins, nil
+	return config.Logins, nil
 }
 
 // GetDefaultLogin return the default login
@@ -47,16 +47,16 @@ func GetDefaultLogin() (*Login, error) {
 		return nil, err
 	}
 
-	if len(Config.Logins) == 0 {
+	if len(config.Logins) == 0 {
 		return nil, errors.New("No available login")
 	}
-	for _, l := range Config.Logins {
+	for _, l := range config.Logins {
 		if l.Default {
 			return &l, nil
 		}
 	}
 
-	return &Config.Logins[0], nil
+	return &config.Logins[0], nil
 }
 
 // SetDefaultLogin set the default login by name
@@ -66,10 +66,10 @@ func SetDefaultLogin(name string) error {
 	}
 
 	loginExist := false
-	for i := range Config.Logins {
-		Config.Logins[i].Default = false
-		if Config.Logins[i].Name == name {
-			Config.Logins[i].Default = true
+	for i := range config.Logins {
+		config.Logins[i].Default = false
+		if config.Logins[i].Name == name {
+			config.Logins[i].Default = true
 			loginExist = true
 		}
 	}
@@ -88,7 +88,7 @@ func GetLoginByName(name string) *Login {
 		log.Fatal(err)
 	}
 
-	for _, l := range Config.Logins {
+	for _, l := range config.Logins {
 		if strings.ToLower(l.Name) == strings.ToLower(name) {
 			return &l
 		}
@@ -103,7 +103,7 @@ func GetLoginByToken(token string) *Login {
 		log.Fatal(err)
 	}
 
-	for _, l := range Config.Logins {
+	for _, l := range config.Logins {
 		if l.Token == token {
 			return &l
 		}
@@ -114,7 +114,7 @@ func GetLoginByToken(token string) *Login {
 // DeleteLogin delete a login by name from config
 func DeleteLogin(name string) error {
 	var idx = -1
-	for i, l := range Config.Logins {
+	for i, l := range config.Logins {
 		if l.Name == name {
 			idx = i
 			break
@@ -124,7 +124,7 @@ func DeleteLogin(name string) error {
 		return fmt.Errorf("can not delete login '%s', does not exist", name)
 	}
 
-	Config.Logins = append(Config.Logins[:idx], Config.Logins[idx+1:]...)
+	config.Logins = append(config.Logins[:idx], config.Logins[idx+1:]...)
 
 	return saveConfig()
 }
@@ -136,7 +136,7 @@ func AddLogin(login *Login) error {
 	}
 
 	// save login to global var
-	Config.Logins = append(Config.Logins, *login)
+	config.Logins = append(config.Logins, *login)
 
 	// save login to config file
 	return saveConfig()

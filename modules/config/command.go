@@ -106,7 +106,7 @@ func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error)
 		return nil, "", errors.New("Remote " + remoteValue + " not found in this Git repository")
 	}
 
-	for _, l := range Config.Logins {
+	for _, l := range config.Logins {
 		for _, u := range remoteConfig.URLs {
 			p, err := git.ParseURL(strings.TrimSpace(u))
 			if err != nil {
