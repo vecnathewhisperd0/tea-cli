@@ -14,10 +14,8 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"code.gitea.io/tea/modules/utils"
 
