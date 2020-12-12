@@ -6,7 +6,7 @@ package milestones
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -26,8 +26,8 @@ var CmdMilestonesReopen = cli.Command{
 }
 
 func editMilestoneStatus(cmd *cli.Context, close bool) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	state := gitea.StateOpen

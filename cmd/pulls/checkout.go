@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
 	"code.gitea.io/tea/modules/utils"
@@ -27,8 +27,8 @@ var CmdPullsCheckout = cli.Command{
 }
 
 func runPullsCheckout(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{LocalRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{LocalRepo: true})
 	if ctx.Args().Len() != 1 {
 		log.Fatal("Must specify a PR index")
 	}

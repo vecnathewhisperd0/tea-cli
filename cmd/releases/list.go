@@ -9,7 +9,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -31,8 +31,8 @@ var CmdReleaseList = cli.Command{
 
 // RunReleasesList list releases
 func RunReleasesList(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	releases, _, err := ctx.Login.Client().ListReleases(ctx.Owner, ctx.Repo, gitea.ListReleasesOptions{
 		ListOptions: ctx.GetListOptions(),

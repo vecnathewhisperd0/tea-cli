@@ -9,7 +9,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/pulls"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -42,8 +42,8 @@ func runPulls(ctx *cli.Context) error {
 }
 
 func runPullDetail(cmd *cli.Context, index string) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	idx, err := utils.ArgToIndex(index)
 	if err != nil {
 		return err

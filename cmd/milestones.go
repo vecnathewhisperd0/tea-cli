@@ -7,7 +7,7 @@ package cmd
 import (
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/milestones"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"github.com/urfave/cli/v2"
@@ -40,8 +40,8 @@ func runMilestones(ctx *cli.Context) error {
 }
 
 func runMilestoneDetail(cmd *cli.Context, name string) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	milestone, _, err := client.GetMilestoneByName(ctx.Owner, ctx.Repo, name)

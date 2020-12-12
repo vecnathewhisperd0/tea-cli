@@ -9,7 +9,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -37,8 +37,8 @@ var CmdIssuesCreate = cli.Command{
 }
 
 func runIssuesCreate(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	issue, _, err := ctx.Login.Client().CreateIssue(ctx.Owner, ctx.Repo, gitea.CreateIssueOption{
 		Title: ctx.String("title"),

@@ -6,7 +6,7 @@ package cmd
 
 import (
 	"code.gitea.io/tea/cmd/repos"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -38,7 +38,7 @@ func runRepos(ctx *cli.Context) error {
 }
 
 func runRepoDetail(cmd *cli.Context, path string) error {
-	ctx := config.InitCommand(cmd)
+	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
 	repoOwner, repoName := utils.GetOwnerAndRepo(path, ctx.Owner)
 	repo, _, err := client.GetRepo(repoOwner, repoName)

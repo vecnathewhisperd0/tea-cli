@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -47,7 +47,7 @@ func runNotifications(cmd *cli.Context) error {
 	var news []*gitea.NotificationThread
 	var err error
 
-	ctx := config.InitCommand(cmd)
+	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
 
 	listOpts := ctx.GetListOptions()
@@ -69,7 +69,7 @@ func runNotifications(cmd *cli.Context) error {
 			Status:      status,
 		})
 	} else {
-		ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+		ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 		news, _, err = client.ListRepoNotifications(ctx.Owner, ctx.Repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,

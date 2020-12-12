@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package config
+package context
 
 import (
 	"errors"
@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
@@ -22,7 +23,7 @@ import (
 // TeaContext contains all context derived during command initialization and wraps cli.Context
 type TeaContext struct {
 	*cli.Context
-	Login     *Login
+	Login     *config.Login
 	RepoSlug  string       // <owner>/<repo>
 	Owner     string       // repo owner as derived from context
 	Repo      string       // repo name as derived from context or provided in flag
@@ -102,12 +103,12 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 
 	// override login from flag, or use default login if repo based detection failed
 	if len(loginFlag) != 0 {
-		login = GetLoginByName(loginFlag)
+		login = config.GetLoginByName(loginFlag)
 		if login == nil {
 			log.Fatalf("Login name '%s' does not exist", loginFlag)
 		}
 	} else if login == nil {
-		if login, err = GetDefaultLogin(); err != nil {
+		if login, err = config.GetDefaultLogin(); err != nil {
 			log.Fatal(err.Error())
 		}
 	}
@@ -119,7 +120,7 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 }
 
 // contextFromLocalRepo discovers login & repo slug from the default branch remote of the given local repo
-func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *Login, string, error) {
+func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *config.Login, string, error) {
 	repo, err := git.RepoFromPath(repoValue)
 	if err != nil {
 		return nil, nil, "", err
@@ -155,7 +156,7 @@ func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *Login, 
 		return repo, nil, "", fmt.Errorf("Remote '%s' not found in this Git repository", remoteValue)
 	}
 
-	logins, err := GetLogins()
+	logins, err := config.GetLogins()
 	if err != nil {
 		return repo, nil, "", err
 	}

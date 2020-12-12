@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -66,8 +66,8 @@ var CmdMilestoneRemoveIssue = cli.Command{
 }
 
 func runMilestoneIssueList(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	state := gitea.StateOpen
@@ -110,8 +110,8 @@ func runMilestoneIssueList(cmd *cli.Context) error {
 }
 
 func runMilestoneIssueAdd(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")
@@ -137,8 +137,8 @@ func runMilestoneIssueAdd(cmd *cli.Context) error {
 }
 
 func runMilestoneIssueRemove(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -57,7 +57,7 @@ var CmdReposSearch = cli.Command{
 }
 
 func runReposSearch(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
+	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
 
 	var ownerID int64

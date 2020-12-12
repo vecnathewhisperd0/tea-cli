@@ -6,7 +6,7 @@ package repos
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -45,7 +45,7 @@ var CmdReposList = cli.Command{
 
 // RunReposList list repositories
 func RunReposList(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
+	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
 
 	typeFilter, err := getTypeFilter(cmd)

@@ -7,7 +7,7 @@ package organizations
 import (
 	"log"
 
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"github.com/urfave/cli/v2"
 )
 
@@ -23,7 +23,7 @@ var CmdOrganizationDelete = cli.Command{
 
 // RunOrganizationDelete delete user organization
 func RunOrganizationDelete(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
+	ctx := context.InitCommand(cmd)
 
 	client := ctx.Login.Client()
 

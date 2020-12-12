@@ -7,7 +7,7 @@ package labels
 import (
 	"log"
 
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -40,8 +40,8 @@ var CmdLabelUpdate = cli.Command{
 }
 
 func runLabelUpdate(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	id := ctx.Int64("id")
 	var pName, pColor, pDescription *string

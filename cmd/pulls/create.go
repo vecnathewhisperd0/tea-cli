@@ -6,7 +6,7 @@ package pulls
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
 
@@ -43,8 +43,8 @@ var CmdPullsCreate = cli.Command{
 }
 
 func runPullsCreate(cmd *cli.Context) error {
-	ctx := config.InitCommand(cmd)
-	ctx.Ensure(config.CtxRequirement{LocalRepo: true})
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{LocalRepo: true})
 
 	// no args -> interactive mode
 	if ctx.NumFlags() == 0 {
