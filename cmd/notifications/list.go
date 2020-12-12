@@ -42,7 +42,7 @@ var CmdNotificationsList = cli.Command{
 func RunNotificationsList(ctx *cli.Context) error {
 	// --states all
 
-	states := []gitea.NotifyStatus{gitea.NotifyStatusRead, gitea.NotifyStatusPinned}
+	states := []gitea.NotifyStatus{}
 
 	switch ctx.String("state") {
 	case "all":
