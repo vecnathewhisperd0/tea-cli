@@ -19,8 +19,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// TeaContext contains all context derived during command initalization.
-// and wraps cli.Context
+// TeaContext contains all context derived during command initialization and wraps cli.Context
 type TeaContext struct {
 	*cli.Context
 	Login     *Login
