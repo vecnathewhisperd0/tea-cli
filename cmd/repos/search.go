@@ -109,7 +109,7 @@ func runReposSearch(cmd *cli.Context) error {
 	}
 
 	rps, _, err := client.SearchRepos(gitea.SearchRepoOptions{
-		ListOptions:          flags.GetListOptions(cmd),
+		ListOptions:          ctx.GetListOptions(),
 		OwnerID:              ownerID,
 		IsPrivate:            isPrivate,
 		IsArchived:           isArchived,

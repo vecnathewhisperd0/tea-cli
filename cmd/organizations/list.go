@@ -34,7 +34,7 @@ func RunOrganizationList(cmd *cli.Context) error {
 	client := ctx.Login.Client()
 
 	userOrganizations, _, err := client.ListUserOrgs(ctx.Login.User, gitea.ListOrgsOptions{
-		ListOptions: flags.GetListOptions(cmd),
+		ListOptions: ctx.GetListOptions(),
 	})
 	if err != nil {
 		log.Fatal(err)

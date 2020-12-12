@@ -34,7 +34,7 @@ func RunReleasesList(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
 
 	releases, _, err := ctx.Login.Client().ListReleases(ctx.Owner, ctx.Repo, gitea.ListReleasesOptions{
-		ListOptions: flags.GetListOptions(cmd),
+		ListOptions: ctx.GetListOptions(),
 	})
 	if err != nil {
 		log.Fatal(err)

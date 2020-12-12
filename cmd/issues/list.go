@@ -40,7 +40,7 @@ func RunIssuesList(cmd *cli.Context) error {
 	}
 
 	issues, _, err := ctx.Login.Client().ListRepoIssues(ctx.Owner, ctx.Repo, gitea.ListIssueOption{
-		ListOptions: flags.GetListOptions(cmd),
+		ListOptions: ctx.GetListOptions(),
 		State:       state,
 		Type:        gitea.IssueTypeIssue,
 	})

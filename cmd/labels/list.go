@@ -39,7 +39,7 @@ func RunLabelsList(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
 	client := ctx.Login.Client()
 	labels, _, err := client.ListRepoLabels(ctx.Owner, ctx.Repo, gitea.ListLabelsOptions{
-		ListOptions: flags.GetListOptions(cmd),
+		ListOptions: ctx.GetListOptions(),
 	})
 	if err != nil {
 		log.Fatal(err)

@@ -10,6 +10,7 @@ import (
 	"log"
 	"strings"
 
+	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
@@ -27,6 +28,19 @@ type TeaContext struct {
 	Repo      string       // repo name as derived from context or provided in flag
 	Output    string       // value of output flag
 	LocalRepo *git.TeaRepo // maybe, we have opened it already anyway
+}
+
+// GetListOptions return ListOptions based on PaginationFlags
+func (ctx *TeaContext) GetListOptions() gitea.ListOptions {
+	page := ctx.Int("page")
+	limit := ctx.Int("limit")
+	if limit != 0 && page == 0 {
+		page = 1
+	}
+	return gitea.ListOptions{
+		Page:     page,
+		PageSize: limit,
+	}
 }
 
 // InitCommand resolves the application context, and returns the active login, and if

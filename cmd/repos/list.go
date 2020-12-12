@@ -60,14 +60,14 @@ func RunReposList(cmd *cli.Context) error {
 			return err
 		}
 		rps, _, err = client.SearchRepos(gitea.SearchRepoOptions{
-			ListOptions:     flags.GetListOptions(cmd),
+			ListOptions:     ctx.GetListOptions(),
 			StarredByUserID: user.ID,
 		})
 	} else if ctx.Bool("watched") {
 		rps, _, err = client.GetMyWatchedRepos() // TODO: this does not expose pagination..
 	} else {
 		rps, _, err = client.ListMyRepos(gitea.ListReposOptions{
-			ListOptions: flags.GetListOptions(cmd),
+			ListOptions: ctx.GetListOptions(),
 		})
 	}
 

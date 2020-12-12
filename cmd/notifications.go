@@ -50,7 +50,7 @@ func runNotifications(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
 	client := ctx.Login.Client()
 
-	listOpts := flags.GetListOptions(cmd)
+	listOpts := ctx.GetListOptions()
 	if listOpts.Page == 0 {
 		listOpts.Page = 1
 	}
