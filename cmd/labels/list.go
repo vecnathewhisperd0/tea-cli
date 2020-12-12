@@ -37,6 +37,8 @@ var CmdLabelsList = cli.Command{
 // RunLabelsList list labels.
 func RunLabelsList(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
+
 	client := ctx.Login.Client()
 	labels, _, err := client.ListRepoLabels(ctx.Owner, ctx.Repo, gitea.ListLabelsOptions{
 		ListOptions: ctx.GetListOptions(),

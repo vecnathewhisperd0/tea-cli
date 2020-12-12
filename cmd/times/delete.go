@@ -28,6 +28,7 @@ var CmdTrackedTimesDelete = cli.Command{
 
 func runTrackedTimesDelete(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	if ctx.Args().Len() < 2 {

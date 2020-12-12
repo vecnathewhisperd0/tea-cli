@@ -24,6 +24,7 @@ var CmdMilestonesDelete = cli.Command{
 
 func deleteMilestone(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	_, err := client.DeleteMilestoneByName(ctx.Owner, ctx.Repo, ctx.Args().First())

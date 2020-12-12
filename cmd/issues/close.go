@@ -32,6 +32,7 @@ var CmdIssuesClose = cli.Command{
 // editIssueState abstracts the arg parsing to edit the given issue
 func editIssueState(cmd *cli.Context, opts gitea.EditIssueOption) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	if ctx.Args().Len() == 0 {
 		log.Fatal(ctx.Command.ArgsUsage)
 	}

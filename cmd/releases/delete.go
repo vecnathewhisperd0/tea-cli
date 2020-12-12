@@ -35,6 +35,7 @@ var CmdReleaseDelete = cli.Command{
 
 func runReleaseDelete(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	tag := ctx.Args().First()

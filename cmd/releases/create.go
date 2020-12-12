@@ -63,6 +63,7 @@ var CmdReleaseCreate = cli.Command{
 
 func runReleaseCreate(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	release, resp, err := ctx.Login.Client().CreateRelease(ctx.Owner, ctx.Repo, gitea.CreateReleaseOption{
 		TagName:      ctx.String("tag"),

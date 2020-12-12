@@ -27,6 +27,7 @@ var CmdMilestonesReopen = cli.Command{
 
 func editMilestoneStatus(cmd *cli.Context, close bool) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	state := gitea.StateOpen

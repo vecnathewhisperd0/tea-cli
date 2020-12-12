@@ -44,6 +44,7 @@ var CmdLabelCreate = cli.Command{
 
 func runLabelCreate(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	labelFile := ctx.String("file")
 	var err error

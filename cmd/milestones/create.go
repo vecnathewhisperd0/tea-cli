@@ -43,6 +43,7 @@ var CmdMilestonesCreate = cli.Command{
 
 func runMilestonesCreate(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	title := ctx.String("title")
 	if len(title) == 0 {

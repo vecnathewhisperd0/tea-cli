@@ -33,6 +33,7 @@ var CmdPullsClean = cli.Command{
 
 func runPullsClean(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{LocalRepo: true})
 	if ctx.Args().Len() != 1 {
 		return fmt.Errorf("Must specify a PR index")
 	}

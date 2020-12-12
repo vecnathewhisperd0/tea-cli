@@ -36,6 +36,7 @@ var CmdMilestonesList = cli.Command{
 // RunMilestonesList list milestones
 func RunMilestonesList(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {

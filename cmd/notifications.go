@@ -69,6 +69,7 @@ func runNotifications(cmd *cli.Context) error {
 			Status:      status,
 		})
 	} else {
+		ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 		news, _, err = client.ListRepoNotifications(ctx.Owner, ctx.Repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,

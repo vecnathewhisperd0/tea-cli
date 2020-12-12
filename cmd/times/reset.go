@@ -27,6 +27,7 @@ var CmdTrackedTimesReset = cli.Command{
 
 func runTrackedTimesReset(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	if ctx.Args().Len() != 1 {

@@ -52,6 +52,7 @@ var CmdTrackedTimesList = cli.Command{
 // RunTimesList list repositories
 func RunTimesList(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
 
 	var times []*gitea.TrackedTime

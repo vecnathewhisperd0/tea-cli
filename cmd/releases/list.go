@@ -32,6 +32,7 @@ var CmdReleaseList = cli.Command{
 // RunReleasesList list releases
 func RunReleasesList(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	releases, _, err := ctx.Login.Client().ListReleases(ctx.Owner, ctx.Repo, gitea.ListReleasesOptions{
 		ListOptions: ctx.GetListOptions(),

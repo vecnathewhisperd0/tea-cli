@@ -43,6 +43,7 @@ func runPulls(ctx *cli.Context) error {
 
 func runPullDetail(cmd *cli.Context, index string) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 	idx, err := utils.ArgToIndex(index)
 	if err != nil {
 		return err

@@ -28,6 +28,7 @@ var CmdPullsCheckout = cli.Command{
 
 func runPullsCheckout(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{LocalRepo: true})
 	if ctx.Args().Len() != 1 {
 		log.Fatal("Must specify a PR index")
 	}

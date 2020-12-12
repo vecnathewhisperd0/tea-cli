@@ -38,6 +38,7 @@ var CmdIssuesCreate = cli.Command{
 
 func runIssuesCreate(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	issue, _, err := ctx.Login.Client().CreateIssue(ctx.Owner, ctx.Repo, gitea.CreateIssueOption{
 		Title: ctx.String("title"),

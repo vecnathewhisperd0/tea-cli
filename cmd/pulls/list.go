@@ -28,6 +28,7 @@ var CmdPullsList = cli.Command{
 // RunPullsList return list of pulls
 func RunPullsList(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {

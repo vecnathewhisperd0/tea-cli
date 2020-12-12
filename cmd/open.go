@@ -28,6 +28,7 @@ var CmdOpen = cli.Command{
 
 func runOpen(cmd *cli.Context) error {
 	ctx := config.InitCommand(cmd)
+	ctx.Ensure(config.CtxRequirement{RemoteRepo: true})
 
 	var suffix string
 	number := ctx.Args().Get(0)
