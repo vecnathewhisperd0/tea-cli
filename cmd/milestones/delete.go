@@ -22,10 +22,10 @@ var CmdMilestonesDelete = cli.Command{
 	Flags:       flags.AllDefaultFlags,
 }
 
-func deleteMilestone(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func deleteMilestone(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
+	client := ctx.Login.Client()
 
-	_, err := client.DeleteMilestoneByName(owner, repo, ctx.Args().First())
+	_, err := client.DeleteMilestoneByName(ctx.Owner, ctx.Repo, ctx.Args().First())
 	return err
 }

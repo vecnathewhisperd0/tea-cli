@@ -7,7 +7,6 @@ package labels
 import (
 	"log"
 
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
 
 	"code.gitea.io/sdk/gitea"
@@ -40,8 +39,8 @@ var CmdLabelUpdate = cli.Command{
 	},
 }
 
-func runLabelUpdate(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runLabelUpdate(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
 	id := ctx.Int64("id")
 	var pName, pColor, pDescription *string
@@ -61,7 +60,7 @@ func runLabelUpdate(ctx *cli.Context) error {
 	}
 
 	var err error
-	_, _, err = login.Client().EditLabel(owner, repo, id, gitea.EditLabelOption{
+	_, _, err = ctx.Login.Client().EditLabel(ctx.Owner, ctx.Repo, id, gitea.EditLabelOption{
 		Name:        pName,
 		Color:       pColor,
 		Description: pDescription,

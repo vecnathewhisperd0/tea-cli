@@ -44,11 +44,11 @@ var CmdReposList = cli.Command{
 }
 
 // RunReposList list repositories
-func RunReposList(ctx *cli.Context) error {
-	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func RunReposList(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
+	client := ctx.Login.Client()
 
-	typeFilter, err := getTypeFilter(ctx)
+	typeFilter, err := getTypeFilter(cmd)
 	if err != nil {
 		return err
 	}
@@ -60,14 +60,14 @@ func RunReposList(ctx *cli.Context) error {
 			return err
 		}
 		rps, _, err = client.SearchRepos(gitea.SearchRepoOptions{
-			ListOptions:     flags.GetListOptions(ctx),
+			ListOptions:     flags.GetListOptions(cmd),
 			StarredByUserID: user.ID,
 		})
 	} else if ctx.Bool("watched") {
 		rps, _, err = client.GetMyWatchedRepos() // TODO: this does not expose pagination..
 	} else {
 		rps, _, err = client.ListMyRepos(gitea.ListReposOptions{
-			ListOptions: flags.GetListOptions(ctx),
+			ListOptions: flags.GetListOptions(cmd),
 		})
 	}
 
@@ -80,7 +80,7 @@ func RunReposList(ctx *cli.Context) error {
 		reposFiltered = filterReposByType(rps, typeFilter)
 	}
 
-	print.ReposList(reposFiltered, flags.GlobalOutputValue, getFields(ctx))
+	print.ReposList(reposFiltered, ctx.Output, getFields(cmd))
 	return nil
 }
 

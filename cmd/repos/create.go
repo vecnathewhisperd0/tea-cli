@@ -82,9 +82,9 @@ var CmdRepoCreate = cli.Command{
 	}, flags.LoginOutputFlags...),
 }
 
-func runRepoCreate(ctx *cli.Context) error {
-	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runRepoCreate(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
+	client := ctx.Login.Client()
 	var (
 		repo *gitea.Repository
 		err  error

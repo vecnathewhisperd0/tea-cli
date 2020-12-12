@@ -41,8 +41,8 @@ var CmdMilestonesCreate = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-func runMilestonesCreate(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runMilestonesCreate(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
 	title := ctx.String("title")
 	if len(title) == 0 {
@@ -55,7 +55,7 @@ func runMilestonesCreate(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	mile, _, err := login.Client().CreateMilestone(owner, repo, gitea.CreateMilestoneOption{
+	mile, _, err := ctx.Login.Client().CreateMilestone(ctx.Owner, ctx.Repo, gitea.CreateMilestoneOption{
 		Title:       title,
 		Description: ctx.String("description"),
 		State:       state,

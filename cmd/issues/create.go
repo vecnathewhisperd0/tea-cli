@@ -36,10 +36,10 @@ var CmdIssuesCreate = cli.Command{
 	}, flags.LoginRepoFlags...),
 }
 
-func runIssuesCreate(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runIssuesCreate(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
-	issue, _, err := login.Client().CreateIssue(owner, repo, gitea.CreateIssueOption{
+	issue, _, err := ctx.Login.Client().CreateIssue(ctx.Owner, ctx.Repo, gitea.CreateIssueOption{
 		Title: ctx.String("title"),
 		Body:  ctx.String("body"),
 		// TODO:

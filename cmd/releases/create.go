@@ -61,10 +61,10 @@ var CmdReleaseCreate = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-func runReleaseCreate(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runReleaseCreate(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
-	release, resp, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
+	release, resp, err := ctx.Login.Client().CreateRelease(ctx.Owner, ctx.Repo, gitea.CreateReleaseOption{
 		TagName:      ctx.String("tag"),
 		Target:       ctx.String("target"),
 		Title:        ctx.String("title"),
@@ -90,7 +90,7 @@ func runReleaseCreate(ctx *cli.Context) error {
 
 		filePath := filepath.Base(asset)
 
-		if _, _, err = login.Client().CreateReleaseAttachment(owner, repo, release.ID, file, filePath); err != nil {
+		if _, _, err = ctx.Login.Client().CreateReleaseAttachment(ctx.Owner, ctx.Repo, release.ID, file, filePath); err != nil {
 			file.Close()
 			log.Fatal(err)
 		}

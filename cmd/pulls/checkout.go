@@ -26,8 +26,8 @@ var CmdPullsCheckout = cli.Command{
 	Flags:       flags.AllDefaultFlags,
 }
 
-func runPullsCheckout(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runPullsCheckout(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 	if ctx.Args().Len() != 1 {
 		log.Fatal("Must specify a PR index")
 	}
@@ -36,5 +36,5 @@ func runPullsCheckout(ctx *cli.Context) error {
 		return err
 	}
 
-	return task.PullCheckout(login, owner, repo, idx, interact.PromptPassword)
+	return task.PullCheckout(ctx.Login, ctx.Owner, ctx.Repo, idx, interact.PromptPassword)
 }

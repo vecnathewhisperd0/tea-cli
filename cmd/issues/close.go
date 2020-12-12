@@ -30,8 +30,8 @@ var CmdIssuesClose = cli.Command{
 }
 
 // editIssueState abstracts the arg parsing to edit the given issue
-func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func editIssueState(cmd *cli.Context, opts gitea.EditIssueOption) error {
+	ctx := config.InitCommand(cmd)
 	if ctx.Args().Len() == 0 {
 		log.Fatal(ctx.Command.ArgsUsage)
 	}
@@ -41,7 +41,7 @@ func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
 		return err
 	}
 
-	issue, _, err := login.Client().EditIssue(owner, repo, index, opts)
+	issue, _, err := ctx.Login.Client().EditIssue(ctx.Owner, ctx.Repo, index, opts)
 	if err != nil {
 		return err
 	}

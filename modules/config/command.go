@@ -14,18 +14,34 @@ import (
 	"code.gitea.io/tea/modules/utils"
 
 	gogit "github.com/go-git/go-git/v5"
+	"github.com/urfave/cli/v2"
 )
+
+// TeaContext contains all context derived during command initalization.
+// and wraps cli.Context
+type TeaContext struct {
+	*cli.Context
+	Login     *Login
+	RepoSlug  string       // <owner>/<repo>
+	Owner     string       // repo owner as derived from context
+	Repo      string       // repo name as derived from context or provided in flag
+	Output    string       // value of output flag
+	LocalRepo *git.TeaRepo // maybe, we have opened it already anyway
+}
 
 // InitCommand resolves the application context, and returns the active login, and if
 // available the repo slug. It does this by reading the config file for logins, parsing
 // the remotes of the .git repo specified in repoFlag or $PWD, and using overrides from
 // command flags. If a local git repo can't be found, repo slug values are unset.
-func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner string, reponame string) {
+func InitCommand(ctx *cli.Context) *TeaContext {
 	err := loadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	repoFlag := ctx.String("repo")
+	loginFlag := ctx.String("login")
+	remoteFlag := ctx.String("remote")
 	var repoSlug string
 	var repoPath string // empty means PWD
 	var repoFlagPathExists bool
@@ -42,7 +58,7 @@ func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner st
 	}
 
 	// try to read git repo & extract context, ignoring if PWD is not a repo
-	login, repoSlug, err = contextFromLocalRepo(repoPath, remoteFlag)
+	localRepo, login, repoSlug, err := contextFromLocalRepo(repoPath, remoteFlag)
 	if err != nil && err != gogit.ErrRepositoryNotExists {
 		log.Fatal(err.Error())
 	}
@@ -65,24 +81,25 @@ func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner st
 	}
 
 	// parse reposlug (owner falling back to login owner if reposlug contains only repo name)
-	owner, reponame = utils.GetOwnerAndRepo(repoSlug, login.User)
-	return
+	owner, reponame := utils.GetOwnerAndRepo(repoSlug, login.User)
+
+	return &TeaContext{ctx, login, repoSlug, owner, reponame, ctx.String("output"), localRepo}
 }
 
 // contextFromLocalRepo discovers login & repo slug from the default branch remote of the given local repo
-func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error) {
+func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *Login, string, error) {
 	repo, err := git.RepoFromPath(repoValue)
 	if err != nil {
-		return nil, "", err
+		return nil, nil, "", err
 	}
 	gitConfig, err := repo.Config()
 	if err != nil {
-		return nil, "", err
+		return repo, nil, "", err
 	}
 
 	// if no remote
 	if len(gitConfig.Remotes) == 0 {
-		return nil, "", errors.New("No remote(s) found in this Git repository")
+		return repo, nil, "", errors.New("No remote(s) found in this Git repository")
 	}
 
 	// if only one remote exists
@@ -103,28 +120,28 @@ func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error)
 
 	remoteConfig, ok := gitConfig.Remotes[remoteValue]
 	if !ok || remoteConfig == nil {
-		return nil, "", errors.New("Remote " + remoteValue + " not found in this Git repository")
+		return repo, nil, "", errors.New("Remote " + remoteValue + " not found in this Git repository")
 	}
 
 	for _, l := range config.Logins {
 		for _, u := range remoteConfig.URLs {
 			p, err := git.ParseURL(strings.TrimSpace(u))
 			if err != nil {
-				return nil, "", fmt.Errorf("Git remote URL parse failed: %s", err.Error())
+				return repo, nil, "", fmt.Errorf("Git remote URL parse failed: %s", err.Error())
 			}
 			if strings.EqualFold(p.Scheme, "http") || strings.EqualFold(p.Scheme, "https") {
 				if strings.HasPrefix(u, l.URL) {
 					ps := strings.Split(p.Path, "/")
 					path := strings.Join(ps[len(ps)-2:], "/")
-					return &l, strings.TrimSuffix(path, ".git"), nil
+					return repo, &l, strings.TrimSuffix(path, ".git"), nil
 				}
 			} else if strings.EqualFold(p.Scheme, "ssh") {
 				if l.GetSSHHost() == strings.Split(p.Host, ":")[0] {
-					return &l, strings.TrimLeft(strings.TrimSuffix(p.Path, ".git"), "/"), nil
+					return repo, &l, strings.TrimLeft(strings.TrimSuffix(p.Path, ".git"), "/"), nil
 				}
 			}
 		}
 	}
 
-	return nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
+	return repo, nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
 }

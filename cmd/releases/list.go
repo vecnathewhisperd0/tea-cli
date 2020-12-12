@@ -30,15 +30,17 @@ var CmdReleaseList = cli.Command{
 }
 
 // RunReleasesList list releases
-func RunReleasesList(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func RunReleasesList(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
-	releases, _, err := login.Client().ListReleases(owner, repo, gitea.ListReleasesOptions{ListOptions: flags.GetListOptions(ctx)})
+	releases, _, err := ctx.Login.Client().ListReleases(ctx.Owner, ctx.Repo, gitea.ListReleasesOptions{
+		ListOptions: flags.GetListOptions(cmd),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	print.ReleasesList(releases, flags.GlobalOutputValue)
+	print.ReleasesList(releases, ctx.Output)
 	return nil
 }
 

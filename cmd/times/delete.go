@@ -26,9 +26,9 @@ var CmdTrackedTimesDelete = cli.Command{
 	Flags:     flags.LoginRepoFlags,
 }
 
-func runTrackedTimesDelete(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runTrackedTimesDelete(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
+	client := ctx.Login.Client()
 
 	if ctx.Args().Len() < 2 {
 		return fmt.Errorf("No issue or time ID specified.\nUsage:\t%s", ctx.Command.UsageText)
@@ -44,7 +44,7 @@ func runTrackedTimesDelete(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	_, err = client.DeleteTime(owner, repo, issue, timeID)
+	_, err = client.DeleteTime(ctx.Owner, ctx.Repo, issue, timeID)
 	if err != nil {
 		log.Fatal(err)
 	}

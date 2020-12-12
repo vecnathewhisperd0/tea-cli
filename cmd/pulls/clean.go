@@ -31,8 +31,8 @@ var CmdPullsClean = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-func runPullsClean(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runPullsClean(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 	if ctx.Args().Len() != 1 {
 		return fmt.Errorf("Must specify a PR index")
 	}
@@ -42,5 +42,5 @@ func runPullsClean(ctx *cli.Context) error {
 		return err
 	}
 
-	return task.PullClean(login, owner, repo, idx, ctx.Bool("ignore-sha"), interact.PromptPassword)
+	return task.PullClean(ctx.Login, ctx.Owner, ctx.Repo, idx, ctx.Bool("ignore-sha"), interact.PromptPassword)
 }

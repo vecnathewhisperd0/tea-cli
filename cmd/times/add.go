@@ -31,8 +31,8 @@ var CmdTrackedTimesAdd = cli.Command{
 	Flags:  flags.LoginRepoFlags,
 }
 
-func runTrackedTimesAdd(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runTrackedTimesAdd(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
 	if ctx.Args().Len() < 2 {
 		return fmt.Errorf("No issue or duration specified.\nUsage:\t%s", ctx.Command.UsageText)
@@ -48,7 +48,7 @@ func runTrackedTimesAdd(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	_, _, err = login.Client().AddTime(owner, repo, issue, gitea.AddTimeOption{
+	_, _, err = ctx.Login.Client().AddTime(ctx.Owner, ctx.Repo, issue, gitea.AddTimeOption{
 		Time: int64(duration.Seconds()),
 	})
 	if err != nil {

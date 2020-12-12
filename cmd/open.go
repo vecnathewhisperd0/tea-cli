@@ -26,8 +26,8 @@ var CmdOpen = cli.Command{
 	Flags:       append([]cli.Flag{}, flags.LoginRepoFlags...),
 }
 
-func runOpen(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runOpen(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
 	var suffix string
 	number := ctx.Args().Get(0)
@@ -73,7 +73,7 @@ func runOpen(ctx *cli.Context) error {
 		suffix = number
 	}
 
-	u := path.Join(login.URL, owner, repo, suffix)
+	u := path.Join(ctx.Login.URL, ctx.RepoSlug, suffix)
 	err := open.Run(u)
 	if err != nil {
 		log.Fatal(err)

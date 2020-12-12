@@ -34,8 +34,8 @@ var CmdMilestonesList = cli.Command{
 }
 
 // RunMilestonesList list milestones
-func RunMilestonesList(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func RunMilestonesList(cmd *cli.Context) error {
+	ctx := config.InitCommand(cmd)
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {
@@ -45,8 +45,9 @@ func RunMilestonesList(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	milestones, _, err := login.Client().ListRepoMilestones(owner, repo, gitea.ListMilestoneOption{
-		ListOptions: flags.GetListOptions(ctx),
+	client := ctx.Login.Client()
+	milestones, _, err := client.ListRepoMilestones(ctx.Owner, ctx.Repo, gitea.ListMilestoneOption{
+		ListOptions: flags.GetListOptions(cmd),
 		State:       state,
 	})
 
@@ -54,6 +55,6 @@ func RunMilestonesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.MilestonesList(milestones, flags.GlobalOutputValue, state)
+	print.MilestonesList(milestones, ctx.Output, state)
 	return nil
 }
