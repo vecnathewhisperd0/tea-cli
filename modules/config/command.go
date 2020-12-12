@@ -34,21 +34,18 @@ type TeaContext struct {
 // the remotes of the .git repo specified in repoFlag or $PWD, and using overrides from
 // command flags. If a local git repo can't be found, repo slug values are unset.
 func InitCommand(ctx *cli.Context) *TeaContext {
-	err := loadConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	// these flags are used as overrides to the context detection via local git repo
 	repoFlag := ctx.String("repo")
 	loginFlag := ctx.String("login")
 	remoteFlag := ctx.String("remote")
+
 	var repoSlug string
 	var repoPath string // empty means PWD
 	var repoFlagPathExists bool
 
 	// check if repoFlag can be interpreted as path to local repo.
 	if len(repoFlag) != 0 {
-		repoFlagPathExists, err = utils.PathExists(repoFlag)
+		repoFlagPathExists, err := utils.PathExists(repoFlag)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -120,10 +117,14 @@ func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *Login, 
 
 	remoteConfig, ok := gitConfig.Remotes[remoteValue]
 	if !ok || remoteConfig == nil {
-		return repo, nil, "", errors.New("Remote " + remoteValue + " not found in this Git repository")
+		return repo, nil, "", fmt.Errorf("Remote '%s' not found in this Git repository", remoteValue)
 	}
 
-	for _, l := range config.Logins {
+	logins, err := GetLogins()
+	if err != nil {
+		return repo, nil, "", err
+	}
+	for _, l := range logins {
 		for _, u := range remoteConfig.URLs {
 			p, err := git.ParseURL(strings.TrimSpace(u))
 			if err != nil {
