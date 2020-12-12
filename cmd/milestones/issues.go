@@ -85,7 +85,9 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 		kind = gitea.IssueTypePull
 	}
 
-	fmt.Println(state)
+	if ctx.Args().Len() != 1 {
+		return fmt.Errorf("Must specify milestone name")
+	}
 
 	milestone := ctx.Args().First()
 	// make sure milestone exist
