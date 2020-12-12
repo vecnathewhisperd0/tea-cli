@@ -7,14 +7,19 @@
   * Add Detail View for Login (#212)
 * FEATURES
   * Add interactive mode for `tea pr create` (#279)
-  * Added organization delete command. (#270)
+  * Add organization delete command (#270)
+  * Add organization list command (#264)
 * BUGFIXES
   * Subcommands work outside of git repos (#285)
   * Fix repo flag ignores local repo for login detection (#285)
   * Improve ssh handling (#277)
   * Issue create return web url (#257)
   * Support prerelease gitea instances (#252)
+  * fix `tea pr create` within same repo (#248)
 * ENHANCEMENTS
+  * Release delete: add --delete-tag & --confirm (#286)
+  * Improved list output (#281)
+  * Pull clean & checkout use token for http(s) auth (#275)
   * Show more infos in pull detail view (#271)
   * Specify fields to print on `tea repos list` (#223)
   * Print times in local timezone (#217)
