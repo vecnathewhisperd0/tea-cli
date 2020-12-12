@@ -15,7 +15,7 @@
   * Improve ssh handling (#277)
   * Issue create return web url (#257)
   * Support prerelease gitea instances (#252)
-  * fix `tea pr create` within same repo (#248)
+  * Fix `tea pr create` within same repo (#248)
 * ENHANCEMENTS
   * Release delete: add --delete-tag & --confirm (#286)
   * Improved list output (#281)
