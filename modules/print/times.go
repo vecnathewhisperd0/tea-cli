@@ -13,9 +13,7 @@ import (
 )
 
 func formatDuration(seconds int64, outputType string) string {
-	switch outputType {
-	case "yaml":
-	case "csv":
+	if isMachineReadable(outputType) {
 		return fmt.Sprint(seconds)
 	}
 	return time.Duration(1e9 * seconds).String()

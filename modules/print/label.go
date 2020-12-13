@@ -21,17 +21,26 @@ func LabelsList(labels []*gitea.Label, output string) {
 		"Description",
 	)
 
-	p := termenv.ColorProfile()
-
 	for _, label := range labels {
-		color := termenv.String(label.Color)
-
 		t.addRow(
 			strconv.FormatInt(label.ID, 10),
-			fmt.Sprint(color.Background(p.Color("#"+label.Color))),
+			formatLabel(label, !isMachineReadable(output), label.Color),
 			label.Name,
 			label.Description,
 		)
 	}
 	t.print(output)
+}
+
+func formatLabel(label *gitea.Label, allowColor bool, text string) string {
+	colorProfile := termenv.Ascii
+	if allowColor {
+		colorProfile = termenv.EnvColorProfile()
+	}
+	if len(text) == 0 {
+		text = label.Name
+	}
+	styled := termenv.String(text)
+	styled = styled.Foreground(colorProfile.Color("#" + label.Color))
+	return fmt.Sprint(styled)
 }
