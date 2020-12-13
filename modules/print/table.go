@@ -22,6 +22,24 @@ type table struct {
 	sortColumn uint // ↑
 }
 
+// printable can be implemented for structs to put fields dynamically into a table
+type printable interface {
+	FormatField(field string) string
+}
+
+// high level api to print a table of items with dynamic fields
+func tableFromItems(fields []string, values []printable) table {
+	t := table{headers: fields}
+	for _, v := range values {
+		row := make([]string, len(fields))
+		for i, f := range fields {
+			row[i] = v.FormatField(f)
+		}
+		t.addRowSlice(row)
+	}
+	return t
+}
+
 func tableWithHeader(header ...string) table {
 	return table{headers: header}
 }
