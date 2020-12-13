@@ -26,66 +26,67 @@ func IssueDetails(issue *gitea.Issue) {
 
 // IssuesList prints a listing of issues
 func IssuesList(issues []*gitea.Issue, output string) {
-	t := tableWithHeader(
-		"Index",
-		"Title",
-		"State",
-		"Author",
-		"Milestone",
-		"Updated",
-	)
-
-	for _, issue := range issues {
-		author := issue.Poster.FullName
-		if len(author) == 0 {
-			author = issue.Poster.UserName
-		}
-		mile := ""
-		if issue.Milestone != nil {
-			mile = issue.Milestone.Title
-		}
-		t.addRow(
-			strconv.FormatInt(issue.Index, 10),
-			issue.Title,
-			string(issue.State),
-			author,
-			mile,
-			FormatTime(issue.Updated),
-		)
-	}
-	t.print(output)
+	// TODO: make fields selectable
+	fields := []string{"index", "title", "state", "author", "milestone", "updated"}
+	printIssues(issues, output, fields)
 }
 
 // IssuesPullsList prints a listing of issues & pulls
-// TODO combine with IssuesList
 func IssuesPullsList(issues []*gitea.Issue, output string) {
-	t := tableWithHeader(
-		"Index",
-		"State",
-		"Kind",
-		"Author",
-		"Updated",
-		"Title",
-	)
+	// TODO: make fields selectable
+	fields := []string{"index", "state", "kind", "author", "updated", "title"}
+	printIssues(issues, output, fields)
+}
 
-	for _, issue := range issues {
-		name := issue.Poster.FullName
-		if len(name) == 0 {
-			name = issue.Poster.UserName
-		}
-		kind := "Issue"
-		if issue.PullRequest != nil {
-			kind = "Pull"
-		}
-		t.addRow(
-			strconv.FormatInt(issue.Index, 10),
-			string(issue.State),
-			kind,
-			name,
-			FormatTime(issue.Updated),
-			issue.Title,
-		)
+// IssueFields are all available fields to print with IssuesList()
+var IssueFields = []string{
+	"index",
+	"state",
+	"kind",
+	"author",
+	"updated",
+	"title",
+	"milestone",
+}
+
+func printIssues(issues []*gitea.Issue, output string, fields []string) {
+	var printables = make([]printable, len(issues))
+	for i, x := range issues {
+		printables[i] = &printableIssue{x}
 	}
 
+	t := tableFromItems(fields, printables)
 	t.print(output)
+}
+
+type printableIssue struct{ *gitea.Issue }
+
+func (x printableIssue) FormatField(field string) string {
+	switch field {
+	case "index":
+		return strconv.FormatInt(x.Index, 10)
+	case "state":
+		return string(x.State)
+	case "kind":
+		if x.PullRequest != nil {
+			return "Pull"
+		}
+		return "Issue"
+	case "author":
+		name := x.Poster.FullName
+		if len(name) == 0 {
+			return x.Poster.UserName
+		}
+		return name
+	case "updated":
+		return FormatTime(x.Updated)
+	case "title":
+		return x.Title
+	case "milestone":
+		if x.Milestone != nil {
+			return x.Milestone.Title
+		}
+		return ""
+	}
+	return ""
 }
