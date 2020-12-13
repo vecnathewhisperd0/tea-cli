@@ -7,6 +7,7 @@ package print
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"code.gitea.io/sdk/gitea"
 )
@@ -27,7 +28,7 @@ func IssueDetails(issue *gitea.Issue) {
 // IssuesList prints a listing of issues
 func IssuesList(issues []*gitea.Issue, output string) {
 	// TODO: make fields selectable
-	fields := []string{"index", "title", "state", "author", "milestone", "updated"}
+	fields := []string{"index", "title", "state", "author", "milestone", "updated", "labels"}
 	printIssues(issues, output, fields)
 }
 
@@ -47,19 +48,32 @@ var IssueFields = []string{
 	"updated",
 	"title",
 	"milestone",
+	"labels",
 }
 
 func printIssues(issues []*gitea.Issue, output string, fields []string) {
+	labelMap := map[int64]string{}
 	var printables = make([]printable, len(issues))
+
 	for i, x := range issues {
-		printables[i] = &printableIssue{x}
+		// serialize labels for performance
+		for _, label := range x.Labels {
+			if _, ok := labelMap[label.ID]; !ok {
+				labelMap[label.ID] = formatLabel(label, !isMachineReadable(output), "")
+			}
+		}
+		// store items with printable interface
+		printables[i] = &printableIssue{x, &labelMap}
 	}
 
 	t := tableFromItems(fields, printables)
 	t.print(output)
 }
 
-type printableIssue struct{ *gitea.Issue }
+type printableIssue struct {
+	*gitea.Issue
+	formattedLabels *map[int64]string
+}
 
 func (x printableIssue) FormatField(field string) string {
 	switch field {
@@ -87,6 +101,12 @@ func (x printableIssue) FormatField(field string) string {
 			return x.Milestone.Title
 		}
 		return ""
+	case "labels":
+		var labels = make([]string, len(x.Labels))
+		for i, l := range x.Labels {
+			labels[i] = (*x.formattedLabels)[l.ID]
+		}
+		return strings.Join(labels, " ")
 	}
 	return ""
 }
