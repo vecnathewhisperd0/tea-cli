@@ -18,8 +18,8 @@ func PromptPassword(name string) (pass string, err error) {
 	return
 }
 
-// PromptRepoSlug interactively prompts for a Gitea repository or returns the current one
-func PromptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
+// promptRepoSlug interactively prompts for a Gitea repository or returns the current one
+func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
 	prompt := "Target repo:"
 	required := true
 	if len(defaultOwner) != 0 && len(defaultRepo) != 0 {

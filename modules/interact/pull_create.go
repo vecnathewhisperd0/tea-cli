@@ -17,7 +17,7 @@ func CreatePull(login *config.Login, owner, repo string) error {
 	var base, head, title, description string
 
 	// owner, repo
-	owner, repo, err := PromptRepoSlug(owner, repo)
+	owner, repo, err := promptRepoSlug(owner, repo)
 	if err != nil {
 		return err
 	}
