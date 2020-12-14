@@ -8,7 +8,6 @@ import (
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/task"
-	"code.gitea.io/tea/modules/utils"
 
 	"github.com/AlecAivazis/survey/v2"
 )
@@ -18,7 +17,7 @@ func CreatePull(login *config.Login, owner, repo string) error {
 	var base, head, title, description string
 
 	// owner, repo
-	owner, repo, err := utils.PromptRepoSlug(owner, repo)
+	owner, repo, err := PromptRepoSlug(owner, repo)
 	if err != nil {
 		return err
 	}
