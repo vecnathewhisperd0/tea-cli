@@ -16,9 +16,10 @@
   * Issue create return web url (#257)
   * Support prerelease gitea instances (#252)
   * Fix `tea pr create` within same repo (#248)
+  * Handle login name case-insensitive on all comands (#227)
 * ENHANCEMENTS
   * Release delete: add --delete-tag & --confirm (#286)
-  * Improved list output (#281)
+  * Sorted milestones list (#281)
   * Pull clean & checkout use token for http(s) auth (#275)
   * Show more infos in pull detail view (#271)
   * Specify fields to print on `tea repos list` (#223)
@@ -28,10 +29,11 @@
   * Added a shorthand for notifications (#209)
   * Common subcommand naming scheme (#208)
   * `tea pr checkout`: fetch via ssh if available (#192)
+  * Major refactor of codebase
 * BUILD
   * Use gox to cross-compile (#274)
 * DOCS
-  * Update Docu to new Structure (#247)
+  * Update Docs to new code structure (#247)
 
 ## [v0.5.0](https://gitea.com/gitea/tea/releases/tag/v0.5.0) - 2020-09-27
 
