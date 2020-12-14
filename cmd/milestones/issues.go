@@ -113,7 +113,7 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 func runMilestoneIssueAdd(ctx *cli.Context) error {
 	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
-	if ctx.Args().Len() == 0 {
+	if ctx.Args().Len() != 2 {
 		return fmt.Errorf("need two arguments")
 	}
 
@@ -139,7 +139,7 @@ func runMilestoneIssueAdd(ctx *cli.Context) error {
 func runMilestoneIssueRemove(ctx *cli.Context) error {
 	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
-	if ctx.Args().Len() == 0 {
+	if ctx.Args().Len() != 2 {
 		return fmt.Errorf("need two arguments")
 	}
 
