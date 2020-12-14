@@ -20,7 +20,7 @@ var CmdAutocomplete = cli.Command{
 	Name:        "autocomplete",
 	Usage:       "Install shell completetion for tea",
 	Description: "Install shell completetion for tea",
-	ArgsUsage:   "<shell type> (bash, zsh)",
+	ArgsUsage:   "<shell type> (bash, zsh, powershell)",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "install",
@@ -31,35 +31,46 @@ var CmdAutocomplete = cli.Command{
 }
 
 func runAutocompleteAdd(ctx *cli.Context) error {
-	var file, cmds string
+	var remoteFile, localFile, cmds string
 	shell := ctx.Args().First()
 
 	switch shell {
 	case "zsh":
-		file = "contrib/autocomplete.zsh"
+		remoteFile = "contrib/autocomplete.zsh"
+		localFile = "autocomplete.zsh"
 		cmds = "echo 'PROG=tea _CLI_ZSH_AUTOCOMPLETE_HACK=1 source %s' >> ~/.zshrc && source ~/.zshrc"
 
 	case "bash":
-		file = "contrib/autocomplete.sh"
+		remoteFile = "contrib/autocomplete.sh"
+		localFile = "autocomplete.sh"
 		cmds = "echo 'PROG=tea source %s' >> ~/.bashrc && source ~/.bashrc"
+
+	case "powershell":
+		remoteFile = "contrib/autocomplete.ps1"
+		localFile = "tea.ps1"
+		cmds = "\"& %s\" >> $profile"
 
 	default:
 		return fmt.Errorf("Must specify valid shell type")
 	}
 
-	destPath, err := xdg.ConfigFile("tea/" + file)
+	localPath, err := xdg.ConfigFile("tea/" + localFile)
 	if err != nil {
 		return err
 	}
-	cmds = fmt.Sprintf(cmds, destPath)
 
-	if err := saveAutoCompleteFile(file, destPath); err != nil {
+	cmds = fmt.Sprintf(cmds, localPath)
+
+	if err := saveAutoCompleteFile(remoteFile, localPath); err != nil {
 		return err
 	}
 
 	if ctx.Bool("install") {
 		fmt.Println("Installing in your shellrc")
 		installer := exec.Command(shell, "-c", cmds)
+		if shell == "powershell" {
+			installer = exec.Command("powershell.exe", "-Command", cmds)
+		}
 		out, err := installer.CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("Couldn't run the commands: %s %s", err, out)
