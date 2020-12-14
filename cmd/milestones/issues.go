@@ -86,7 +86,9 @@ func runMilestoneIssueList(cmd *cli.Context) error {
 		kind = gitea.IssueTypePull
 	}
 
-	fmt.Println(state)
+	if ctx.Args().Len() != 1 {
+		return fmt.Errorf("Must specify milestone name")
+	}
 
 	milestone := ctx.Args().First()
 	// make sure milestone exist
@@ -113,7 +115,7 @@ func runMilestoneIssueAdd(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
-	if ctx.Args().Len() == 0 {
+	if ctx.Args().Len() != 2 {
 		return fmt.Errorf("need two arguments")
 	}
 
@@ -140,7 +142,7 @@ func runMilestoneIssueRemove(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	client := ctx.Login.Client()
-	if ctx.Args().Len() == 0 {
+	if ctx.Args().Len() != 2 {
 		return fmt.Errorf("need two arguments")
 	}
 
