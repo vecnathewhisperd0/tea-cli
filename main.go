@@ -40,6 +40,7 @@ func main() {
 		&cmd.CmdNotifications,
 		&cmd.CmdMilestones,
 		&cmd.CmdOrgs,
+		&cmd.CmdMeta,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
