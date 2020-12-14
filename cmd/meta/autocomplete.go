@@ -18,8 +18,8 @@ import (
 // CmdAutocomplete manages autocompletion
 var CmdAutocomplete = cli.Command{
 	Name:        "autocomplete",
-	Usage:       "Install shell completetion for tea",
-	Description: "Install shell completetion for tea",
+	Usage:       "Install shell completion for tea",
+	Description: "Install shell completion for tea",
 	ArgsUsage:   "<shell type> (bash, zsh, powershell)",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
