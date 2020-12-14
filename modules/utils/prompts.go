@@ -11,6 +11,7 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
+// PromptRepoSlug interactively prompts for a Gitea repository or returns the current one
 func PromptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
 	prompt := "Target repo:"
 	required := true
