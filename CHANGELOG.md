@@ -10,6 +10,7 @@
   * Add organization delete command (#270)
   * Add organization list command (#264)
 * BUGFIXES
+  * Forces needed arguments to `tea ms issues` (#297)
   * Subcommands work outside of git repos (#285)
   * Fix repo flag ignores local repo for login detection (#285)
   * Improve ssh handling (#277)
@@ -18,6 +19,7 @@
   * Fix `tea pr create` within same repo (#248)
   * Handle login name case-insensitive on all comands (#227)
 * ENHANCEMENTS
+  * Add `tea login delete` (#296)
   * Release delete: add --delete-tag & --confirm (#286)
   * Sorted milestones list (#281)
   * Pull clean & checkout use token for http(s) auth (#275)
