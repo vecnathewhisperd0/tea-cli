@@ -24,7 +24,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 	}
 
 	out := fmt.Sprintf(
-		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n",
+		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n\n",
 		pr.Index,
 		pr.Title,
 		pr.State,
@@ -36,23 +36,28 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 	)
 
 	if len(reviews) != 0 {
-		out += "\n"
-		revMap := make(map[string]gitea.ReviewStateType)
+		out += "---\n"
+		revMap := make(map[gitea.ReviewStateType][]string)
 		for _, review := range reviews {
 			switch review.State {
 			case gitea.ReviewStateApproved,
 				gitea.ReviewStateRequestChanges,
 				gitea.ReviewStateRequestReview:
-				revMap[review.Reviewer.UserName] = review.State
+				u := revMap[review.State]
+				revMap[review.State] = append(u, review.Reviewer.UserName)
 			}
 		}
 		for k, v := range revMap {
-			out += fmt.Sprintf("\n  @%s: %s", k, v)
+			out += fmt.Sprintf("- %s by @%s\n", k, strings.Join(v, ", @"))
 		}
 	}
 
-	if pr.State == gitea.StateOpen && pr.Mergeable {
-		out += "\nNo Conflicts"
+	if pr.State == gitea.StateOpen {
+		if pr.Mergeable {
+			out += "\nNo Conflicts"
+		} else {
+			out += "\nConflicting files"
+		}
 	}
 
 	outputMarkdown(out)
