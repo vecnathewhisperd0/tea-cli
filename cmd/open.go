@@ -46,7 +46,6 @@ func runOpen(cmd *cli.Context) error {
 		b, err := repo.Head()
 		if err != nil {
 			return err
-			return nil
 		}
 		name := b.Name()
 		switch {
