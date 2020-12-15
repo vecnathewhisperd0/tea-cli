@@ -45,7 +45,7 @@ func main() {
 	if err != nil {
 		// app.Run already exits for errors implementing ErrorCoder,
 		// so we only handle generic errors with code 1 here.
-		fmt.Printf("Error: %v\n", err)
+		fmt.Fprintf(app.ErrWriter, "Error: %v\n", err)
 		os.Exit(1) //
 	}
 }
