@@ -32,7 +32,7 @@ brew install tea
 Distribution packages exist for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** and **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
 
 
-Shell completion can be added via `tea meta autocomplete --install`.
+Shell completion can be added via `tea autocomplete --install`.
 
 ## Usage
 
@@ -59,7 +59,6 @@ open             Open something of the repository on web browser
 notifications    Show notifications
 milestones       List and create milestones
 organizations    List, create, delete organizations
-meta             Operations on tea itself
 help, h          Shows a list of commands or help for one command
 ```
 
