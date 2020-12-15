@@ -6,7 +6,6 @@ package print
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -45,10 +44,19 @@ var IssueFields = []string{
 	"state",
 	"kind",
 	"author",
-	"updated",
+	"url",
+
 	"title",
+	"body",
+
+	"created",
+	"updated",
+	"deadline",
+
+	"assignees",
 	"milestone",
 	"labels",
+	"comments",
 }
 
 func printIssues(issues []*gitea.Issue, output string, fields []string) {
@@ -56,7 +64,7 @@ func printIssues(issues []*gitea.Issue, output string, fields []string) {
 	var printables = make([]printable, len(issues))
 
 	for i, x := range issues {
-		// serialize labels for performance
+		// pre-serialize labels for performance
 		for _, label := range x.Labels {
 			if _, ok := labelMap[label.ID]; !ok {
 				labelMap[label.ID] = formatLabel(label, !isMachineReadable(output), "")
@@ -78,7 +86,7 @@ type printableIssue struct {
 func (x printableIssue) FormatField(field string) string {
 	switch field {
 	case "index":
-		return strconv.FormatInt(x.Index, 10)
+		return fmt.Sprintf("%d", x.Index)
 	case "state":
 		return string(x.State)
 	case "kind":
@@ -88,10 +96,18 @@ func (x printableIssue) FormatField(field string) string {
 		return "Issue"
 	case "author":
 		formatUserName(x.Poster)
-	case "updated":
-		return FormatTime(x.Updated)
+	case "url":
+		return x.HTMLURL
 	case "title":
 		return x.Title
+	case "body":
+		return x.Body
+	case "created":
+		return FormatTime(x.Created)
+	case "updated":
+		return FormatTime(x.Updated)
+	case "deadline":
+		return FormatTime(*x.Deadline)
 	case "milestone":
 		if x.Milestone != nil {
 			return x.Milestone.Title
@@ -103,6 +119,14 @@ func (x printableIssue) FormatField(field string) string {
 			labels[i] = (*x.formattedLabels)[l.ID]
 		}
 		return strings.Join(labels, " ")
+	case "assignees":
+		var assignees = make([]string, len(x.Assignees))
+		for i, a := range x.Assignees {
+			assignees[i] = formatUserName(a)
+		}
+		return strings.Join(assignees, " ")
+	case "comments":
+		return fmt.Sprintf("%d", x.Comments)
 	}
 	return ""
 }
