@@ -7,12 +7,22 @@ package print
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"code.gitea.io/sdk/gitea"
 )
 
+var ciStatusSymbols = map[gitea.StatusState]string{
+	gitea.StatusSuccess: "✓ ",
+	gitea.StatusPending: "⭮ ",
+	gitea.StatusWarning: "⚠ ",
+	gitea.StatusError:   "✘ ",
+	gitea.StatusFailure: "❌ ",
+}
+
 // PullDetails print an pull rendered to stdout
-func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
+func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *gitea.CombinedStatus) {
+	// func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus []*gitea.Status) {
 	base := pr.Base.Name
 	head := pr.Head.Name
 	if pr.Head.RepoID != pr.Base.RepoID {
@@ -49,6 +59,19 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 		}
 		for k, v := range revMap {
 			out += fmt.Sprintf("- %s by @%s\n", k, strings.Join(v, ", @"))
+		}
+	}
+
+	if ciStatus != nil {
+		var summary, errors string
+		for _, s := range ciStatus.Statuses {
+			summary += ciStatusSymbols[s.State]
+			if s.State != gitea.StatusSuccess {
+				errors += fmt.Sprintf("  - [**%s**:\t%s](%s)\n", s.Context, s.Description, s.TargetURL)
+			}
+		}
+		if len(ciStatus.Statuses) != 0 {
+			out += fmt.Sprintf("- CI: %s\n%s", summary, errors)
 		}
 	}
 
