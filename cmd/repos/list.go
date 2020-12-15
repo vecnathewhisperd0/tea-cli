@@ -27,7 +27,9 @@ var CmdReposListFlags = append([]cli.Flag{
 		Required: false,
 		Usage:    "List your starred repos instead",
 	},
-	&printFieldsFlag,
+	flags.FieldsFlag(print.RepoFields, []string{
+		"owner", "name", "type", "ssh",
+	}),
 	&typeFilterFlag,
 	&flags.PaginationPageFlag,
 	&flags.PaginationLimitFlag,
@@ -80,7 +82,8 @@ func RunReposList(cmd *cli.Context) error {
 		reposFiltered = filterReposByType(rps, typeFilter)
 	}
 
-	print.ReposList(reposFiltered, ctx.Output, getFields(cmd))
+	fields, _ := flags.GetFields(cmd, nil)
+	print.ReposList(reposFiltered, ctx.Output, fields)
 	return nil
 }
 
