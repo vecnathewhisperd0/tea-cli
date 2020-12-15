@@ -23,6 +23,9 @@ var Version = "development"
 var Tags = ""
 
 func main() {
+	// make parsing tea --version easier, by printing /just/ the version string
+	cli.VersionPrinter = func(c *cli.Context) { fmt.Fprintln(c.App.Writer, c.App.Version) }
+
 	app := cli.NewApp()
 	app.Name = "tea"
 	app.Usage = "command line tool to interact with Gitea"
@@ -100,11 +103,6 @@ var helpTemplate = bold(`
 
    # send gitea desktop notifications every 5 minutes (bash + libnotify)
    while :; do tea notifications --all -o simple | xargs -i notify-send {}; sleep 300; done
-
- EXIT CODES
-     0 success
-     1 generic error
-   404 entity not found
 
  ABOUT
    Written & maintained by The Gitea Authors.
