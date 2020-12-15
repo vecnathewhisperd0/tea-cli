@@ -20,7 +20,11 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      RunIssuesList,
-	Flags:       flags.IssuePRFlags,
+	Flags: append([]cli.Flag{
+		flags.FieldsFlag(print.IssueFields, []string{
+			"index", "title", "state", "author", "milestone", "updated",
+		}),
+	}, flags.IssuePRFlags...),
 }
 
 // RunIssuesList list issues
@@ -48,6 +52,7 @@ func RunIssuesList(cmd *cli.Context) error {
 		return err
 	}
 
-	print.IssuesList(issues, ctx.Output)
+	fields, _ := flags.GetFields(cmd, nil)
+	print.IssuesPullsList(issues, ctx.Output, fields)
 	return nil
 }

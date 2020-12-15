@@ -24,17 +24,8 @@ func IssueDetails(issue *gitea.Issue) {
 	))
 }
 
-// IssuesList prints a listing of issues
-func IssuesList(issues []*gitea.Issue, output string) {
-	// TODO: make fields selectable
-	fields := []string{"index", "title", "state", "author", "milestone", "updated", "labels"}
-	printIssues(issues, output, fields)
-}
-
 // IssuesPullsList prints a listing of issues & pulls
-func IssuesPullsList(issues []*gitea.Issue, output string) {
-	// TODO: make fields selectable
-	fields := []string{"index", "state", "kind", "author", "updated", "title"}
+func IssuesPullsList(issues []*gitea.Issue, output string, fields []string) {
 	printIssues(issues, output, fields)
 }
 

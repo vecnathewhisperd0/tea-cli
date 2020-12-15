@@ -40,6 +40,9 @@ var CmdMilestonesIssues = cli.Command{
 		},
 		&flags.PaginationPageFlag,
 		&flags.PaginationLimitFlag,
+		flags.FieldsFlag(print.IssueFields, []string{
+			"index", "state", "kind", "author", "updated", "title",
+		}),
 	}, flags.AllDefaultFlags...),
 }
 
@@ -107,7 +110,8 @@ func runMilestoneIssueList(cmd *cli.Context) error {
 		return err
 	}
 
-	print.IssuesPullsList(issues, ctx.Output)
+	fields, _ := flags.GetFields(cmd, nil)
+	print.IssuesPullsList(issues, ctx.Output, fields)
 	return nil
 }
 
