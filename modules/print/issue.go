@@ -87,11 +87,7 @@ func (x printableIssue) FormatField(field string) string {
 		}
 		return "Issue"
 	case "author":
-		name := x.Poster.FullName
-		if len(name) == 0 {
-			return x.Poster.UserName
-		}
-		return name
+		formatUserName(x.Poster)
 	case "updated":
 		return FormatTime(x.Updated)
 	case "title":

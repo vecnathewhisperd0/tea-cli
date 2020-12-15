@@ -140,12 +140,3 @@ func (x printableRepo) FormatField(field string) string {
 	}
 	return ""
 }
-
-func formatPermission(p *gitea.Permission) string {
-	if p.Admin {
-		return "admin"
-	} else if p.Push {
-		return "write"
-	}
-	return "read"
-}
