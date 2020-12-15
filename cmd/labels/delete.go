@@ -15,6 +15,7 @@ import (
 // CmdLabelDelete represents a sub command of labels to delete label.
 var CmdLabelDelete = cli.Command{
 	Name:        "delete",
+	Aliases:     []string{"rm"},
 	Usage:       "Delete a label",
 	Description: `Delete a label`,
 	Action:      runLabelDelete,
