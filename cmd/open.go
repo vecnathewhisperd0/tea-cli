@@ -20,6 +20,7 @@ import (
 // CmdOpen represents a sub command of issues to open issue on the web browser
 var CmdOpen = cli.Command{
 	Name:        "open",
+	Category:    catHelpers,
 	Usage:       "Open something of the repository on web browser",
 	Description: `Open something of the repository on web browser`,
 	Action:      runOpen,

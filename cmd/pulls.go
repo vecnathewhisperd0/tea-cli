@@ -21,6 +21,7 @@ import (
 var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Aliases:     []string{"pull", "pr"},
+	Category:    catEntities,
 	Usage:       "List, create, checkout and clean pull requests",
 	Description: `List, create, checkout and clean pull requests`,
 	ArgsUsage:   "[<pull index>]",

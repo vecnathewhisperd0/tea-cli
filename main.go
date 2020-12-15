@@ -35,16 +35,18 @@ func main() {
 	app.Commands = []*cli.Command{
 		&cmd.CmdLogin,
 		&cmd.CmdLogout,
+
 		&cmd.CmdIssues,
 		&cmd.CmdPulls,
-		&cmd.CmdReleases,
-		&cmd.CmdRepos,
 		&cmd.CmdLabels,
+		&cmd.CmdMilestones,
+		&cmd.CmdReleases,
 		&cmd.CmdTrackedTimes,
+		&cmd.CmdOrgs,
+		&cmd.CmdRepos,
+
 		&cmd.CmdOpen,
 		&cmd.CmdNotifications,
-		&cmd.CmdMilestones,
-		&cmd.CmdOrgs,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)

@@ -19,6 +19,7 @@ import (
 var CmdNotifications = cli.Command{
 	Name:        "notifications",
 	Aliases:     []string{"notification", "notif"},
+	Category:    catHelpers,
 	Usage:       "Show notifications",
 	Description: "Show notifications, by default based of the current repo and unread one",
 	Action:      runNotifications,
