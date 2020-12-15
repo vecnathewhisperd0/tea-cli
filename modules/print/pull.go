@@ -77,9 +77,9 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 
 	if pr.State == gitea.StateOpen {
 		if pr.Mergeable {
-			out += "\nNo Conflicts"
+			out += "- No Conflicts\n"
 		} else {
-			out += "\nConflicting files"
+			out += "- **Conflicting files**\n"
 		}
 	}
 
