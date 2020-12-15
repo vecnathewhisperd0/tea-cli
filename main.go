@@ -1,4 +1,4 @@
-// Copyright 2018 The Gitea Authors. All rights reserved.
+// Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -25,7 +25,6 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "tea"
 	app.Usage = "Command line tool to interact with Gitea"
-	app.Description = ``
 	app.Version = Version + formatBuiltWith(Tags)
 	app.Commands = []*cli.Command{
 		&cmd.CmdLogin,
@@ -44,7 +43,10 @@ func main() {
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
 	if err != nil {
+		// app.Run already exits for errors implementing ErrorCoder,
+		// so we only handle generic errors with code 1 here.
 		fmt.Printf("Error: %v\n", err)
+		os.Exit(1) //
 	}
 }
 
