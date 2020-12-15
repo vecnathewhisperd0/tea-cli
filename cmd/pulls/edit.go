@@ -7,8 +7,7 @@ package pulls
 import (
 	"log"
 
-	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -17,8 +16,9 @@ import (
 )
 
 // editPullState abstracts the arg parsing to edit the given pull request
-func editPullState(ctx *cli.Context, opts gitea.EditPullRequestOption) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func editPullState(cmd *cli.Context, opts gitea.EditPullRequestOption) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	if ctx.Args().Len() == 0 {
 		log.Fatal(ctx.Command.ArgsUsage)
 	}
@@ -28,7 +28,7 @@ func editPullState(ctx *cli.Context, opts gitea.EditPullRequestOption) error {
 		return err
 	}
 
-	pr, _, err := login.Client().EditPullRequest(owner, repo, index, opts)
+	pr, _, err := ctx.Login.Client().EditPullRequest(ctx.Owner, ctx.Repo, index, opts)
 	if err != nil {
 		return err
 	}
