@@ -22,7 +22,6 @@ var ciStatusSymbols = map[gitea.StatusState]string{
 
 // PullDetails print an pull rendered to stdout
 func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *gitea.CombinedStatus) {
-	// func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus []*gitea.Status) {
 	base := pr.Base.Name
 	head := pr.Head.Name
 	if pr.Head.RepoID != pr.Base.RepoID {
