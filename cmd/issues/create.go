@@ -5,14 +5,11 @@
 package issues
 
 import (
-	"fmt"
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
-	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/interact"
+	"code.gitea.io/tea/modules/task"
 
-	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -40,23 +37,15 @@ func runIssuesCreate(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
-	issue, _, err := ctx.Login.Client().CreateIssue(ctx.Owner, ctx.Repo, gitea.CreateIssueOption{
-		Title: ctx.String("title"),
-		Body:  ctx.String("body"),
-		// TODO:
-		//Assignee  string   `json:"assignee"`
-		//Assignees []string `json:"assignees"`
-		//Deadline *time.Time `json:"due_date"`
-		//Milestone int64 `json:"milestone"`
-		//Labels []int64 `json:"labels"`
-		//Closed bool    `json:"closed"`
-	})
-
-	if err != nil {
-		log.Fatal(err)
+	if ctx.NumFlags() == 0 {
+		return interact.CreateIssue(ctx.Login, ctx.Owner, ctx.Repo)
 	}
 
-	print.IssueDetails(issue)
-	fmt.Println(issue.HTMLURL)
-	return nil
+	return task.CreateIssue(
+		ctx.Login,
+		ctx.Owner,
+		ctx.Repo,
+		ctx.String("title"),
+		ctx.String("body"),
+	)
 }
