@@ -10,6 +10,7 @@ import (
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/pulls"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -68,5 +69,11 @@ func runPullDetail(cmd *cli.Context, index string) error {
 	}
 
 	print.PullDetails(pr, reviews, ci)
+
+	if pr.Comments > 0 {
+		if err := interact.ShowComments(ctx, idx, pr.Comments); err != nil {
+			fmt.Printf("error while loading comments: %v\n", err)
+		}
+	}
 	return nil
 }
