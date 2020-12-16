@@ -6,7 +6,6 @@ package times
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -21,6 +20,7 @@ import (
 // CmdTrackedTimesAdd represents a sub command of times to add time to an issue
 var CmdTrackedTimesAdd = cli.Command{
 	Name:      "add",
+	Aliases:   []string{"a"},
 	Usage:     "Track spent time on an issue",
 	UsageText: "tea times add <issue> <duration>",
 	Description: `Track spent time on an issue
@@ -41,20 +41,16 @@ func runTrackedTimesAdd(cmd *cli.Context) error {
 
 	issue, err := utils.ArgToIndex(ctx.Args().First())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	duration, err := time.ParseDuration(strings.Join(ctx.Args().Tail(), ""))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, _, err = ctx.Login.Client().AddTime(ctx.Owner, ctx.Repo, issue, gitea.AddTimeOption{
 		Time: int64(duration.Seconds()),
 	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return err
 }

@@ -6,7 +6,6 @@ package milestones
 
 import (
 	"fmt"
-	"log"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
@@ -19,6 +18,7 @@ import (
 // CmdMilestonesCreate represents a sub command of milestones to create milestone
 var CmdMilestonesCreate = cli.Command{
 	Name:        "create",
+	Aliases:     []string{"c"},
 	Usage:       "Create an milestone on repository",
 	Description: `Create an milestone on repository`,
 	Action:      runMilestonesCreate,
@@ -62,7 +62,7 @@ func runMilestonesCreate(cmd *cli.Context) error {
 		State:       state,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.MilestoneDetails(mile)
