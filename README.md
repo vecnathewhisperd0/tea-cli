@@ -3,6 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Release](https://raster.shields.io/badge/dynamic/json.svg?label=release&url=https://gitea.com/api/v1/repos/gitea/tea/releases&query=$[0].tag_name)](https://gitea.com/gitea/tea/releases) [![Build Status](https://drone.gitea.com/api/badges/gitea/tea/status.svg)](https://drone.gitea.com/gitea/tea) [![Join the chat at https://img.shields.io/discord/322538954119184384.svg](https://img.shields.io/discord/322538954119184384.svg)](https://discord.gg/Gitea) [![Go Report Card](https://goreportcard.com/badge/code.gitea.io/tea)](https://goreportcard.com/report/code.gitea.io/tea) [![GoDoc](https://godoc.org/code.gitea.io/tea?status.svg)](https://godoc.org/code.gitea.io/tea)
 
 ### the official CLI interface for gitea
+
+![demo gif](./demo.gif)
+
 ```
    tea - command line tool to interact with Gitea
    version 0.6.0+9-g75d415b
@@ -62,11 +65,8 @@
    More info about Gitea itself on https://gitea.io.
 ```
 
-
-- [Watch a short demo GIF](https://dl.gitea.io/screenshots/tea_demo.gif)
 - [Compare features with other git forge CLIs](./FEATURE-COMPARISON.md)
-
-Tea uses [code.gitea.io/sdk](https://code.gitea.io/sdk) and interacts with the Gitea API.
+- tea uses [code.gitea.io/sdk](https://code.gitea.io/sdk) and interacts with the Gitea API.
 
 ## Installation
 
