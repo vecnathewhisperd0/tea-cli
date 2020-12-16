@@ -32,11 +32,16 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 		}
 	}
 
+	state := pr.State
+	if pr.Merged != nil {
+		state = "merged"
+	}
+
 	out := fmt.Sprintf(
 		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n\n",
 		pr.Index,
 		pr.Title,
-		pr.State,
+		state,
 		pr.Poster.UserName,
 		FormatTime(*pr.Created),
 		base,
@@ -44,8 +49,11 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 		pr.Body,
 	)
 
-	if len(reviews) != 0 {
+	if ciStatus != nil || len(reviews) != 0 || pr.State == gitea.StateOpen {
 		out += "---\n"
+	}
+
+	if len(reviews) != 0 {
 		revMap := make(map[gitea.ReviewStateType][]string)
 		for _, review := range reviews {
 			switch review.State {
