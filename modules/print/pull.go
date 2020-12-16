@@ -53,21 +53,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 		out += "---\n"
 	}
 
-	if len(reviews) != 0 {
-		revMap := make(map[gitea.ReviewStateType][]string)
-		for _, review := range reviews {
-			switch review.State {
-			case gitea.ReviewStateApproved,
-				gitea.ReviewStateRequestChanges,
-				gitea.ReviewStateRequestReview:
-				u := revMap[review.State]
-				revMap[review.State] = append(u, review.Reviewer.UserName)
-			}
-		}
-		for k, v := range revMap {
-			out += fmt.Sprintf("- %s by @%s\n", k, strings.Join(v, ", @"))
-		}
-	}
+	out += formatReviews(reviews)
 
 	if ciStatus != nil {
 		var summary, errors string
@@ -91,6 +77,40 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 	}
 
 	outputMarkdown(out)
+}
+
+func formatReviews(reviews []*gitea.PullReview) string {
+	result := ""
+	if len(reviews) == 0 {
+		return result
+	}
+
+	// deduplicate reviews by user (via review time & userID),
+	reviewByUser := make(map[int64]*gitea.PullReview)
+	for _, review := range reviews {
+		switch review.State {
+		case gitea.ReviewStateApproved,
+			gitea.ReviewStateRequestChanges,
+			gitea.ReviewStateRequestReview:
+			if r, ok := reviewByUser[review.Reviewer.ID]; !ok || review.Submitted.After(r.Submitted) {
+				reviewByUser[review.Reviewer.ID] = review
+			}
+		}
+	}
+
+	// group reviews by type
+	usersByState := make(map[gitea.ReviewStateType][]string)
+	for _, r := range reviewByUser {
+		u := r.Reviewer.UserName
+		users := usersByState[r.State]
+		usersByState[r.State] = append(users, u)
+	}
+
+	// stringify
+	for state, user := range usersByState {
+		result += fmt.Sprintf("- %s by @%s\n", state, strings.Join(user, ", @"))
+	}
+	return result
 }
 
 // PullsList prints a listing of pulls
