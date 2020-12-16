@@ -5,7 +5,7 @@
 package pulls
 
 import (
-	"log"
+	"fmt"
 
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -20,7 +20,7 @@ func editPullState(cmd *cli.Context, opts gitea.EditPullRequestOption) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	if ctx.Args().Len() == 0 {
-		log.Fatal(ctx.Command.ArgsUsage)
+		return fmt.Errorf("Please provide a Pull Request index")
 	}
 
 	index, err := utils.ArgToIndex(ctx.Args().First())
@@ -33,6 +33,6 @@ func editPullState(cmd *cli.Context, opts gitea.EditPullRequestOption) error {
 		return err
 	}
 
-	print.PullDetails(pr, nil)
+	print.PullDetails(pr, nil, nil)
 	return nil
 }
