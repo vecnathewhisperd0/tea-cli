@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Release](https://raster.shields.io/badge/dynamic/json.svg?label=release&url=https://gitea.com/api/v1/repos/gitea/tea/releases&query=$[0].tag_name)](https://gitea.com/gitea/tea/releases) [![Build Status](https://drone.gitea.com/api/badges/gitea/tea/status.svg)](https://drone.gitea.com/gitea/tea) [![Join the chat at https://img.shields.io/discord/322538954119184384.svg](https://img.shields.io/discord/322538954119184384.svg)](https://discord.gg/Gitea) [![Go Report Card](https://goreportcard.com/badge/code.gitea.io/tea)](https://goreportcard.com/report/code.gitea.io/tea) [![GoDoc](https://godoc.org/code.gitea.io/tea?status.svg)](https://godoc.org/code.gitea.io/tea)
 
-### the official CLI interface for gitea
+### the official CLI for gitea
 
 ![demo gif](./demo.gif)
 
@@ -72,6 +72,10 @@
 
 You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
+Distribution packages exist for:
+- **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** 
+- **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
+
 To install from source, go 1.13 or newer is required:
 
 ```sh
@@ -85,8 +89,6 @@ If you have `brew` installed, you can install `tea` via:
 brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
 brew install tea
 ```
-
-Distribution packages exist for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** and **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
 
 ## Compilation
 
