@@ -5,8 +5,6 @@
 package labels
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -18,8 +16,8 @@ import (
 
 // CmdLabelsList represents a sub command of labels to list labels
 var CmdLabelsList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List labels",
 	Description: "List labels",
 	Action:      RunLabelsList,
@@ -44,7 +42,7 @@ func RunLabelsList(cmd *cli.Context) error {
 		ListOptions: ctx.GetListOptions(),
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if ctx.IsSet("save") {

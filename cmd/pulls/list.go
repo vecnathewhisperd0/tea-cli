@@ -5,8 +5,6 @@
 package pulls
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -17,8 +15,8 @@ import (
 
 // CmdPullsList represents a sub command of issues to list pulls
 var CmdPullsList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List pull requests of the repository",
 	Description: `List pull requests of the repository`,
 	Action:      RunPullsList,
@@ -45,7 +43,7 @@ func RunPullsList(cmd *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.PullsList(prs, ctx.Output)

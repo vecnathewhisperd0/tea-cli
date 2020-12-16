@@ -5,8 +5,6 @@
 package labels
 
 import (
-	"log"
-
 	"code.gitea.io/tea/modules/context"
 
 	"github.com/urfave/cli/v2"
@@ -15,6 +13,7 @@ import (
 // CmdLabelDelete represents a sub command of labels to delete label.
 var CmdLabelDelete = cli.Command{
 	Name:        "delete",
+	Aliases:     []string{"rm"},
 	Usage:       "Delete a label",
 	Description: `Delete a label`,
 	Action:      runLabelDelete,
@@ -31,9 +30,5 @@ func runLabelDelete(cmd *cli.Context) error {
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	_, err := ctx.Login.Client().DeleteLabel(ctx.Owner, ctx.Repo, ctx.Int64("id"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return err
 }

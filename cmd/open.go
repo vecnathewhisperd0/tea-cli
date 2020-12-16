@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"log"
 	"path"
 	"strings"
 
@@ -20,8 +19,9 @@ import (
 // CmdOpen represents a sub command of issues to open issue on the web browser
 var CmdOpen = cli.Command{
 	Name:        "open",
-	Usage:       "Open something of the repository on web browser",
-	Description: `Open something of the repository on web browser`,
+	Aliases:     []string{"o"},
+	Usage:       "Open something of the repository in web browser",
+	Description: `Open something of the repository in web browser`,
 	Action:      runOpen,
 	Flags:       append([]cli.Flag{}, flags.LoginRepoFlags...),
 }
@@ -42,12 +42,11 @@ func runOpen(cmd *cli.Context) error {
 	case strings.EqualFold(number, "commits"):
 		repo, err := local_git.RepoForWorkdir()
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		b, err := repo.Head()
 		if err != nil {
-			log.Fatal(err)
-			return nil
+			return err
 		}
 		name := b.Name()
 		switch {
@@ -74,11 +73,6 @@ func runOpen(cmd *cli.Context) error {
 		suffix = number
 	}
 
-	u := path.Join(ctx.Login.URL, ctx.RepoSlug, suffix)
-	err := open.Run(u)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	u := path.Join(ctx.Login.URL, ctx.Owner, ctx.Repo, suffix)
+	return open.Run(u)
 }
