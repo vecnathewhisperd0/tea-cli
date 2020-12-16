@@ -40,6 +40,7 @@ func main() {
 		&cmd.CmdMilestones,
 		&cmd.CmdOrgs,
 		&cmd.CmdAutocomplete,
+		&cmd.CmdAddComment,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
