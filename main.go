@@ -67,7 +67,7 @@ func formatBuiltWith(Tags string) string {
 }
 
 var appDescription = `tea is a productivity helper for Gitea.  It can be used to manage most entities on one
-or multiple Gitea instances, and also provides local helpers like 'tea pull checkout'.
+or multiple Gitea instances and provides local helpers like 'tea pull checkout'.
 tea makes use of context provided by the repository in $PWD if available, but is still
 usable independently of $PWD. Configuration is persisted in $XDG_CONFIG_HOME/tea.
 `
