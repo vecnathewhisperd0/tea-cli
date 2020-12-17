@@ -18,8 +18,7 @@ func CreateMilestone(login *config.Login, repoOwner, repoName, title, descriptio
 
 	// title is required
 	if len(title) == 0 {
-		fmt.Printf("Title is required\n")
-		return nil
+		return fmt.Errorf("Title is required")
 	}
 
 	mile, _, err := login.Client().CreateMilestone(repoOwner, repoName, gitea.CreateMilestoneOption{
