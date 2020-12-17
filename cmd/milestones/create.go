@@ -11,9 +11,9 @@ import (
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
-	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
 )
 
@@ -36,8 +36,9 @@ var CmdMilestonesCreate = cli.Command{
 			Usage:   "milestone description to create",
 		},
 		&cli.StringFlag{
-			Name:  "deadline",
-			Usage: "set milestone deadline (default is no due date)",
+			Name:    "deadline",
+			Aliases: []string{"expires", "x"},
+			Usage:   "set milestone deadline (default is no due date)",
 		},
 		&cli.StringFlag{
 			Name:        "state",
@@ -53,11 +54,11 @@ func runMilestonesCreate(cmd *cli.Context) error {
 	date := ctx.String("deadline")
 	deadline := &time.Time{}
 	if date != "" {
-		t, err := utils.GetIso8601Date(date)
+		t, err := dateparse.ParseAny(date)
 		if err == nil {
 			return err
 		}
-		deadline = t
+		deadline = &t
 	}
 
 	state := gitea.StateOpen
@@ -66,7 +67,7 @@ func runMilestonesCreate(cmd *cli.Context) error {
 	}
 
 	if ctx.NumFlags() == 0 {
-		return interact.CreateMilestone(ctx.Login, ctx.Owner, ctx.Repo, deadline, state)
+		return interact.CreateMilestone(ctx.Login, ctx.Owner, ctx.Repo)
 	}
 
 	return task.CreateMilestone(

@@ -5,19 +5,21 @@
 package interact
 
 import (
+	"fmt"
 	"time"
 
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/task"
-	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/araddon/dateparse"
 )
 
 // CreateMilestone interactively creates a milestone
-func CreateMilestone(login *config.Login, owner, repo string, deadline *time.Time, state gitea.StateType) error {
+func CreateMilestone(login *config.Login, owner, repo string) error {
 	var title, description, dueDate string
+	var deadline *time.Time
 
 	// owner, repo
 	owner, repo, err := promptRepoSlug(owner, repo)
@@ -40,16 +42,28 @@ func CreateMilestone(login *config.Login, owner, repo string, deadline *time.Tim
 
 	// deadline
 	promptI = &survey.Input{Message: "Milestone deadline [no due date]:"}
-	if err := survey.AskOne(promptI, &dueDate, nil); err != nil {
+	err = survey.AskOne(
+		promptI,
+		&dueDate,
+		survey.WithValidator(func(input interface{}) error {
+			if str, ok := input.(string); ok {
+				if len(str) == 0 {
+					return nil
+				}
+				t, err := dateparse.ParseAny(str)
+				if err != nil {
+					return err
+				}
+				deadline = &t
+			} else {
+				return fmt.Errorf("invalid result type")
+			}
+			return nil
+		}),
+	)
+
+	if err != nil {
 		return err
-	}
-	if dueDate != "" {
-		deadline, err = utils.GetIso8601Date(dueDate)
-		if err != nil {
-			return err
-		}
-	} else {
-		deadline = nil
 	}
 
 	return task.CreateMilestone(
@@ -59,5 +73,5 @@ func CreateMilestone(login *config.Login, owner, repo string, deadline *time.Tim
 		title,
 		description,
 		deadline,
-		state)
+		gitea.StateOpen)
 }
