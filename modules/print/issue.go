@@ -35,6 +35,7 @@ var IssueFields = []string{
 	"state",
 	"kind",
 	"author",
+	"author-id",
 	"url",
 
 	"title",
@@ -86,7 +87,9 @@ func (x printableIssue) FormatField(field string) string {
 		}
 		return "Issue"
 	case "author":
-		formatUserName(x.Poster)
+		return formatUserName(x.Poster)
+	case "author-id":
+		return x.Poster.UserName
 	case "url":
 		return x.HTMLURL
 	case "title":
