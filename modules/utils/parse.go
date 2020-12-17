@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // ArgToIndex take issue/pull index as string and return int64
@@ -38,4 +39,17 @@ func GetOwnerAndRepo(repoPath, user string) (string, string) {
 		return p[0], p[1]
 	}
 	return user, repoPath
+}
+
+// GetIso8601Date parses a date from a string
+func GetIso8601Date(date string) (*time.Time, error) {
+	t, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		t, err := time.Parse(time.RFC3339, date)
+		if err != nil {
+			return nil, err
+		}
+		return &t, nil
+	}
+	return &t, nil
 }

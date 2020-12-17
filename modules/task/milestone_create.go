@@ -6,6 +6,7 @@ package task
 
 import (
 	"fmt"
+	"time"
 
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
@@ -14,7 +15,7 @@ import (
 )
 
 // CreateMilestone creates a milestone in the given repo and prints the result
-func CreateMilestone(login *config.Login, repoOwner, repoName, title, description string, state gitea.StateType) error {
+func CreateMilestone(login *config.Login, repoOwner, repoName, title, description string, deadline *time.Time, state gitea.StateType) error {
 
 	// title is required
 	if len(title) == 0 {
@@ -24,6 +25,7 @@ func CreateMilestone(login *config.Login, repoOwner, repoName, title, descriptio
 	mile, _, err := login.Client().CreateMilestone(repoOwner, repoName, gitea.CreateMilestoneOption{
 		Title:       title,
 		Description: description,
+		Deadline:    deadline,
 		State:       state,
 	})
 	if err != nil {
