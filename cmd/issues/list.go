@@ -22,7 +22,7 @@ var CmdIssuesList = cli.Command{
 	Action:      RunIssuesList,
 	Flags: append([]cli.Flag{
 		flags.FieldsFlag(print.IssueFields, []string{
-			"index", "title", "state", "author", "milestone", "updated",
+			"index", "title", "state", "author", "milestone", "labels",
 		}),
 	}, flags.IssuePRFlags...),
 }

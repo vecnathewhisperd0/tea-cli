@@ -41,7 +41,7 @@ var CmdMilestonesIssues = cli.Command{
 		&flags.PaginationPageFlag,
 		&flags.PaginationLimitFlag,
 		flags.FieldsFlag(print.IssueFields, []string{
-			"index", "state", "kind", "author", "updated", "title",
+			"index", "kind", "title", "state", "updated", "labels",
 		}),
 	}, flags.AllDefaultFlags...),
 }
