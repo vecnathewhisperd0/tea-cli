@@ -6,7 +6,6 @@ package releases
 
 import (
 	"fmt"
-	"log"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
@@ -18,8 +17,8 @@ import (
 
 // CmdReleaseList represents a sub command of Release to list releases
 var CmdReleaseList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List Releases",
 	Description: "List Releases",
 	Action:      RunReleasesList,
@@ -38,7 +37,7 @@ func RunReleasesList(cmd *cli.Context) error {
 		ListOptions: ctx.GetListOptions(),
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.ReleasesList(releases, ctx.Output)

@@ -5,8 +5,6 @@
 package login
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
@@ -16,8 +14,8 @@ import (
 
 // CmdLoginList represents to login a gitea server.
 var CmdLoginList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List Gitea logins",
 	Description: `List Gitea logins`,
 	Action:      RunLoginList,
@@ -28,7 +26,7 @@ var CmdLoginList = cli.Command{
 func RunLoginList(cmd *cli.Context) error {
 	logins, err := config.GetLogins()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	print.LoginsList(logins, cmd.String("output"))
 	return nil

@@ -6,7 +6,6 @@ package releases
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,6 +20,7 @@ import (
 // CmdReleaseCreate represents a sub command of Release to create release
 var CmdReleaseCreate = cli.Command{
 	Name:        "create",
+	Aliases:     []string{"c"},
 	Usage:       "Create a release",
 	Description: `Create a release`,
 	Action:      runReleaseCreate,
@@ -76,24 +76,23 @@ func runReleaseCreate(cmd *cli.Context) error {
 
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusConflict {
-			fmt.Println("error: There already is a release for this tag")
-			return nil
+			return fmt.Errorf("There already is a release for this tag")
 		}
-		log.Fatal(err)
+		return err
 	}
 
 	for _, asset := range ctx.StringSlice("asset") {
 		var file *os.File
 
 		if file, err = os.Open(asset); err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		filePath := filepath.Base(asset)
 
 		if _, _, err = ctx.Login.Client().CreateReleaseAttachment(ctx.Owner, ctx.Repo, release.ID, file, filePath); err != nil {
 			file.Close()
-			log.Fatal(err)
+			return err
 		}
 
 		file.Close()

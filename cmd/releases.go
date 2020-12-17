@@ -15,7 +15,7 @@ import (
 // ToDo: ReleaseDetails
 var CmdReleases = cli.Command{
 	Name:        "releases",
-	Aliases:     []string{"release"},
+	Aliases:     []string{"release", "r"},
 	Category:    catEntities,
 	Usage:       "Manage releases",
 	Description: "Manage releases",

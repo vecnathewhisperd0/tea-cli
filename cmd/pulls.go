@@ -22,8 +22,8 @@ var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Aliases:     []string{"pull", "pr"},
 	Category:    catEntities,
-	Usage:       "List, create, checkout and clean pull requests",
-	Description: `List, create, checkout and clean pull requests`,
+	Usage:       "Manage and checkout pull requests",
+	Description: `Manage and checkout pull requests`,
 	ArgsUsage:   "[<pull index>]",
 	Action:      runPulls,
 	Flags:       flags.IssuePRFlags,
@@ -32,6 +32,8 @@ var CmdPulls = cli.Command{
 		&pulls.CmdPullsCheckout,
 		&pulls.CmdPullsClean,
 		&pulls.CmdPullsCreate,
+		&pulls.CmdPullsClose,
+		&pulls.CmdPullsReopen,
 	},
 }
 
@@ -61,6 +63,11 @@ func runPullDetail(cmd *cli.Context, index string) error {
 		fmt.Printf("error while loading reviews: %v\n", err)
 	}
 
-	print.PullDetails(pr, reviews)
+	ci, _, err := client.GetCombinedStatus(ctx.Owner, ctx.Repo, pr.Head.Sha)
+	if err != nil {
+		fmt.Printf("error while loading CI: %v\n", err)
+	}
+
+	print.PullDetails(pr, reviews, ci)
 	return nil
 }

@@ -1,4 +1,4 @@
-// Copyright 2018 The Gitea Authors. All rights reserved.
+// Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -7,7 +7,6 @@ package main // import "code.gitea.io/tea"
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -35,6 +34,7 @@ func main() {
 	app.Commands = []*cli.Command{
 		&cmd.CmdLogin,
 		&cmd.CmdLogout,
+		&cmd.CmdAutocomplete,
 
 		&cmd.CmdIssues,
 		&cmd.CmdPulls,
@@ -51,7 +51,10 @@ func main() {
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatalf("Failed to run app with %s: %v", os.Args, err)
+		// app.Run already exits for errors implementing ErrorCoder,
+		// so we only handle generic errors with code 1 here.
+		fmt.Fprintf(app.ErrWriter, "Error: %v\n", err)
+		os.Exit(1)
 	}
 }
 

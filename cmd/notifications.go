@@ -5,8 +5,6 @@
 package cmd
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -18,7 +16,7 @@ import (
 // CmdNotifications is the main command to operate with notifications
 var CmdNotifications = cli.Command{
 	Name:        "notifications",
-	Aliases:     []string{"notification", "notif"},
+	Aliases:     []string{"notification", "n"},
 	Category:    catHelpers,
 	Usage:       "Show notifications",
 	Description: "Show notifications, by default based of the current repo and unread one",
@@ -77,7 +75,7 @@ func runNotifications(cmd *cli.Context) error {
 		})
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.NotificationsList(news, ctx.Output, ctx.Bool("all"))

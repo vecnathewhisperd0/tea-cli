@@ -8,7 +8,7 @@
 
 ```
    tea - command line tool to interact with Gitea
-   version 0.6.0+9-g75d415b
+   version 0.6.0+17-g1c10f33
 
  USAGE
    tea command [subcommand] [command options] [arguments...]
@@ -22,20 +22,21 @@
  COMMANDS
    help, h  Shows a list of commands or help for one command
    ENTITIES:
-     issues, issue                     List, create and update issues
-     pulls, pull, pr                   List, create, checkout and clean pull requests
+     issues, issue, i                  List, create and update issues
+     pulls, pull, pr                   Manage and checkout pull requests
      labels, label                     Manage issue labels
      milestones, milestone, ms         List and create milestones
-     releases, release                 Manage releases
-     times, time                       Operate on tracked times of a repository's issues & pulls
+     releases, release, r              Manage releases
+     times, time, t                    Operate on tracked times of a repository's issues & pulls
      organizations, organization, org  List, create, delete organizations
      repos, repo                       Show repository details
    HELPERS:
-     open                                Open something of the repository on web browser
-     notifications, notification, notif  Show notifications
+     open, o                         Open something of the repository in web browser
+     notifications, notification, n  Show notifications
    SETUP:
-     logins, login  Log in to a Gitea server
-     logout         Log out from a Gitea server
+     logins, login                  Log in to a Gitea server
+     logout                         Log out from a Gitea server
+     shellcompletion, autocomplete  Install shell completion for tea
 
  OPTIONS
    --help, -h     show help (default: false)
@@ -73,7 +74,7 @@
 You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
 Distribution packages exist for:
-- **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** 
+- **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))**
 - **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
 
 To install from source, go 1.13 or newer is required:

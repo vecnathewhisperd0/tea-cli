@@ -5,8 +5,6 @@
 package issues
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -17,8 +15,8 @@ import (
 
 // CmdIssuesList represents a sub command of issues to list issues
 var CmdIssuesList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      RunIssuesList,
@@ -47,7 +45,7 @@ func RunIssuesList(cmd *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.IssuesList(issues, ctx.Output)
