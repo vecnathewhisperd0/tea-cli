@@ -52,7 +52,11 @@ func RunIssuesList(cmd *cli.Context) error {
 		return err
 	}
 
-	fields, _ := flags.GetFields(cmd, nil)
+	fields, err := flags.GetFields(cmd, print.IssueFields)
+	if err != nil {
+		return err
+	}
+
 	print.IssuesPullsList(issues, ctx.Output, fields)
 	return nil
 }
