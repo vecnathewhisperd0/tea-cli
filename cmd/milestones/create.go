@@ -5,11 +5,10 @@
 package milestones
 
 import (
-	"fmt"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
-	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/interact"
+	"code.gitea.io/tea/modules/task"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -43,28 +42,22 @@ var CmdMilestonesCreate = cli.Command{
 
 func runMilestonesCreate(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
-	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
-
-	title := ctx.String("title")
-	if len(title) == 0 {
-		fmt.Printf("Title is required\n")
-		return nil
-	}
 
 	state := gitea.StateOpen
 	if ctx.String("state") == "closed" {
 		state = gitea.StateClosed
 	}
 
-	mile, _, err := ctx.Login.Client().CreateMilestone(ctx.Owner, ctx.Repo, gitea.CreateMilestoneOption{
-		Title:       title,
-		Description: ctx.String("description"),
-		State:       state,
-	})
-	if err != nil {
-		return err
+	if ctx.NumFlags() == 0 {
+		return interact.CreateMilestone(ctx.Login, ctx.Owner, ctx.Repo, state)
 	}
 
-	print.MilestoneDetails(mile)
-	return nil
+	return task.CreateMilestone(
+		ctx.Login,
+		ctx.Owner,
+		ctx.Repo,
+		ctx.String("title"),
+		ctx.String("description"),
+		state,
+	)
 }

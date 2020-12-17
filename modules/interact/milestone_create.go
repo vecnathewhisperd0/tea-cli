@@ -8,11 +8,12 @@ import (
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/task"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/AlecAivazis/survey/v2"
 )
 
-// CreateIssue interactively creates an issue
-func CreateIssue(login *config.Login, owner, repo string) error {
+// CreateMilestone interactively creates a milestone
+func CreateMilestone(login *config.Login, owner, repo string, state gitea.StateType) error {
 	var title, description string
 
 	// owner, repo
@@ -23,21 +24,22 @@ func CreateIssue(login *config.Login, owner, repo string) error {
 
 	// title
 	promptOpts := survey.WithValidator(survey.Required)
-	promptI := &survey.Input{Message: "Issue title:"}
+	promptI := &survey.Input{Message: "Milestone title:"}
 	if err := survey.AskOne(promptI, &title, promptOpts); err != nil {
 		return err
 	}
 
 	// description
-	promptM := &survey.Multiline{Message: "Issue description:"}
+	promptM := &survey.Multiline{Message: "Milestone description:"}
 	if err := survey.AskOne(promptM, &description); err != nil {
 		return err
 	}
 
-	return task.CreateIssue(
+	return task.CreateMilestone(
 		login,
 		owner,
 		repo,
 		title,
-		description)
+		description,
+		state)
 }
