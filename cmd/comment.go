@@ -13,6 +13,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 	"github.com/urfave/cli/v2"
 )
@@ -20,6 +21,7 @@ import (
 // CmdAddComment is the main command to operate with notifications
 var CmdAddComment = cli.Command{
 	Name:        "comment",
+	Aliases:     []string{"c"},
 	Usage:       "Add a comment to an issue / pr",
 	Description: "Add a comment to an issue / pr",
 	ArgsUsage:   "<issue / pr index> [<comment body>]",
@@ -49,8 +51,14 @@ func runAddComment(cmd *cli.Context) error {
 	}
 
 	client := ctx.Login.Client()
-	_, _, err = client.CreateIssueComment(ctx.Owner, ctx.Repo, idx, gitea.CreateIssueCommentOption{
+	comment, _, err := client.CreateIssueComment(ctx.Owner, ctx.Repo, idx, gitea.CreateIssueCommentOption{
 		Body: body,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+
+	print.Comment(comment)
+
+	return nil
 }
