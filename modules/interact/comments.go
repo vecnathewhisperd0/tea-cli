@@ -5,14 +5,38 @@
 package interact
 
 import (
+	"fmt"
+	"os"
+
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"github.com/AlecAivazis/survey/v2"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
-// ShowComments prompts if issue/pr comments should be shown and continues to do so.
-func ShowComments(ctx *context.TeaContext, idx int64, totalComments int) error {
+// ShowCommentsMaybeInteractive fetches & prints comments, depending on the --comments flag.
+// If that flag is unset, and output is not piped, prompts the user first.
+func ShowCommentsMaybeInteractive(ctx *context.TeaContext, idx int64, totalComments int) error {
+	if ctx.Bool("comments") {
+		opts := gitea.ListIssueCommentOptions{ListOptions: ctx.GetListOptions()}
+		c := ctx.Login.Client()
+		comments, _, err := c.ListIssueComments(ctx.Owner, ctx.Repo, idx, opts)
+		if err != nil {
+			return err
+		}
+		print.Comments(comments)
+	} else if isInteractive() && !ctx.IsSet("comments") {
+		// if we're interactive, but --comments hasn't been explicitly set to false
+		if err := ShowCommentsPaginated(ctx, idx, totalComments); err != nil {
+			fmt.Printf("error while loading comments: %v\n", err)
+		}
+	}
+	return nil
+}
+
+// ShowCommentsPaginated prompts if issue/pr comments should be shown and continues to do so.
+func ShowCommentsPaginated(ctx *context.TeaContext, idx int64, totalComments int) error {
 	c := ctx.Login.Client()
 	opts := gitea.ListIssueCommentOptions{ListOptions: ctx.GetListOptions()}
 	prompt := "show comments?"
@@ -43,4 +67,9 @@ func ShowComments(ctx *context.TeaContext, idx int64, totalComments int) error {
 		}
 	}
 	return nil
+}
+
+// IsInteractive checks if the output is piped, but NOT if the session is run interactively..
+func isInteractive() bool {
+	return terminal.IsTerminal(int(os.Stdout.Fd()))
 }
