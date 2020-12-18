@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Release](https://raster.shields.io/badge/dynamic/json.svg?label=release&url=https://gitea.com/api/v1/repos/gitea/tea/releases&query=$[0].tag_name)](https://gitea.com/gitea/tea/releases) [![Build Status](https://drone.gitea.com/api/badges/gitea/tea/status.svg)](https://drone.gitea.com/gitea/tea) [![Join the chat at https://img.shields.io/discord/322538954119184384.svg](https://img.shields.io/discord/322538954119184384.svg)](https://discord.gg/Gitea) [![Go Report Card](https://goreportcard.com/badge/code.gitea.io/tea)](https://goreportcard.com/report/code.gitea.io/tea) [![GoDoc](https://godoc.org/code.gitea.io/tea?status.svg)](https://godoc.org/code.gitea.io/tea)
 
-### the official CLI for gitea
+### The official CLI for Gitea
 
 ![demo gif](./demo.gif)
 
@@ -71,25 +71,26 @@
 
 ## Installation
 
-You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
+There are different ways to get `tea`:
 
-Distribution packages exist for:
-- **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))**
-- **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
+1. Install via your system package manager:
+    - macOS via `brew` (gitea-maintained):
+      ```sh
+      brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
+      brew install tea
+      ```
+    - arch linux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea), thirdparty)
+    - alpine linux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge), thirdparty)
 
-To install from source, go 1.13 or newer is required:
+2. Use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
-```sh
-go get code.gitea.io/tea
-go install code.gitea.io/tea
-```
+3. Install from source (go 1.13 or newer is required):
+    ```sh
+    go get code.gitea.io/tea
+    go install code.gitea.io/tea
+    ```
 
-If you have `brew` installed, you can install `tea` via:
-
-```sh
-brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
-brew install tea
-```
+4. Docker (thirdparty): [tgerczei/tea](https://hub.docker.com/r/tgerczei/tea)
 
 ## Compilation
 
