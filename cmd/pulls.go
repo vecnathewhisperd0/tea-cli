@@ -34,6 +34,8 @@ var CmdPulls = cli.Command{
 		&pulls.CmdPullsClose,
 		&pulls.CmdPullsReopen,
 		&pulls.CmdPullsReview,
+		&pulls.CmdPullsApprove,
+		&pulls.CmdPullsReject,
 	},
 }
 
