@@ -6,6 +6,7 @@ package pulls
 
 import (
 	"fmt"
+	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
@@ -22,7 +23,7 @@ var CmdPullsApprove = cli.Command{
 	Aliases:     []string{"lgtm", "a"},
 	Usage:       "Approve a pull request",
 	Description: "Approve a pull request",
-	ArgsUsage:   "<pull index>",
+	ArgsUsage:   "<pull index> [<comment>]",
 	Action: func(cmd *cli.Context) error {
 		ctx := context.InitCommand(cmd)
 		ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
@@ -36,7 +37,9 @@ var CmdPullsApprove = cli.Command{
 			return err
 		}
 
-		return task.CreatePullReview(ctx, idx, gitea.ReviewStateApproved, "", nil)
+		comment := strings.Join(ctx.Args().Tail(), " ")
+
+		return task.CreatePullReview(ctx, idx, gitea.ReviewStateApproved, comment, nil)
 	},
 	Flags: flags.AllDefaultFlags,
 }
