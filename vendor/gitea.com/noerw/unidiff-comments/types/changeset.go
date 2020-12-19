@@ -1,4 +1,4 @@
-package godiff
+package types
 
 type Changeset struct {
 	FromHash   string

@@ -1,4 +1,4 @@
-package godiff
+package unidiff
 
 import (
 	"bufio"
@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"gitea.com/noerw/unidiff-comments/types"
 )
 
 const (
@@ -21,6 +23,8 @@ const (
 	stateDiffComment       = "stateDiffComment"
 	stateDiffCommentDelim  = "stateDiffCommentDelim"
 	stateDiffCommentHeader = "stateDiffCommentHeader"
+
+	ignorePrefix = "###"
 )
 
 var (
@@ -69,16 +73,16 @@ var (
 
 type parser struct {
 	state      string
-	changeset  Changeset
-	diff       *Diff
-	hunk       *Hunk
-	segment    *Segment
-	comment    *Comment
-	line       *Line
+	changeset  types.Changeset
+	diff       *types.Diff
+	hunk       *types.Hunk
+	segment    *types.Segment
+	comment    *types.Comment
+	line       *types.Line
 	lineNumber int
 
 	segmentType  string
-	commentsList []*Comment
+	commentsList []*types.Comment
 }
 
 type Error struct {
@@ -90,7 +94,7 @@ func (err Error) Error() string {
 	return fmt.Sprintf("line %d: %s", err.LineNumber, err.Message)
 }
 
-func ReadChangeset(r io.Reader) (Changeset, error) {
+func ReadChangeset(r io.Reader) (types.Changeset, error) {
 	buffer := bufio.NewReader(r)
 
 	current := parser{}
@@ -175,13 +179,13 @@ func (current *parser) switchState(line string) error {
 		switch {
 		case reSegmentContext.MatchString(line):
 			current.state = stateHunkBody
-			current.segmentType = SegmentTypeContext
+			current.segmentType = types.SegmentTypeContext
 		case reSegmentRemoved.MatchString(line):
 			current.state = stateHunkBody
-			current.segmentType = SegmentTypeRemoved
+			current.segmentType = types.SegmentTypeRemoved
 		case reSegmentAdded.MatchString(line):
 			current.state = stateHunkBody
-			current.segmentType = SegmentTypeAdded
+			current.segmentType = types.SegmentTypeAdded
 		case reHunk.MatchString(line):
 			current.state = stateHunkHeader
 		case reCommentText.MatchString(line):
@@ -244,31 +248,31 @@ func (current *parser) createNodes(line string) error {
 		}
 		fallthrough
 	case stateDiffCommentDelim, stateDiffCommentHeader:
-		current.comment = &Comment{}
+		current.comment = &types.Comment{}
 		fallthrough
 	case stateDiffHeader:
 		if current.diff == nil {
-			current.diff = &Diff{}
+			current.diff = &types.Diff{}
 			current.changeset.Diffs = append(current.changeset.Diffs,
 				current.diff)
 		}
 	case stateHunkHeader:
-		current.hunk = &Hunk{}
-		current.segment = &Segment{}
+		current.hunk = &types.Hunk{}
+		current.segment = &types.Segment{}
 	case stateCommentDelim, stateCommentHeader:
-		current.comment = &Comment{}
+		current.comment = &types.Comment{}
 	case stateComment:
 		if current.comment == nil {
-			current.comment = &Comment{}
+			current.comment = &types.Comment{}
 		}
 	case stateHunkBody:
 		if current.segment.Type != current.segmentType {
-			current.segment = &Segment{Type: current.segmentType}
+			current.segment = &types.Segment{Type: current.segmentType}
 			current.hunk.Segments = append(current.hunk.Segments,
 				current.segment)
 		}
 
-		current.line = &Line{}
+		current.line = &types.Line{}
 		current.segment.Lines = append(current.segment.Lines, current.line)
 	}
 
@@ -332,13 +336,13 @@ func (current *parser) locateLine(line string) error {
 	}
 	hunkLength := int64(len(current.segment.Lines))
 	switch current.segment.Type {
-	case SegmentTypeContext:
+	case types.SegmentTypeContext:
 		current.line.Source = sourceOffset + hunkLength
 		current.line.Destination = destinationOffset + hunkLength
-	case SegmentTypeAdded:
+	case types.SegmentTypeAdded:
 		current.line.Source = sourceOffset
 		current.line.Destination = destinationOffset + hunkLength
-	case SegmentTypeRemoved:
+	case types.SegmentTypeRemoved:
 		current.line.Source = sourceOffset + hunkLength
 		current.line.Destination = destinationOffset
 	}
@@ -408,7 +412,7 @@ func (current *parser) parseCommentHeader(line string) error {
 	updatedDate, _ := time.ParseInLocation(time.ANSIC,
 		strings.TrimSpace(matches[4]),
 		time.Local)
-	current.comment.UpdatedDate = UnixTimestamp(updatedDate.Unix() * 1000)
+	current.comment.UpdatedDate = types.UnixTimestamp(updatedDate.Unix() * 1000)
 
 	version, _ := strconv.ParseInt(matches[2], 10, 64)
 	current.comment.Version = int(version)
@@ -434,7 +438,7 @@ func (current *parser) parseComment(line string) error {
 	return nil
 }
 
-func (current *parser) findParentComment(comment *Comment) *Comment {
+func (current *parser) findParentComment(comment *types.Comment) *types.Comment {
 	for i := len(current.commentsList) - 1; i >= 0; i-- {
 		c := current.commentsList[i]
 		if comment.Indent > c.Indent {

@@ -1,4 +1,4 @@
-package godiff
+package types
 
 const (
 	SegmentTypeContext = "CONTEXT"

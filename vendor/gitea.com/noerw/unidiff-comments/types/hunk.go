@@ -1,4 +1,4 @@
-package godiff
+package types
 
 type Hunk struct {
 	SourceLine      int64

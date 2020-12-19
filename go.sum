@@ -4,6 +4,10 @@ code.gitea.io/sdk/gitea v0.13.1-0.20201209180822-68eec69f472e h1:oJOoT5TGbSYRNGU
 code.gitea.io/sdk/gitea v0.13.1-0.20201209180822-68eec69f472e/go.mod h1:89WiyOX1KEcvjP66sRHdu0RafojGo60bT9UqW17VbWs=
 gitea.com/noerw/unidiff-comments v0.0.0-20201218123713-6f546f1fdea9 h1:1nyuvVnt3q2rXITHxkpXMfOaOQrbK5Bi78m+n2vVXYs=
 gitea.com/noerw/unidiff-comments v0.0.0-20201218123713-6f546f1fdea9/go.mod h1:1YlCscxedF3xz1q1LjYAi0hlWXbwQxHFaFatUtlJFQ4=
+gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b h1:CLYsMGcGLohESQDMth+RgJ4cB3CCHToxnj0zBbvB3sE=
+gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b/go.mod h1:Fc8iyPm4NINRWujeIk2bTfcbGc4ZYY29/oMAAGcr4qI=
+gitea.com/noerw/unidiff-comments v0.0.0-20201219085322-17e21062c0fa h1:bPh35lXneetZVVmIUlRn67qGoc7lfm+t9p5lIOAIBHQ=
+gitea.com/noerw/unidiff-comments v0.0.0-20201219085322-17e21062c0fa/go.mod h1:1YlCscxedF3xz1q1LjYAi0hlWXbwQxHFaFatUtlJFQ4=
 github.com/AlecAivazis/survey/v2 v2.2.2 h1:1I4qBrNsHQE+91tQCqVlfrKe9DEL65949d1oKZWVELY=
 github.com/AlecAivazis/survey/v2 v2.2.2/go.mod h1:9FJRdMdDm8rnT+zHVbvQT2RTSTLq0Ttd6q3Vl2fahjk=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=

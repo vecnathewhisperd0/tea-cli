@@ -3,8 +3,9 @@ code.gitea.io/gitea-vet
 code.gitea.io/gitea-vet/checks
 # code.gitea.io/sdk/gitea v0.13.1-0.20201209180822-68eec69f472e
 code.gitea.io/sdk/gitea
-# gitea.com/noerw/unidiff-comments v0.0.0-20201218123713-6f546f1fdea9
+# gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 gitea.com/noerw/unidiff-comments
+gitea.com/noerw/unidiff-comments/types
 # github.com/AlecAivazis/survey/v2 v2.2.2
 github.com/AlecAivazis/survey/v2
 github.com/AlecAivazis/survey/v2/core
@@ -167,8 +168,6 @@ github.com/olekukonko/tablewriter
 github.com/pmezard/go-difflib/difflib
 # github.com/russross/blackfriday/v2 v2.1.0
 github.com/russross/blackfriday/v2
-# github.com/seletskiy/tplutil v0.0.0-20200921103632-f880f6245597
-github.com/seletskiy/tplutil
 # github.com/sergi/go-diff v1.1.0
 github.com/sergi/go-diff/diffmatchpatch
 # github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
