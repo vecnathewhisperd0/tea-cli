@@ -31,7 +31,7 @@ func ReviewPull(ctx *context.TeaContext, idx int64) error {
 
 	// codeComments
 	var reviewDiff bool
-	promptDiff := &survey.Confirm{Message: "Review & comment the diff?", Default: false}
+	promptDiff := &survey.Confirm{Message: "Review / comment the diff?", Default: true}
 	if err = survey.AskOne(promptDiff, &reviewDiff); err != nil {
 		return err
 	}
