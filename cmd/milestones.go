@@ -16,6 +16,7 @@ import (
 var CmdMilestones = cli.Command{
 	Name:        "milestones",
 	Aliases:     []string{"milestone", "ms"},
+	Category:    catEntities,
 	Usage:       "List and create milestones",
 	Description: `List and create milestones`,
 	ArgsUsage:   "[<milestone name>]",
