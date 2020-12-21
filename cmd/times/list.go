@@ -47,6 +47,11 @@ Depending on your permissions on the repository, only your own tracked times mig
 			Aliases: []string{"t"},
 			Usage:   "Print the total duration at the end",
 		},
+		&cli.BoolFlag{
+			Name:    "mine",
+			Aliases: []string{"m"},
+			Usage:   "Show Print the total duration at the end",
+		},
 	}, flags.AllDefaultFlags...),
 }
 
@@ -60,7 +65,9 @@ func RunTimesList(cmd *cli.Context) error {
 	var err error
 
 	user := ctx.Args().First()
-	if user == "" {
+	if ctx.Bool("mine") {
+		times, _, err = client.GetMyTrackedTimes()
+	} else if user == "" {
 		// get all tracked times on the repo
 		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, gitea.ListTrackedTimesOptions{})
 	} else if strings.HasPrefix(user, "#") {
