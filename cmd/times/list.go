@@ -64,6 +64,7 @@ func RunTimesList(cmd *cli.Context) error {
 	var times []*gitea.TrackedTime
 	var err error
 	var from, until time.Time
+	var fields []string
 
 	if ctx.IsSet("from") {
 		from, err = dateparse.ParseLocal(ctx.String("from"))
@@ -83,6 +84,7 @@ func RunTimesList(cmd *cli.Context) error {
 	user := ctx.Args().First()
 	if ctx.Bool("mine") {
 		times, _, err = client.GetMyTrackedTimes()
+		fields = []string{"created", "repo", "issue", "duration"}
 	} else if user == "" {
 		// get all tracked times on the repo
 		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, opts)
@@ -93,16 +95,18 @@ func RunTimesList(cmd *cli.Context) error {
 			return err
 		}
 		times, _, err = client.ListIssueTrackedTimes(ctx.Owner, ctx.Repo, issue, opts)
+		fields = []string{"created", "user", "duration"}
 	} else {
 		// get all tracked times by the specified user
 		opts.User = user
 		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, opts)
+		fields = []string{"created", "issue", "duration"}
 	}
 
 	if err != nil {
 		return err
 	}
 
-	print.TrackedTimesList(times, ctx.Output, ctx.Bool("total"))
+	print.TrackedTimesList(times, ctx.Output, fields, ctx.Bool("total"))
 	return nil
 }
