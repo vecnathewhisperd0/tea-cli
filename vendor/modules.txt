@@ -3,7 +3,7 @@ code.gitea.io/gitea-vet
 code.gitea.io/gitea-vet/checks
 # code.gitea.io/sdk/gitea v0.13.1-0.20201209180822-68eec69f472e
 code.gitea.io/sdk/gitea
-# github.com/AlecAivazis/survey/v2 v2.2.2
+# github.com/AlecAivazis/survey/v2 v2.2.7
 github.com/AlecAivazis/survey/v2
 github.com/AlecAivazis/survey/v2/core
 github.com/AlecAivazis/survey/v2/terminal
@@ -185,7 +185,7 @@ github.com/yuin/goldmark/renderer
 github.com/yuin/goldmark/renderer/html
 github.com/yuin/goldmark/text
 github.com/yuin/goldmark/util
-# golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
+# golang.org/x/crypto v0.0.0-20201217014255-9d1352758620
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/cast5
 golang.org/x/crypto/chacha20
@@ -211,11 +211,14 @@ golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# golang.org/x/sys v0.0.0-20201107080550-4d91cf3a1aaf
+# golang.org/x/sys v0.0.0-20201221093633-bc327ba9c2f0
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
+# golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf
+golang.org/x/term
 # golang.org/x/text v0.3.4
 golang.org/x/text/transform
 golang.org/x/text/width
