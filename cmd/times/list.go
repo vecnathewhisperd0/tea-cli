@@ -5,6 +5,7 @@
 package times
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -51,6 +52,12 @@ Depending on your permissions on the repository, only your own tracked times mig
 			Name:    "mine",
 			Aliases: []string{"m"},
 			Usage:   "Show Print the total duration at the end",
+		},
+		&cli.StringFlag{
+			Name: "fields",
+			Usage: fmt.Sprintf(`Comma-separated list of fields to print. Available values:
+			%s
+		`, strings.Join(print.TrackedTimeFields, ",")),
 		},
 	}, flags.AllDefaultFlags...),
 }
@@ -105,6 +112,12 @@ func RunTimesList(cmd *cli.Context) error {
 
 	if err != nil {
 		return err
+	}
+
+	if ctx.IsSet("fields") {
+		if fields, err = flags.GetFields(cmd, print.TrackedTimeFields); err != nil {
+			return err
+		}
 	}
 
 	print.TrackedTimesList(times, ctx.Output, fields, ctx.Bool("total"))
