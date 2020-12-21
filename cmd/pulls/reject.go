@@ -38,7 +38,7 @@ var CmdPullsReject = cli.Command{
 
 		comment := strings.Join(ctx.Args().Tail(), " ")
 
-		return task.CreatePullReview(ctx, idx, gitea.ReviewStateApproved, comment, nil)
+		return task.CreatePullReview(ctx, idx, gitea.ReviewStateRequestChanges, comment, nil)
 	},
 	Flags: flags.AllDefaultFlags,
 }
