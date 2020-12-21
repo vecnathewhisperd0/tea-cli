@@ -1,7 +1,7 @@
 # code.gitea.io/gitea-vet v0.2.1
 code.gitea.io/gitea-vet
 code.gitea.io/gitea-vet/checks
-# code.gitea.io/sdk/gitea v0.13.3-0.20201217134952-c8e1b4c94feb
+# code.gitea.io/sdk/gitea v0.13.1-0.20201217101417-97e61e5a8a5f
 code.gitea.io/sdk/gitea
 # github.com/AlecAivazis/survey/v2 v2.2.7
 github.com/AlecAivazis/survey/v2

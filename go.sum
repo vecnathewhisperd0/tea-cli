@@ -1,7 +1,7 @@
 code.gitea.io/gitea-vet v0.2.1 h1:b30by7+3SkmiftK0RjuXqFvZg2q4p68uoPGuxhzBN0s=
 code.gitea.io/gitea-vet v0.2.1/go.mod h1:zcNbT/aJEmivCAhfmkHOlT645KNOf9W2KnkLgFjGGfE=
-code.gitea.io/sdk/gitea v0.13.3-0.20201217134952-c8e1b4c94feb h1:FTOPJxP6+jOy1OA26iYMEDpBvJDdmZbqBCFM2If0qpw=
-code.gitea.io/sdk/gitea v0.13.3-0.20201217134952-c8e1b4c94feb/go.mod h1:lee2y8LeV3kQb2iK+hHlMqoadL4bp27QOkOV/hawLKg=
+code.gitea.io/sdk/gitea v0.13.1-0.20201217101417-97e61e5a8a5f h1:v+cKQhO5BFcUVZN73CaKPgM3yudiT8U1DYetMS6l1tE=
+code.gitea.io/sdk/gitea v0.13.1-0.20201217101417-97e61e5a8a5f/go.mod h1:89WiyOX1KEcvjP66sRHdu0RafojGo60bT9UqW17VbWs=
 github.com/AlecAivazis/survey/v2 v2.2.7 h1:5NbxkF4RSKmpywYdcRgUmos1o+roJY8duCLZXbVjoig=
 github.com/AlecAivazis/survey/v2 v2.2.7/go.mod h1:9DYvHgXtiXm6nCn+jXnOXLKbH+Yo9u8fAS/SduGdoPk=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
