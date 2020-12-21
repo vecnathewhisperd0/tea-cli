@@ -6,13 +6,12 @@ package print
 
 import (
 	"strconv"
-	"time"
 
 	"code.gitea.io/sdk/gitea"
 )
 
 // TrackedTimesList print list of tracked times to stdout
-func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {
+func TrackedTimesList(times []*gitea.TrackedTime, outputType string, printTotal bool) {
 	tab := tableWithHeader(
 		"Created",
 		"Issue",
@@ -22,13 +21,6 @@ func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until
 	var totalDuration int64
 
 	for _, t := range times {
-		if !from.IsZero() && from.After(t.Created) {
-			continue
-		}
-		if !until.IsZero() && until.Before(t.Created) {
-			continue
-		}
-
 		totalDuration += t.Time
 		tab.addRow(
 			FormatTime(t.Created),

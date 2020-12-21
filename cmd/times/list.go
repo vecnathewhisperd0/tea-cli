@@ -63,45 +63,46 @@ func RunTimesList(cmd *cli.Context) error {
 
 	var times []*gitea.TrackedTime
 	var err error
-
-	user := ctx.Args().First()
-	if ctx.Bool("mine") {
-		times, _, err = client.GetMyTrackedTimes()
-	} else if user == "" {
-		// get all tracked times on the repo
-		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, gitea.ListTrackedTimesOptions{})
-	} else if strings.HasPrefix(user, "#") {
-		// get all tracked times on the specified issue
-		issue, err := utils.ArgToIndex(user)
-		if err != nil {
-			return err
-		}
-		times, _, err = client.ListIssueTrackedTimes(ctx.Owner, ctx.Repo, issue, gitea.ListTrackedTimesOptions{})
-	} else {
-		// get all tracked times by the specified user
-		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, gitea.ListTrackedTimesOptions{
-			User: user,
-		})
-	}
-
-	if err != nil {
-		return err
-	}
-
 	var from, until time.Time
-	if ctx.String("from") != "" {
+
+	if ctx.IsSet("from") {
 		from, err = dateparse.ParseLocal(ctx.String("from"))
 		if err != nil {
 			return err
 		}
 	}
-	if ctx.String("until") != "" {
+	if ctx.IsSet("until") {
 		until, err = dateparse.ParseLocal(ctx.String("until"))
 		if err != nil {
 			return err
 		}
 	}
 
-	print.TrackedTimesList(times, ctx.Output, from, until, ctx.Bool("total"))
+	opts := gitea.ListTrackedTimesOptions{Since: from, Before: until}
+
+	user := ctx.Args().First()
+	if ctx.Bool("mine") {
+		times, _, err = client.GetMyTrackedTimes()
+	} else if user == "" {
+		// get all tracked times on the repo
+		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, opts)
+	} else if strings.HasPrefix(user, "#") {
+		// get all tracked times on the specified issue
+		issue, err := utils.ArgToIndex(user)
+		if err != nil {
+			return err
+		}
+		times, _, err = client.ListIssueTrackedTimes(ctx.Owner, ctx.Repo, issue, opts)
+	} else {
+		// get all tracked times by the specified user
+		opts.User = user
+		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, opts)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	print.TrackedTimesList(times, ctx.Output, ctx.Bool("total"))
 	return nil
 }
