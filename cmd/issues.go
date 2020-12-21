@@ -63,7 +63,7 @@ func runIssueDetail(cmd *cli.Context, index string) error {
 	if issue.Comments > 0 {
 		err = interact.ShowCommentsMaybeInteractive(ctx, idx, issue.Comments)
 		if err != nil {
-			return fmt.Errorf("error loading comments: %v\n", err)
+			return fmt.Errorf("error loading comments: %v", err)
 		}
 	}
 
