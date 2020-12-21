@@ -7,7 +7,7 @@ require (
 	code.gitea.io/sdk/gitea v0.13.1-0.20201209180822-68eec69f472e
 	github.com/AlecAivazis/survey/v2 v2.2.2
 	github.com/Microsoft/go-winio v0.4.15 // indirect
-	github.com/adrg/xdg v0.2.2
+	github.com/adrg/xdg v0.2.3
 	github.com/alecthomas/chroma v0.8.1 // indirect
 	github.com/araddon/dateparse v0.0.0-20201001162425-8aadafed4dc4
 	github.com/charmbracelet/glamour v0.2.0
