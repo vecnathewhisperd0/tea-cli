@@ -125,7 +125,10 @@ func runReposSearch(cmd *cli.Context) error {
 		return err
 	}
 
-	fields, _ := flags.GetFields(cmd, nil)
+	fields, err := flags.GetFields(cmd, nil)
+	if err != nil {
+		return err
+	}
 	print.ReposList(rps, ctx.Output, fields)
 	return nil
 }

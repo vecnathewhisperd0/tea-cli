@@ -82,7 +82,7 @@ func RunReposList(cmd *cli.Context) error {
 		reposFiltered = filterReposByType(rps, typeFilter)
 	}
 
-	fields, _ := flags.GetFields(cmd, print.RepoFields)
+	fields, err := flags.GetFields(cmd, print.RepoFields)
 	if err != nil {
 		return err
 	}
