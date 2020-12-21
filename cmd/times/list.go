@@ -23,10 +23,12 @@ var CmdTrackedTimesList = cli.Command{
 	Name:    "list",
 	Aliases: []string{"ls"},
 	Action:  RunTimesList,
-	Usage:   "Operate on tracked times of a repository's issues & pulls",
-	Description: `Operate on tracked times of a repository's issues & pulls.
-		 Depending on your permissions on the repository, only your own tracked
-		 times might be listed.`,
+	Usage:   "List tracked times on issues & pulls",
+	Description: `List tracked times, across repos, or on a single repo or issue:
+- given a username all times on a repo by that user are shown,
+- given a issue index with '#' prefix, all times on that issue are listed,
+- given --mine, your times are listed across all repositories.
+Depending on your permissions on the repository, only your own tracked times might be listed.`,
 	ArgsUsage: "[username | #issue]",
 
 	Flags: append([]cli.Flag{
