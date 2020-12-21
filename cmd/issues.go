@@ -20,6 +20,7 @@ import (
 var CmdIssues = cli.Command{
 	Name:        "issues",
 	Aliases:     []string{"issue", "i"},
+	Category:    catEntities,
 	Usage:       "List, create and update issues",
 	Description: `Lists issues when called without argument. If issue index is provided, will show it in detail.`,
 	ArgsUsage:   "[<issue index>]",

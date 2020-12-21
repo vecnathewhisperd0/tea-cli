@@ -22,6 +22,7 @@ import (
 var CmdAddComment = cli.Command{
 	Name:        "comment",
 	Aliases:     []string{"c"},
+	Category:    catEntities,
 	Usage:       "Add a comment to an issue / pr",
 	Description: "Add a comment to an issue / pr",
 	ArgsUsage:   "<issue / pr index> [<comment body>]",

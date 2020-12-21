@@ -21,6 +21,7 @@ import (
 var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Aliases:     []string{"pull", "pr"},
+	Category:    catEntities,
 	Usage:       "Manage and checkout pull requests",
 	Description: `Lists PRs when called without argument. If PR index is provided, will show it in detail.`,
 	ArgsUsage:   "[<pull index>]",
