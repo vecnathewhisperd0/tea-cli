@@ -51,7 +51,7 @@ Depending on your permissions on the repository, only your own tracked times mig
 		&cli.BoolFlag{
 			Name:    "mine",
 			Aliases: []string{"m"},
-			Usage:   "Show Print the total duration at the end",
+			Usage:   "Show all times tracked by you across all repositories (overrides command arguments)",
 		},
 		&cli.StringFlag{
 			Name: "fields",
@@ -95,6 +95,7 @@ func RunTimesList(cmd *cli.Context) error {
 	} else if user == "" {
 		// get all tracked times on the repo
 		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, opts)
+		fields = []string{"created", "issue", "user", "duration"}
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
 		issue, err := utils.ArgToIndex(user)
