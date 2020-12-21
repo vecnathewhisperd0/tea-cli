@@ -24,8 +24,6 @@ require (
 	github.com/muesli/termenv v0.7.4
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/seletskiy/godiff v0.0.0-20160229093234-ad7fb8d1f905 // indirect
-	github.com/seletskiy/tplutil v0.0.0-20200921103632-f880f6245597 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli/v2 v2.3.0
