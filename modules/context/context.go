@@ -75,13 +75,16 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 	loginFlag := ctx.String("login")
 	remoteFlag := ctx.String("remote")
 
-	var repoSlug string
-	var repoPath string // empty means PWD
-	var repoFlagPathExists bool
+	var (
+		err                error
+		repoSlug           string
+		repoPath           string // empty means PWD
+		repoFlagPathExists bool
+	)
 
 	// check if repoFlag can be interpreted as path to local repo.
 	if len(repoFlag) != 0 {
-		repoFlagPathExists, err := utils.DirExists(repoFlag)
+		repoFlagPathExists, err = utils.DirExists(repoFlag)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -96,7 +99,7 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		log.Fatal(err.Error())
 	}
 
-	// if repoFlag is not a path, use it to override repoSlug
+	// if repoFlag is not a valid path, use it to override repoSlug
 	if len(repoFlag) != 0 && !repoFlagPathExists {
 		repoSlug = repoFlag
 	}
