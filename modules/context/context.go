@@ -81,7 +81,7 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 
 	// check if repoFlag can be interpreted as path to local repo.
 	if len(repoFlag) != 0 {
-		repoFlagPathExists, err := utils.PathExists(repoFlag)
+		repoFlagPathExists, err := utils.DirExists(repoFlag)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
