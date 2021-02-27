@@ -76,8 +76,8 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 	remoteFlag := ctx.String("remote")
 
 	var (
+		c                  TeaContext
 		err                error
-		repoSlug           string
 		repoPath           string // empty means PWD
 		repoFlagPathExists bool
 	)
@@ -93,38 +93,42 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		}
 	}
 
-	// try to read git repo & extract context, ignoring if PWD is not a repo
-	localRepo, login, repoSlug, err := contextFromLocalRepo(repoPath, remoteFlag)
-	if err != nil && err != gogit.ErrRepositoryNotExists {
-		log.Fatal(err.Error())
+	if len(repoFlag) == 0 || repoFlagPathExists {
+		// try to read git repo & extract context, ignoring if PWD is not a repo
+		c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag)
+		if err != nil && err != gogit.ErrRepositoryNotExists {
+			log.Fatal(err.Error())
+		}
 	}
 
-	// if repoFlag is not a valid path, use it to override repoSlug
 	if len(repoFlag) != 0 && !repoFlagPathExists {
-		repoSlug = repoFlag
+		// if repoFlag is not a valid path, use it to override repoSlug
+		c.RepoSlug = repoFlag
 	}
 
 	// override login from flag, or use default login if repo based detection failed
 	if len(loginFlag) != 0 {
-		login = config.GetLoginByName(loginFlag)
-		if login == nil {
+		c.Login = config.GetLoginByName(loginFlag)
+		if c.Login == nil {
 			log.Fatalf("Login name '%s' does not exist", loginFlag)
 		}
-	} else if login == nil {
-		if login, err = config.GetDefaultLogin(); err != nil {
+	} else if c.Login == nil {
+		if c.Login, err = config.GetDefaultLogin(); err != nil {
 			log.Fatal(err.Error())
 		}
 	}
 
 	// parse reposlug (owner falling back to login owner if reposlug contains only repo name)
-	owner, reponame := utils.GetOwnerAndRepo(repoSlug, login.User)
+	c.Owner, c.Repo = utils.GetOwnerAndRepo(c.RepoSlug, c.Login.User)
 
-	return &TeaContext{ctx, login, repoSlug, owner, reponame, ctx.String("output"), localRepo}
+	c.Context = ctx
+	c.Output = ctx.String("output")
+	return &c
 }
 
 // contextFromLocalRepo discovers login & repo slug from the default branch remote of the given local repo
-func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *config.Login, string, error) {
-	repo, err := git.RepoFromPath(repoValue)
+func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.Login, string, error) {
+	repo, err := git.RepoFromPath(repoPath)
 	if err != nil {
 		return nil, nil, "", err
 	}
