@@ -7,7 +7,7 @@ package task
 import (
 	"fmt"
 
-	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
 
 	"github.com/go-git/go-git/v5"
@@ -15,9 +15,8 @@ import (
 )
 
 // PullCheckout checkout current workdir to the head branch of specified pull request
-func PullCheckout(ctx *context.TeaContext, index int64, callback func(string) (string, error)) error {
-	client := ctx.Login.Client()
-	forceCreateBranch := ctx.Bool("branch")
+func PullCheckout(login *config.Login, repoOwner, repoName string, forceCreateBranch bool, index int64, callback func(string) (string, error)) error {
+	client := login.Client()
 
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
@@ -25,7 +24,7 @@ func PullCheckout(ctx *context.TeaContext, index int64, callback func(string) (s
 	}
 
 	// fetch PR source-localRepo & -branch from gitea
-	pr, _, err := client.GetPullRequest(ctx.Owner, ctx.Repo, index)
+	pr, _, err := client.GetPullRequest(repoOwner, repoName, index)
 	if err != nil {
 		return err
 	}
@@ -35,7 +34,7 @@ func PullCheckout(ctx *context.TeaContext, index int64, callback func(string) (s
 	}
 
 	remoteURL := pr.Head.Repository.CloneURL
-	if len(ctx.Login.SSHKey) != 0 {
+	if len(login.SSHKey) != 0 {
 		// login.SSHKey is nonempty, if user specified a key manually or we automatically
 		// found a matching private key on this machine during login creation.
 		// this means, we are very likely to have a working ssh setup.
@@ -56,7 +55,7 @@ func PullCheckout(ctx *context.TeaContext, index int64, callback func(string) (s
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, ctx.Login.Token, ctx.Login.SSHKey, callback)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
 	if err != nil {
 		return err
 	}
