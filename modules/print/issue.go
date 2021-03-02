@@ -13,11 +13,16 @@ import (
 
 // IssueDetails print an issue rendered to stdout
 func IssueDetails(issue *gitea.Issue) {
+	var labels = make([]string, len(issue.Labels))
+	for i, l := range issue.Labels {
+		labels[i] = fmt.Sprintf("`%s`", formatLabel(l, false, ""))
+	}
 	outputMarkdown(fmt.Sprintf(
-		"# #%d %s (%s)\n@%s created %s\n\n%s\n",
+		"# #%d %s (%s)\n\n%s\n\n@%s created %s\n\n%s\n",
 		issue.Index,
 		issue.Title,
 		issue.State,
+		strings.Join(labels, ", "),
 		issue.Poster.UserName,
 		FormatTime(issue.Created),
 		issue.Body,
