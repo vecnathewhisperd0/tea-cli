@@ -14,7 +14,6 @@ import (
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
-	"code.gitea.io/tea/modules/utils"
 
 	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
@@ -73,6 +72,8 @@ func runIssuesCreate(cmd *cli.Context) error {
 		client      *gitea.Client
 		milestoneID int64
 		deadline    *time.Time
+		labelIDs    []int64
+		err         error
 	)
 
 	date := ctx.String("deadline")
@@ -85,19 +86,12 @@ func runIssuesCreate(cmd *cli.Context) error {
 	}
 
 	labelNames := strings.Split(ctx.String("labels"), ",")
-	labelIDs := make([]int64, len(labelNames))
 	if len(labelNames) != 0 {
 		if client == nil {
 			client = ctx.Login.Client()
 		}
-		labels, _, err := client.ListRepoLabels(ctx.Owner, ctx.Repo, gitea.ListLabelsOptions{})
-		if err != nil {
+		if labelIDs, err = task.ResolveLabelNames(client, ctx.Owner, ctx.Repo, labelNames); err != nil {
 			return err
-		}
-		for _, l := range labels {
-			if utils.Contains(labelNames, l.Name) {
-				labelIDs = append(labelIDs, l.ID)
-			}
 		}
 	}
 
