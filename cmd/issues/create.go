@@ -5,6 +5,7 @@
 package issues
 
 import (
+	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
@@ -46,7 +47,10 @@ func runIssuesCreate(cmd *cli.Context) error {
 		ctx.Login,
 		ctx.Owner,
 		ctx.Repo,
-		ctx.String("title"),
-		ctx.String("body"),
+		gitea.CreateIssueOption{
+			Title: ctx.String("title"),
+			Body:  ctx.String("body"),
+			// Labels: []int64{4157, 4730},
+		},
 	)
 }

@@ -5,6 +5,7 @@
 package interact
 
 import (
+	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/task"
 
@@ -38,6 +39,9 @@ func CreateIssue(login *config.Login, owner, repo string) error {
 		login,
 		owner,
 		repo,
-		title,
-		description)
+		gitea.CreateIssueOption{
+			Title: title,
+			Body:  description,
+		},
+	)
 }
