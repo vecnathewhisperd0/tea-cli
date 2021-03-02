@@ -21,12 +21,12 @@ func Comments(comments []*gitea.Comment) {
 		// this will become a heading by means of the first --- from a comment
 		"Comments\n%s",
 		strings.Join(out, "\n"),
-	))
+	), comments[0].HTMLURL)
 }
 
 // Comment renders a comment to stdout
 func Comment(c *gitea.Comment) {
-	outputMarkdown(formatComment(c))
+	outputMarkdown(formatComment(c), c.HTMLURL)
 }
 
 func formatComment(c *gitea.Comment) string {

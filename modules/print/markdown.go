@@ -15,9 +15,10 @@ import (
 // outputMarkdown prints markdown to stdout, formatted for terminals.
 // If the input could not be parsed, it is printed unformatted, the error
 // is returned anyway.
-func outputMarkdown(markdown string) error {
+func outputMarkdown(markdown string, baseURL string) error {
 	renderer, err := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
+		glamour.WithBaseURL(baseURL),
 		glamour.WithWordWrap(getWordWrap()),
 	)
 	if err != nil {
