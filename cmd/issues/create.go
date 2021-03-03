@@ -5,17 +5,11 @@
 package issues
 
 import (
-	"fmt"
-	"strings"
-	"time"
-
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
 
-	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
 )
 
@@ -26,38 +20,7 @@ var CmdIssuesCreate = cli.Command{
 	Usage:       "Create an issue on repository",
 	Description: `Create an issue on repository`,
 	Action:      runIssuesCreate,
-	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:    "title",
-			Aliases: []string{"t"},
-			Usage:   "issue title to create",
-		},
-		&cli.StringFlag{
-			Name:    "body",
-			Aliases: []string{"b"},
-			Usage:   "issue body to create",
-		},
-		&cli.StringFlag{
-			Name:    "assignees",
-			Aliases: []string{"a"},
-			Usage:   "Comma separated list of usernames to assign",
-		},
-		&cli.StringFlag{
-			Name:    "deadline",
-			Aliases: []string{"D"},
-			Usage:   "Deadline timestamp to assign",
-		},
-		&cli.StringFlag{
-			Name:    "labels",
-			Aliases: []string{"L"},
-			Usage:   "Comma separated list of labels to assign",
-		},
-		&cli.StringFlag{
-			Name:    "milestone",
-			Aliases: []string{"m"},
-			Usage:   "Milestone to assign",
-		},
-	}, flags.LoginRepoFlags...),
+	Flags:       flags.IssuePREditFlags,
 }
 
 func runIssuesCreate(cmd *cli.Context) error {
@@ -68,55 +31,15 @@ func runIssuesCreate(cmd *cli.Context) error {
 		return interact.CreateIssue(ctx.Login, ctx.Owner, ctx.Repo)
 	}
 
-	var (
-		client      *gitea.Client
-		milestoneID int64
-		deadline    *time.Time
-		labelIDs    []int64
-		err         error
-	)
-
-	date := ctx.String("deadline")
-	if date != "" {
-		t, err := dateparse.ParseAny(date)
-		if err != nil {
-			return err
-		}
-		deadline = &t
-	}
-
-	labelNames := strings.Split(ctx.String("labels"), ",")
-	if len(labelNames) != 0 {
-		if client == nil {
-			client = ctx.Login.Client()
-		}
-		if labelIDs, err = task.ResolveLabelNames(client, ctx.Owner, ctx.Repo, labelNames); err != nil {
-			return err
-		}
-	}
-
-	if milestoneName := ctx.String("milestone"); len(milestoneName) != 0 {
-		if client == nil {
-			client = ctx.Login.Client()
-		}
-		ms, _, err := client.GetMilestoneByName(ctx.Owner, ctx.Repo, milestoneName)
-		if err != nil {
-			return fmt.Errorf("Milestone '%s' not found", milestoneName)
-		}
-		milestoneID = ms.ID
+	opts, err := flags.GetIssuePREditFlags(ctx)
+	if err != nil {
+		return err
 	}
 
 	return task.CreateIssue(
 		ctx.Login,
 		ctx.Owner,
 		ctx.Repo,
-		gitea.CreateIssueOption{
-			Title:     ctx.String("title"),
-			Body:      ctx.String("body"),
-			Assignees: strings.Split(ctx.String("assignees"), ","),
-			Deadline:  deadline,
-			Labels:    labelIDs,
-			Milestone: milestoneID,
-		},
+		*opts,
 	)
 }
