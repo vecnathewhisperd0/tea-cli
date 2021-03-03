@@ -27,9 +27,10 @@ func PromptPassword(name string) (pass string, err error) {
 // promptRepoSlug interactively prompts for a Gitea repository or returns the current one
 func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
 	prompt := "Target repo:"
+	defaultVal := ""
 	required := true
 	if len(defaultOwner) != 0 && len(defaultRepo) != 0 {
-		prompt = fmt.Sprintf("Target repo [%s/%s]:", defaultOwner, defaultRepo)
+		defaultVal = fmt.Sprintf("%s/%s", defaultOwner, defaultRepo)
 		required = false
 	}
 	var repoSlug string
@@ -38,7 +39,10 @@ func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err e
 	repo = defaultRepo
 
 	err = survey.AskOne(
-		&survey.Input{Message: prompt},
+		&survey.Input{
+			Message: prompt,
+			Default: defaultVal,
+		},
 		&repoSlug,
 		survey.WithValidator(func(input interface{}) error {
 			if str, ok := input.(string); ok {

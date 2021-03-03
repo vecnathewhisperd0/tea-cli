@@ -23,16 +23,13 @@ func CreatePull(login *config.Login, owner, repo string) error {
 	}
 
 	// base
-	baseBranch, err := task.GetDefaultPRBase(login, owner, repo)
+	base, err = task.GetDefaultPRBase(login, owner, repo)
 	if err != nil {
 		return err
 	}
-	promptI := &survey.Input{Message: "Target branch [" + baseBranch + "]:"}
+	promptI := &survey.Input{Message: "Target branch:", Default: base}
 	if err := survey.AskOne(promptI, &base); err != nil {
 		return err
-	}
-	if len(base) == 0 {
-		base = baseBranch
 	}
 
 	// head
@@ -45,20 +42,13 @@ func CreatePull(login *config.Login, owner, repo string) error {
 	if err == nil {
 		promptOpts = nil
 	}
-	var headOwnerInput, headBranchInput string
-	promptI = &survey.Input{Message: "Source repo owner [" + headOwner + "]:"}
-	if err := survey.AskOne(promptI, &headOwnerInput); err != nil {
+	promptI = &survey.Input{Message: "Source repo owner:", Default: headOwner}
+	if err := survey.AskOne(promptI, &headOwner); err != nil {
 		return err
 	}
-	if len(headOwnerInput) != 0 {
-		headOwner = headOwnerInput
-	}
-	promptI = &survey.Input{Message: "Source branch [" + headBranch + "]:"}
-	if err := survey.AskOne(promptI, &headBranchInput, promptOpts); err != nil {
+	promptI = &survey.Input{Message: "Source branch:", Default: headBranch}
+	if err := survey.AskOne(promptI, &headBranch, promptOpts); err != nil {
 		return err
-	}
-	if len(headBranchInput) != 0 {
-		headBranch = headBranchInput
 	}
 
 	head = task.GetHeadSpec(headOwner, headBranch, owner)
@@ -69,7 +59,7 @@ func CreatePull(login *config.Login, owner, repo string) error {
 	if len(title) != 0 {
 		promptOpts = nil
 	}
-	promptI = &survey.Input{Message: "PR title [" + title + "]:"}
+	promptI = &survey.Input{Message: "PR title:", Default: title}
 	if err := survey.AskOne(promptI, &title, promptOpts); err != nil {
 		return err
 	}
