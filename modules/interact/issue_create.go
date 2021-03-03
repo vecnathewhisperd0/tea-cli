@@ -62,12 +62,13 @@ func CreateIssue(login *config.Login, owner, repo string) error {
 	}
 	// check for custom value & prompt again with text input
 	// HACK until https://github.com/AlecAivazis/survey/issues/339 is implemented
-	if utils.Contains(assignees, customVal) {
+	if otherIndex := utils.IndexOf(assignees, customVal); otherIndex != -1 {
 		var customAssignees string
 		promptA := &survey.Input{Message: "Assignees:", Help: "comma separated usernames"}
 		if err := survey.AskOne(promptA, &customAssignees); err != nil {
 			return err
 		}
+		assignees = append(assignees[:otherIndex], assignees[otherIndex+1:]...)
 		assignees = append(assignees, strings.Split(customAssignees, ",")...)
 	}
 
