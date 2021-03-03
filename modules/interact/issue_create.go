@@ -5,8 +5,6 @@
 package interact
 
 import (
-	"time"
-
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/task"
@@ -16,29 +14,37 @@ import (
 
 // CreateIssue interactively creates an issue
 func CreateIssue(login *config.Login, owner, repo string) error {
-	var title, description, milestone string
-	var assignees, labels []string
-	var deadline *time.Time
-
-	// owner, repo
 	owner, repo, err := promptRepoSlug(owner, repo)
 	if err != nil {
 		return err
 	}
+
+	var opts gitea.CreateIssueOption
+	if err := promptIssueProperties(login, owner, repo, &opts); err != nil {
+		return err
+	}
+
+	return task.CreateIssue(login, owner, repo, opts)
+}
+
+func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.CreateIssueOption) error {
+	var milestoneName string
+	var labels []string
+	var err error
 
 	selectableChan := make(chan (issueSelectables), 1)
 	go fetchIssueSelectables(login, owner, repo, selectableChan)
 
 	// title
 	promptOpts := survey.WithValidator(survey.Required)
-	promptI := &survey.Input{Message: "Issue title:"}
-	if err := survey.AskOne(promptI, &title, promptOpts); err != nil {
+	promptI := &survey.Input{Message: "Issue title:", Default: o.Title}
+	if err = survey.AskOne(promptI, &o.Title, promptOpts); err != nil {
 		return err
 	}
 
 	// description
-	promptD := &survey.Multiline{Message: "Issue description:"}
-	if err := survey.AskOne(promptD, &description); err != nil {
+	promptD := &survey.Multiline{Message: "Issue description:", Default: o.Body}
+	if err = survey.AskOne(promptD, &o.Body); err != nil {
 		return err
 	}
 
@@ -49,43 +55,32 @@ func CreateIssue(login *config.Login, owner, repo string) error {
 	}
 
 	// assignees
-	if assignees, err = promptMultiSelect("Assignees:", selectables.Collaborators, "[other]"); err != nil {
+	if o.Assignees, err = promptMultiSelect("Assignees:", selectables.Collaborators, "[other]"); err != nil {
 		return err
 	}
 
 	// milestone
-	if milestone, err = promptSelect("Milestone:", selectables.MilestoneList, "", "[none]"); err != nil {
+	if milestoneName, err = promptSelect("Milestone:", selectables.MilestoneList, "", "[none]"); err != nil {
 		return err
 	}
+	o.Milestone = selectables.MilestoneMap[milestoneName]
 
 	// labels
-	promptL := &survey.MultiSelect{Message: "Labels:", Options: selectables.LabelList, VimMode: true}
+	promptL := &survey.MultiSelect{Message: "Labels:", Options: selectables.LabelList, VimMode: true, Default: o.Labels}
 	if err := survey.AskOne(promptL, &labels); err != nil {
 		return err
 	}
-	labelIDs := make([]int64, len(labels))
+	o.Labels = make([]int64, len(labels))
 	for i, l := range labels {
-		labelIDs[i] = selectables.LabelMap[l]
+		o.Labels[i] = selectables.LabelMap[l]
 	}
 
 	// deadline
-	if deadline, err = promptDatetime("Due date:"); err != nil {
+	if o.Deadline, err = promptDatetime("Due date:"); err != nil {
 		return err
 	}
 
-	return task.CreateIssue(
-		login,
-		owner,
-		repo,
-		gitea.CreateIssueOption{
-			Title:     title,
-			Body:      description,
-			Deadline:  deadline,
-			Assignees: assignees,
-			Milestone: selectables.MilestoneMap[milestone],
-			Labels:    labelIDs,
-		},
-	)
+	return nil
 }
 
 type issueSelectables struct {
