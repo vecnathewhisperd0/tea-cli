@@ -9,7 +9,7 @@ func Contains(haystack []string, needle string) bool {
 	return IndexOf(haystack, needle) != -1
 }
 
-// IndexOf returns the index of first occurence of needle in haystack
+// IndexOf returns the index of first occurrence of needle in haystack
 func IndexOf(haystack []string, needle string) int {
 	for i, s := range haystack {
 		if s == needle {
