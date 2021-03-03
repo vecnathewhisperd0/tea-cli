@@ -5,6 +5,7 @@
 package pulls
 
 import (
+	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
@@ -59,7 +60,9 @@ func runPullsCreate(cmd *cli.Context) error {
 		ctx.Repo,
 		ctx.String("base"),
 		ctx.String("head"),
-		ctx.String("title"),
-		ctx.String("description"),
+		&gitea.CreateIssueOption{
+			Title: ctx.String("title"),
+			Body:  ctx.String("description"),
+		},
 	)
 }

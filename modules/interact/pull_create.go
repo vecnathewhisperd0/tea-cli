@@ -5,6 +5,7 @@
 package interact
 
 import (
+	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/task"
@@ -14,7 +15,7 @@ import (
 
 // CreatePull interactively creates a PR
 func CreatePull(login *config.Login, owner, repo string) error {
-	var base, head, title, description string
+	var base, head string
 
 	// owner, repo
 	owner, repo, err := promptRepoSlug(owner, repo)
@@ -53,20 +54,8 @@ func CreatePull(login *config.Login, owner, repo string) error {
 
 	head = task.GetHeadSpec(headOwner, headBranch, owner)
 
-	// title
-	title = task.GetDefaultPRTitle(head)
-	promptOpts = survey.WithValidator(survey.Required)
-	if len(title) != 0 {
-		promptOpts = nil
-	}
-	promptI = &survey.Input{Message: "PR title:", Default: title}
-	if err := survey.AskOne(promptI, &title, promptOpts); err != nil {
-		return err
-	}
-
-	// description
-	promptM := &survey.Multiline{Message: "PR description:"}
-	if err := survey.AskOne(promptM, &description); err != nil {
+	opts := gitea.CreateIssueOption{Title: task.GetDefaultPRTitle(head)}
+	if err = promptIssueProperties(login, owner, repo, &opts); err != nil {
 		return err
 	}
 
@@ -76,6 +65,5 @@ func CreatePull(login *config.Login, owner, repo string) error {
 		repo,
 		base,
 		head,
-		title,
-		description)
+		&opts)
 }
