@@ -54,6 +54,11 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 		return selectables.Err
 	}
 
+	// skip remaining props if we don't have permission to set them
+	if !selectables.Repo.Permissions.Push {
+		return &o, nil
+	}
+
 	// assignees
 	if o.Assignees, err = promptMultiSelect("Assignees:", selectables.Collaborators, "[other]"); err != nil {
 		return err
@@ -84,6 +89,7 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 }
 
 type issueSelectables struct {
+	Repo          *gitea.Repository
 	Collaborators []string
 	MilestoneList []string
 	MilestoneMap  map[string]int64
@@ -96,6 +102,18 @@ func fetchIssueSelectables(login *config.Login, owner, repo string, done chan is
 	// TODO PERF make these calls concurrent
 	r := issueSelectables{}
 	c := login.Client()
+
+	r.Repo, _, r.Err = c.GetRepo(owner, repo)
+	if r.Err != nil {
+		done <- r
+		return
+	}
+	// we can set the following properties only if we have write access to the repo
+	// so we fastpath this if not.
+	if !r.Repo.Permissions.Push {
+		done <- r
+		return
+	}
 
 	// FIXME: this should ideally be ListAssignees(), https://github.com/go-gitea/gitea/issues/14856
 	colabs, _, err := c.ListCollaborators(owner, repo, gitea.ListCollaboratorsOptions{})
