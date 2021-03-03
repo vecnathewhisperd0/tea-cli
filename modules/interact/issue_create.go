@@ -56,7 +56,7 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 
 	// skip remaining props if we don't have permission to set them
 	if !selectables.Repo.Permissions.Push {
-		return &o, nil
+		return nil
 	}
 
 	// assignees
