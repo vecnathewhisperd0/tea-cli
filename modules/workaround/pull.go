@@ -14,7 +14,7 @@ import (
 // FixPullHeadSha is a workaround for https://github.com/go-gitea/gitea/issues/12675
 func FixPullHeadSha(client *gitea.Client, pr *gitea.PullRequest, repoOwner, repoName string) error {
 	if pr.Head != nil && pr.Head.Sha == "" {
-		fmt.Println("TRY workaround")
+		fmt.Printf("TRY workaround (resolve '%s')\n", pr.Head.Ref)
 		headCommit, resp, err := client.GetSingleCommit(repoOwner, repoName, url.PathEscape(pr.Head.Ref))
 		if resp != nil && resp.StatusCode == 404 {
 			fmt.Println("Got 404")
