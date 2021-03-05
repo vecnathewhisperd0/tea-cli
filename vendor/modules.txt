@@ -54,7 +54,7 @@ github.com/araddon/dateparse
 # github.com/charmbracelet/glamour v0.2.0
 github.com/charmbracelet/glamour
 github.com/charmbracelet/glamour/ansi
-# github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d
+# github.com/cpuguy83/go-md2man/v2 v2.0.0
 github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964
 github.com/danwakefield/fnmatch
@@ -161,12 +161,10 @@ github.com/olekukonko/tablewriter
 github.com/pmezard/go-difflib/difflib
 # github.com/rivo/uniseg v0.2.0
 github.com/rivo/uniseg
-# github.com/russross/blackfriday/v2 v2.0.1
+# github.com/russross/blackfriday/v2 v2.1.0
 github.com/russross/blackfriday/v2
 # github.com/sergi/go-diff v1.1.0
 github.com/sergi/go-diff/diffmatchpatch
-# github.com/shurcooL/sanitized_anchor_name v1.0.0
-github.com/shurcooL/sanitized_anchor_name
 # github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 github.com/skratchdot/open-golang/open
 # github.com/stretchr/testify v1.7.0
@@ -233,7 +231,7 @@ golang.org/x/tools/internal/analysisinternal
 golang.org/x/tools/internal/lsp/fuzzy
 # gopkg.in/warnings.v0 v0.1.2
 gopkg.in/warnings.v0
-# gopkg.in/yaml.v2 v2.3.0
+# gopkg.in/yaml.v2 v2.4.0
 gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 gopkg.in/yaml.v3
