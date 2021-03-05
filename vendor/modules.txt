@@ -1,7 +1,7 @@
 # code.gitea.io/gitea-vet v0.2.1
 code.gitea.io/gitea-vet
 code.gitea.io/gitea-vet/checks
-# code.gitea.io/sdk/gitea v0.13.1-0.20201217101417-97e61e5a8a5f
+# code.gitea.io/sdk/gitea v0.13.1-0.20210304201955-ff82113459b5
 code.gitea.io/sdk/gitea
 # gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 gitea.com/noerw/unidiff-comments

@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	code.gitea.io/gitea-vet v0.2.1
-	code.gitea.io/sdk/gitea v0.13.1-0.20201217101417-97e61e5a8a5f
+	code.gitea.io/sdk/gitea v0.13.1-0.20210304201955-ff82113459b5
 	gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 	github.com/AlecAivazis/survey/v2 v2.2.7
 	github.com/Microsoft/go-winio v0.4.15 // indirect
