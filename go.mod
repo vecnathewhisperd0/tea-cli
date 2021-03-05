@@ -34,3 +34,5 @@ require (
 	golang.org/x/tools v0.1.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+replace github.com/charmbracelet/glamour => github.com/noerw/glamour v0.2.1-0.20201216000957-cb1296a13ebf
