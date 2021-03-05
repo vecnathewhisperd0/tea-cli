@@ -13,9 +13,12 @@ import (
 
 // Comments renders a list of comments to stdout
 func Comments(comments []*gitea.Comment) {
-	var out = make([]string, len(comments))
 	var baseURL string
+	if len(comments) != 0 {
+		baseURL = comments[0].HTMLURL
+	}
 
+	var out = make([]string, len(comments))
 	for i, c := range comments {
 		out[i] = formatComment(c)
 		baseURL = comments[i].HTMLURL
