@@ -7,7 +7,7 @@ require (
 	code.gitea.io/sdk/gitea v0.13.1-0.20210304201955-ff82113459b5
 	gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 	github.com/AlecAivazis/survey/v2 v2.2.8
-	github.com/adrg/xdg v0.2.3
+	github.com/adrg/xdg v0.3.1
 	github.com/araddon/dateparse v0.0.0-20201001162425-8aadafed4dc4
 	github.com/charmbracelet/glamour v0.2.0
 	github.com/go-git/go-git/v5 v5.2.0
