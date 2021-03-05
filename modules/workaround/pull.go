@@ -5,6 +5,7 @@
 package workaround
 
 import (
+	"fmt"
 	"net/url"
 
 	"code.gitea.io/sdk/gitea"
@@ -13,11 +14,16 @@ import (
 // FixPullHeadSha is a workaround for https://github.com/go-gitea/gitea/issues/12675
 func FixPullHeadSha(client *gitea.Client, pr *gitea.PullRequest, repoOwner, repoName string) error {
 	if pr.Head != nil && pr.Head.Sha == "" {
+		fmt.Println("TRY workaround")
 		headCommit, resp, err := client.GetSingleCommit(repoOwner, repoName, url.PathEscape(pr.Head.Ref))
-		if err != nil && resp == nil || err != nil && resp.StatusCode != 404 {
+		if resp != nil && resp.StatusCode == 404 {
+			fmt.Println("Got 404")
+			return nil
+		} else if err != nil {
 			return err
 		}
 		if headCommit != nil {
+			fmt.Printf("Got: '%s'\n", headCommit.SHA)
 			pr.Head.Sha = headCommit.SHA
 		}
 	}
