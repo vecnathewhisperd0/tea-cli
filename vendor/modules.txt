@@ -10,6 +10,9 @@ gitea.com/noerw/unidiff-comments/types
 github.com/AlecAivazis/survey/v2
 github.com/AlecAivazis/survey/v2/core
 github.com/AlecAivazis/survey/v2/terminal
+# github.com/Microsoft/go-winio v0.4.16
+github.com/Microsoft/go-winio
+github.com/Microsoft/go-winio/pkg/guid
 # github.com/adrg/xdg v0.3.1
 github.com/adrg/xdg
 # github.com/alecthomas/chroma v0.7.3
@@ -123,15 +126,15 @@ github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
 github.com/go-git/go-git/v5/utils/merkletrie/noder
 # github.com/hashicorp/go-version v1.2.1
 github.com/hashicorp/go-version
-# github.com/imdario/mergo v0.3.9
+# github.com/imdario/mergo v0.3.11
 github.com/imdario/mergo
 # github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99
 github.com/jbenet/go-context/io
 # github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 github.com/kballard/go-shellquote
-# github.com/kevinburke/ssh_config v0.0.0-20190725054713-01f96b0aa0cd
+# github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351
 github.com/kevinburke/ssh_config
-# github.com/lucasb-eyer/go-colorful v1.0.3
+# github.com/lucasb-eyer/go-colorful v1.2.0
 github.com/lucasb-eyer/go-colorful
 # github.com/mattn/go-colorable v0.1.8
 github.com/mattn/go-colorable
@@ -152,11 +155,11 @@ github.com/muesli/reflow/padding
 github.com/muesli/reflow/wordwrap
 # github.com/muesli/termenv v0.7.4
 github.com/muesli/termenv
-# github.com/olekukonko/tablewriter v0.0.4
+# github.com/olekukonko/tablewriter v0.0.5
 github.com/olekukonko/tablewriter
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
-# github.com/rivo/uniseg v0.1.0
+# github.com/rivo/uniseg v0.2.0
 github.com/rivo/uniseg
 # github.com/russross/blackfriday/v2 v2.0.1
 github.com/russross/blackfriday/v2
@@ -170,7 +173,7 @@ github.com/skratchdot/open-golang/open
 github.com/stretchr/testify/assert
 # github.com/urfave/cli/v2 v2.3.0
 github.com/urfave/cli/v2
-# github.com/xanzy/ssh-agent v0.2.1
+# github.com/xanzy/ssh-agent v0.3.0
 github.com/xanzy/ssh-agent
 # github.com/yuin/goldmark v1.2.1
 github.com/yuin/goldmark
@@ -202,7 +205,7 @@ golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20201021035429-f5854403a974
+# golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 golang.org/x/net/context
 golang.org/x/net/html
 golang.org/x/net/html/atom
