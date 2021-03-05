@@ -54,7 +54,7 @@ github.com/alecthomas/chroma/styles
 github.com/araddon/dateparse
 # github.com/aymerick/douceur v0.2.0
 github.com/aymerick/douceur/css
-# github.com/charmbracelet/glamour v0.2.0 => github.com/noerw/glamour v0.2.1-0.20201216000957-cb1296a13ebf
+# github.com/charmbracelet/glamour v0.2.0 => github.com/noerw/glamour v0.2.1-0.20210305125354-f0a29f1de0c2
 github.com/charmbracelet/glamour
 github.com/charmbracelet/glamour/ansi
 # github.com/chris-ramon/douceur v0.2.0
@@ -180,7 +180,7 @@ github.com/stretchr/testify/assert
 github.com/urfave/cli/v2
 # github.com/xanzy/ssh-agent v0.3.0
 github.com/xanzy/ssh-agent
-# github.com/yuin/goldmark v1.2.1
+# github.com/yuin/goldmark v1.3.1
 github.com/yuin/goldmark
 github.com/yuin/goldmark/ast
 github.com/yuin/goldmark/extension

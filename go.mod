@@ -35,4 +35,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-replace github.com/charmbracelet/glamour => github.com/noerw/glamour v0.2.1-0.20201216000957-cb1296a13ebf
+replace github.com/charmbracelet/glamour => github.com/noerw/glamour v0.2.1-0.20210305125354-f0a29f1de0c2
