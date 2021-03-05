@@ -14,14 +14,18 @@ import (
 // Comments renders a list of comments to stdout
 func Comments(comments []*gitea.Comment) {
 	var out = make([]string, len(comments))
+	var baseURL string
+
 	for i, c := range comments {
 		out[i] = formatComment(c)
+		baseURL = comments[i].HTMLURL
 	}
+
 	outputMarkdown(fmt.Sprintf(
 		// this will become a heading by means of the first --- from a comment
 		"Comments\n%s",
 		strings.Join(out, "\n"),
-	), comments[0].HTMLURL)
+	), baseURL)
 }
 
 // Comment renders a comment to stdout
