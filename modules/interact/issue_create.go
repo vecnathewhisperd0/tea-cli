@@ -65,19 +65,23 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 	}
 
 	// milestone
-	if milestoneName, err = promptSelect("Milestone:", selectables.MilestoneList, "", "[none]"); err != nil {
-		return err
+	if len(selectables.MilestoneList) != 0 {
+		if milestoneName, err = promptSelect("Milestone:", selectables.MilestoneList, "", "[none]"); err != nil {
+			return err
+		}
+		o.Milestone = selectables.MilestoneMap[milestoneName]
 	}
-	o.Milestone = selectables.MilestoneMap[milestoneName]
 
 	// labels
-	promptL := &survey.MultiSelect{Message: "Labels:", Options: selectables.LabelList, VimMode: true, Default: o.Labels}
-	if err := survey.AskOne(promptL, &labels); err != nil {
-		return err
-	}
-	o.Labels = make([]int64, len(labels))
-	for i, l := range labels {
-		o.Labels[i] = selectables.LabelMap[l]
+	if len(selectables.LabelList) != 0 {
+		promptL := &survey.MultiSelect{Message: "Labels:", Options: selectables.LabelList, VimMode: true, Default: o.Labels}
+		if err := survey.AskOne(promptL, &labels); err != nil {
+			return err
+		}
+		o.Labels = make([]int64, len(labels))
+		for i, l := range labels {
+			o.Labels[i] = selectables.LabelMap[l]
+		}
 	}
 
 	// deadline
