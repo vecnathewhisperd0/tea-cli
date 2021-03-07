@@ -18,7 +18,6 @@ func FixPullHeadSha(client *gitea.Client, pr *gitea.PullRequest) error {
 	owner := pr.Base.Repository.Owner.UserName
 	repo := pr.Base.Repository.Name
 	if pr.Head != nil && pr.Head.Sha == "" {
-		fmt.Printf("TRY workaround (resolve '%s')\n", pr.Head.Ref)
 		refs, _, err := client.GetRepoRefs(owner, repo, pr.Head.Ref)
 		if err != nil {
 			return err
@@ -27,6 +26,5 @@ func FixPullHeadSha(client *gitea.Client, pr *gitea.PullRequest) error {
 		}
 		pr.Head.Sha = refs[0].Object.SHA
 	}
-	fmt.Println("SHA", pr.Head.Sha)
 	return nil
 }
