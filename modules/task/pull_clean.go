@@ -34,7 +34,7 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 	if err != nil {
 		return err
 	}
-	if err := workaround.FixPullHeadSha(client, pr, repoOwner, repoName); err != nil {
+	if err := workaround.FixPullHeadSha(client, pr); err != nil {
 		return err
 	}
 

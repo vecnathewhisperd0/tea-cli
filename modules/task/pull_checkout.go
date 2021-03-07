@@ -29,7 +29,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, forceCreateBr
 	if err != nil {
 		return err
 	}
-	if err := workaround.FixPullHeadSha(client, pr, repoOwner, repoName); err != nil {
+	if err := workaround.FixPullHeadSha(client, pr); err != nil {
 		return err
 	}
 

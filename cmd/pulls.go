@@ -66,7 +66,7 @@ func runPullDetail(cmd *cli.Context, index string) error {
 	if err != nil {
 		return err
 	}
-	if err := workaround.FixPullHeadSha(client, pr, ctx.Owner, ctx.Repo); err != nil {
+	if err := workaround.FixPullHeadSha(client, pr); err != nil {
 		return err
 	}
 
