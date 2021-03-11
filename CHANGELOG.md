@@ -15,7 +15,7 @@
 * BUGFIXES
   * Introduce workaround for missing pull head sha (#340)
   * Don't exit if we can't find a local repo with a remote matching to a login (#336)
-  * don't push before creating a pull (#334)
+  * Don't push before creating a pull (#334)
   * InitCommand() robustness (#327)
   * `tea comment`: handle piped stdin (#322)
 * ENHANCEMENTS
@@ -24,7 +24,7 @@
   * `tea pr checkout`: dont create local branches (#314)
   * Add `tea issues --fields`, allow printing labels (#312)
   * Show PR CI status (#306)
-  * make PR workflow helpers more robust (#300)
+  * Make PR workflow helpers more robust (#300)
 
 ## [v0.6.0](https://gitea.com/gitea/tea/releases/tag/v0.6.0) - 2020-12-11
 
