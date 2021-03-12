@@ -20,6 +20,7 @@
   * `tea comment`: handle piped stdin (#322)
 * ENHANCEMENTS
   * Allow checking out PRs with deleted head branch (#341)
+  * Markdown renderer: detect terminal width, resolve relative URLs (#332)
   * Add more issue / pr creation parameters (#331)
   * Improve `tea time` (#319)
   * `tea pr checkout`: dont create local branches (#314)
