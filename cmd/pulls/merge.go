@@ -27,6 +27,17 @@ var CmdPullsMerge = cli.Command{
 			Name:    "style",
 			Aliases: []string{"s"},
 			Usage:   "Kind of merge to perform: merge, rebase, squash, rebase-merge",
+			Value:   "merge",
+		},
+		&cli.StringFlag{
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "Merge commit title",
+		},
+		&cli.StringFlag{
+			Name:    "message",
+			Aliases: []string{"m"},
+			Usage:   "Merge commit message",
 		},
 	}, flags.AllDefaultFlags...),
 	Action: func(cmd *cli.Context) error {
@@ -43,7 +54,9 @@ var CmdPullsMerge = cli.Command{
 		}
 
 		success, _, err := ctx.Login.Client().MergePullRequest(ctx.Owner, ctx.Repo, idx, gitea.MergePullRequestOption{
-			Style: gitea.MergeStyle(ctx.String("style")),
+			Style:   gitea.MergeStyle(ctx.String("style")),
+			Title:   ctx.String("title"),
+			Message: ctx.String("message"),
 		})
 
 		if err != nil {
