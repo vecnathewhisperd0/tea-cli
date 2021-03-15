@@ -21,9 +21,6 @@ endif
 GOFILES := $(shell find . -name "*.go" -type f ! -path "./vendor/*" ! -path "*/bindata.go")
 GOFMT ?= gofmt -s
 
-GOFLAGS := -i -v
-EXTRA_GOFLAGS ?=
-
 MAKE_VERSION := $(shell make -v | head -n 1)
 
 ifneq ($(DRONE_TAG),)
@@ -38,12 +35,21 @@ else
 	TEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 endif
 
+TAGS ?=
+TAGS_STATIC := osusergo,netgo,static_build,$(TAGS)
+
 LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)"
+LDFLAGS_STATIC := $(LDFLAGS) -extldflags "-fno-PIC -static" -s -w
+
+GOFLAGS := -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
+# TODO: clean this mess up when there are news on https://github.com/golang/go/issues/26492
+GOFLAGS_STATIC_GOX := $(GOFLAGS) -tags '$(TAGS_STATIC)' -ldflags '$(LDFLAGS_STATIC) -s -w'
+ifeq ($(STATIC),true)
+	GOFLAGS := $(GOFLAGS_STATIC_GOX) -buildmode=pie
+endif
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
 SOURCES ?= $(shell find . -name "*.go" -type f)
-
-TAGS ?=
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := tea.exe
@@ -130,14 +136,15 @@ test-vendor: vendor
 check: test
 
 .PHONY: install
-install: $(wildcard *.go)
-	$(GO) install -mod=vendor -v -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)'
+install: $(SOURCES)
+	@echo "installing to $(GOPATH)/bin/$(EXECUTABLE)"
+	$(GO) install -v $(GOFLAGS)
 
 .PHONY: build
 build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES)
-	$(GO) build -mod=vendor $(GOFLAGS) $(EXTRA_GOFLAGS) -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -o $@
+	$(GO) build -v $(GOFLAGS) -o $@
 
 .PHONY: release
 release: release-dirs release-os release-compress release-check
@@ -151,7 +158,7 @@ release-os:
 	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u github.com/mitchellh/gox; \
 	fi
-	CGO_ENABLED=0 gox -verbose -cgo=false -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
+	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS_STATIC_GOX) -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
 release-compress:
