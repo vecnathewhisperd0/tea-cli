@@ -2,26 +2,19 @@ ARG GOVERSION="1.16.2"
 
 FROM golang:${GOVERSION}-alpine AS buildenv
 
-ARG REPO="https://gitea.com/gitea/tea.git"
-
 ARG VERSION="0.7.0"
 ENV TEA_VERSION="${VERSION}"
 
 ARG CGO_ENABLED="0"
 ARG GOOS="linux"
 
-ARG BUILD_DATE
-
+COPY . $GOPATH/src/
 WORKDIR $GOPATH/src
 
-RUN	apk add --quiet --no-cache git && \
-	git config --global advice.detachedHead false && \
-	git clone --single-branch ${REPO} -b v${TEA_VERSION} . && \
-	go get -v . && \
+RUN	go get -v . && \
 	go build -v -a -ldflags "-X main.Version=${TEA_VERSION}" -o /tea .
 
 FROM scratch
-ARG BUILD_DATE
 ARG VERSION="0.7.0"
 LABEL org.opencontainers.image.title="tea - CLI for Gitea - git with a cup of tea"
 LABEL org.opencontainers.image.description="A command line tool to interact with Gitea servers"
