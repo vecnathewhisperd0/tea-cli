@@ -1,27 +1,13 @@
 DIST := dist
-IMPORT := code.gitea.io/tea
 export GO111MODULE=on
 
 GO ?= go
-SED_INPLACE := sed -i
 SHASUM ?= shasum -a 256
 
 export PATH := $($(GO) env GOPATH)/bin:$(PATH)
 
-ifeq ($(OS), Windows_NT)
-	EXECUTABLE := tea.exe
-else
-	EXECUTABLE := tea
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Darwin)
-		SED_INPLACE := sed -i ''
-	endif
-endif
-
 GOFILES := $(shell find . -name "*.go" -type f ! -path "./vendor/*" ! -path "*/bindata.go")
 GOFMT ?= gofmt -s
-
-MAKE_VERSION := $(shell make -v | head -n 1)
 
 ifneq ($(DRONE_TAG),)
 	VERSION ?= $(subst v,,$(DRONE_TAG))
@@ -56,9 +42,6 @@ ifeq ($(OS), Windows_NT)
 else
 	EXECUTABLE := tea
 endif
-
-# $(call strip-suffix,filename)
-strip-suffix = $(firstword $(subst ., ,$(1)))
 
 .PHONY: all
 all: build
