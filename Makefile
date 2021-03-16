@@ -143,7 +143,7 @@ $(EXECUTABLE): $(SOURCES)
 
 .PHONY: build-image
 build-image:
-	podman build --build-arg VERSION=$(TEA_VERSION) -t gitea/tea:$(TEA_VERSION_TAG) .
+	docker build --build-arg VERSION=$(TEA_VERSION) -t gitea/tea:$(TEA_VERSION_TAG) .
 
 .PHONY: release
 release: release-dirs release-os release-compress release-check
