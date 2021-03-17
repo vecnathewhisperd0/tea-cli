@@ -1,5 +1,6 @@
 DIST := dist
 export GO111MODULE=on
+export CGO_ENABLED=0
 
 GO ?= go
 SHASUM ?= shasum -a 256
@@ -24,14 +25,17 @@ endif
 TAGS ?=
 TAGS_STATIC := osusergo,netgo,static_build,$(TAGS)
 
-LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)"
-LDFLAGS_STATIC := $(LDFLAGS) -extldflags "-fno-PIC -static" -s -w
-
+LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)" -s -w
 GOFLAGS := -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
+
 # TODO: clean this mess up when there are news on https://github.com/golang/go/issues/26492
-GOFLAGS_STATIC_GOX := $(GOFLAGS) -tags '$(TAGS_STATIC)' -ldflags '$(LDFLAGS_STATIC) -s -w'
+# note: -buildmode=pie is incompatible with static builds as of go 1.16!
+LDFLAGS_STATIC := $(LDFLAGS) -extldflags "-fno-PIC -static" -X "main.Tags=$(TAGS_STATIC)"
+GOFLAGS_STATIC := $(GOFLAGS) -tags '$(TAGS_STATIC)' -ldflags '$(LDFLAGS_STATIC)'
 ifeq ($(STATIC),true)
-	GOFLAGS := $(GOFLAGS_STATIC_GOX) -buildmode=pie
+	GOFLAGS := $(GOFLAGS_STATIC) -a
+else
+	GOFLAGS := $(GOFLAGS) -buildmode=pie
 endif
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
@@ -141,7 +145,7 @@ release-os:
 	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u github.com/mitchellh/gox; \
 	fi
-	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS_STATIC_GOX) -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
+	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS_STATIC) -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
 release-compress:
