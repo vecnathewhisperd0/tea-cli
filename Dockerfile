@@ -2,17 +2,16 @@ ARG GOVERSION="1.16.2"
 
 FROM golang:${GOVERSION}-alpine AS buildenv
 
-ARG VERSION="0.7.0"
-ENV TEA_VERSION="${VERSION}"
-
 ARG CGO_ENABLED="0"
 ARG GOOS="linux"
 
 COPY . $GOPATH/src/
 WORKDIR $GOPATH/src
 
-RUN	go get -v . && \
-	go build -v -a -ldflags "-X main.Version=${TEA_VERSION}" -o /tea .
+RUN	apk add --quiet --no-cache \
+		make \
+		git && \
+	make build
 
 FROM scratch
 ARG VERSION="0.7.0"
@@ -21,6 +20,6 @@ LABEL org.opencontainers.image.description="A command line tool to interact with
 LABEL org.opencontainers.image.version="${VERSION}"
 LABEL org.opencontainers.image.authors="Tamás Gérczei <tamas@gerczei.eu>"
 LABEL org.opencontainers.image.vendor="The Gitea Authors"
-COPY --from=buildenv /tea /
+COPY --from=buildenv /go/src/tea /
 ENV HOME="/app"
 ENTRYPOINT ["/tea"]
