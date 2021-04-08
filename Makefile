@@ -21,6 +21,8 @@ else
 	endif
 	TEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 endif
+TEA_VERSION_TAG ?= $(shell sed 's/+/_/' <<< $(TEA_VERSION))
+
 
 TAGS ?=
 TAGS_STATIC := osusergo,netgo,static_build,$(TAGS)
@@ -132,6 +134,10 @@ build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES)
 	$(GO) build -v $(GOFLAGS) -o $@
+
+.PHONY: build-image
+build-image:
+	docker build --build-arg VERSION=$(TEA_VERSION) -t gitea/tea:$(TEA_VERSION_TAG) .
 
 .PHONY: release
 release: release-dirs release-os release-compress release-check
