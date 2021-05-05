@@ -112,7 +112,7 @@ func OpenFileInEditor(filename string) error {
 		editor = os.Getenv("EDITOR")
 		if editor == "" {
 			fmt.Println("No $VISUAL or $EDITOR env is set, defaulting to vim")
-			editor = "vim"
+			editor = "vi"
 		}
 	}
 
