@@ -34,7 +34,7 @@ ifeq ($(STATIC),true)
 endif
 
 # override to allow passing additional goflags via make CLI
-override GOFLAGS := $(GOFLAGS) -mod=vendor -buildmode=pie -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
+override GOFLAGS := $(GOFLAGS) -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
 SOURCES ?= $(shell find . -name "*.go" -type f)
@@ -123,7 +123,7 @@ check: test
 .PHONY: install
 install: $(SOURCES)
 	@echo "installing to $(GOPATH)/bin/$(EXECUTABLE)"
-	$(GO) install -v $(GOFLAGS)
+	$(GO) install -v -buildmode=pie $(GOFLAGS) 
 
 .PHONY: build
 build: $(EXECUTABLE)
@@ -132,7 +132,7 @@ $(EXECUTABLE): $(SOURCES)
 ifeq ($(STATIC),true)
 	@echo "enabling static build, make sure you have glibc-static (or equivalent) installed"
 endif
-	$(GO) build $(GOFLAGS) -o $@
+	$(GO) build -buildmode=pie $(GOFLAGS) -o $@
 
 .PHONY: build-image
 build-image:
@@ -150,7 +150,7 @@ release-os:
 	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u github.com/mitchellh/gox; \
 	fi
-	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS_STATIC) -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
+	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
 release-compress:
