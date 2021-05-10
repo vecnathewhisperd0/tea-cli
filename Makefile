@@ -28,6 +28,7 @@ LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)" -s -w
 
 ifeq ($(STATIC),true)
 	# NOTE: clean up this mess, when https://github.com/golang/go/issues/26492 is resolved
+	# static_build is a defacto standard tag used in go packages
 	TAGS := osusergo,netgo,static_build,$(TAGS)
 	LDFLAGS := $(LDFLAGS) -linkmode=external -extldflags "-static-pie" -X "main.Tags=$(TAGS)"
 	export CGO_ENABLED=1 # needed for linkmode=external
@@ -150,7 +151,7 @@ release-os:
 	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u github.com/mitchellh/gox; \
 	fi
-	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
+	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
 release-compress:
