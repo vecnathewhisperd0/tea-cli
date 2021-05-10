@@ -23,20 +23,18 @@ else
 endif
 TEA_VERSION_TAG ?= $(shell sed 's/+/_/' <<< $(TEA_VERSION))
 
-
 TAGS ?=
-TAGS_STATIC := osusergo,netgo,static_build,$(TAGS)
-
 LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)" -s -w
-GOFLAGS := -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -buildmode=pie
 
-# TODO: clean up this mess, when there is news on https://github.com/golang/go/issues/26492
-LDFLAGS_STATIC := $(LDFLAGS) -linkmode=external -extldflags "-static-pie" -X "main.Tags=$(TAGS_STATIC)"
-GOFLAGS_STATIC := -tags '$(TAGS_STATIC)' -ldflags '$(LDFLAGS_STATIC)'
 ifeq ($(STATIC),true)
-	GOFLAGS := $(GOFLAGS_STATIC)
-	export CGO_ENABLED=1
+	# NOTE: clean up this mess, when https://github.com/golang/go/issues/26492 is resolved
+	TAGS := osusergo,netgo,static_build,$(TAGS)
+	LDFLAGS := $(LDFLAGS) -linkmode=external -extldflags "-static-pie" -X "main.Tags=$(TAGS)"
+	export CGO_ENABLED=1 # needed for linkmode=external
 endif
+
+# override to allow passing additional goflags via make CLI
+override GOFLAGS := $(GOFLAGS) -mod=vendor -buildmode=pie -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
 SOURCES ?= $(shell find . -name "*.go" -type f)
