@@ -28,16 +28,14 @@ TAGS ?=
 TAGS_STATIC := osusergo,netgo,static_build,$(TAGS)
 
 LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)" -s -w
-GOFLAGS := -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
+GOFLAGS := -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -buildmode=pie
 
-# TODO: clean this mess up when there are news on https://github.com/golang/go/issues/26492
-# note: -buildmode=pie is incompatible with static builds as of go 1.16!
-LDFLAGS_STATIC := $(LDFLAGS) -extldflags "-fno-PIC -static" -X "main.Tags=$(TAGS_STATIC)"
-GOFLAGS_STATIC := $(GOFLAGS) -tags '$(TAGS_STATIC)' -ldflags '$(LDFLAGS_STATIC)'
+# TODO: clean up this mess, when there is news on https://github.com/golang/go/issues/26492
+LDFLAGS_STATIC := $(LDFLAGS) -linkmode=external -extldflags "-static-pie" -X "main.Tags=$(TAGS_STATIC)"
+GOFLAGS_STATIC := -tags '$(TAGS_STATIC)' -ldflags '$(LDFLAGS_STATIC)'
 ifeq ($(STATIC),true)
-	GOFLAGS := $(GOFLAGS_STATIC) -a
-else
-	GOFLAGS := $(GOFLAGS) -buildmode=pie
+	GOFLAGS := $(GOFLAGS_STATIC)
+	export CGO_ENABLED=1
 endif
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
@@ -133,7 +131,10 @@ install: $(SOURCES)
 build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES)
-	$(GO) build -v $(GOFLAGS) -o $@
+ifeq ($(STATIC),true)
+	@echo "enabling static build, make sure you have glibc-static (or equivalent) installed"
+endif
+	$(GO) build $(GOFLAGS) -o $@
 
 .PHONY: build-image
 build-image:
