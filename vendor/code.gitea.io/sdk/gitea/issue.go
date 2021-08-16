@@ -39,12 +39,10 @@ type Issue struct {
 	OriginalAuthorID int64      `json:"original_author_id"`
 	Title            string     `json:"title"`
 	Body             string     `json:"body"`
+	Ref              string     `json:"ref"`
 	Labels           []*Label   `json:"labels"`
 	Milestone        *Milestone `json:"milestone"`
-	// deprecated
-	// TODO: rm on sdk 0.15.0
-	Assignee  *User   `json:"assignee"`
-	Assignees []*User `json:"assignees"`
+	Assignees        []*User    `json:"assignees"`
 	// Whether the issue is open or closed
 	State       StateType        `json:"state"`
 	IsLocked    bool             `json:"is_locked"`
@@ -65,6 +63,14 @@ type ListIssueOption struct {
 	Labels     []string
 	Milestones []string
 	KeyWord    string
+	Since      time.Time
+	Before     time.Time
+	// filter by created by username
+	CreatedBy string
+	// filter by assigned to username
+	AssignedBy string
+	// filter by username mentioned
+	MentionedBy string
 }
 
 // StateType issue state type
@@ -113,6 +119,23 @@ func (opt *ListIssueOption) QueryEncode() string {
 		query.Add("milestones", strings.Join(opt.Milestones, ","))
 	}
 
+	if !opt.Since.IsZero() {
+		query.Add("since", opt.Since.Format(time.RFC3339))
+	}
+	if !opt.Before.IsZero() {
+		query.Add("before", opt.Before.Format(time.RFC3339))
+	}
+
+	if len(opt.CreatedBy) > 0 {
+		query.Add("created_by", opt.CreatedBy)
+	}
+	if len(opt.AssignedBy) > 0 {
+		query.Add("assigned_by", opt.AssignedBy)
+	}
+	if len(opt.MentionedBy) > 0 {
+		query.Add("mentioned_by", opt.MentionedBy)
+	}
+
 	return query.Encode()
 }
 
@@ -139,6 +162,9 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 
 // ListRepoIssues returns all issues for a given repository
 func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Issue, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	opt.setDefaults()
 	issues := make([]*Issue, 0, opt.PageSize)
 
@@ -160,6 +186,9 @@ func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Iss
 
 // GetIssue returns a single issue for a given repository
 func (c *Client) GetIssue(owner, repo string, index int64) (*Issue, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	issue := new(Issue)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index), nil, nil, issue)
 	if e := c.checkServerVersionGreaterThanOrEqual(version1_12_0); e != nil && issue.Repository != nil {
@@ -171,10 +200,9 @@ func (c *Client) GetIssue(owner, repo string, index int64) (*Issue, *Response, e
 
 // CreateIssueOption options to create one issue
 type CreateIssueOption struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
-	// username of assignee
-	Assignee  string     `json:"assignee"`
+	Title     string     `json:"title"`
+	Body      string     `json:"body"`
+	Ref       string     `json:"ref"`
 	Assignees []string   `json:"assignees"`
 	Deadline  *time.Time `json:"due_date"`
 	// milestone id
@@ -194,6 +222,9 @@ func (opt CreateIssueOption) Validate() error {
 
 // CreateIssue create a new issue for a given repository
 func (c *Client) CreateIssue(owner, repo string, opt CreateIssueOption) (*Issue, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := opt.Validate(); err != nil {
 		return nil, nil, err
 	}
@@ -210,13 +241,14 @@ func (c *Client) CreateIssue(owner, repo string, opt CreateIssueOption) (*Issue,
 
 // EditIssueOption options for editing an issue
 type EditIssueOption struct {
-	Title     string     `json:"title"`
-	Body      *string    `json:"body"`
-	Assignee  *string    `json:"assignee"`
-	Assignees []string   `json:"assignees"`
-	Milestone *int64     `json:"milestone"`
-	State     *StateType `json:"state"`
-	Deadline  *time.Time `json:"due_date"`
+	Title          string     `json:"title"`
+	Body           *string    `json:"body"`
+	Ref            *string    `json:"ref"`
+	Assignees      []string   `json:"assignees"`
+	Milestone      *int64     `json:"milestone"`
+	State          *StateType `json:"state"`
+	Deadline       *time.Time `json:"due_date"`
+	RemoveDeadline *bool      `json:"unset_due_date"`
 }
 
 // Validate the EditIssueOption struct
@@ -229,6 +261,9 @@ func (opt EditIssueOption) Validate() error {
 
 // EditIssue modify an existing issue for a given repository
 func (c *Client) EditIssue(owner, repo string, index int64, opt EditIssueOption) (*Issue, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := opt.Validate(); err != nil {
 		return nil, nil, err
 	}
@@ -246,6 +281,8 @@ func (c *Client) EditIssue(owner, repo string, index int64, opt EditIssueOption)
 
 func (c *Client) issueBackwardsCompatibility(issue *Issue) {
 	if c.checkServerVersionGreaterThanOrEqual(version1_12_0) != nil {
+		c.mutex.RLock()
 		issue.HTMLURL = fmt.Sprintf("%s/%s/issues/%d", c.url, issue.Repository.FullName, issue.Index)
+		c.mutex.RUnlock()
 	}
 }

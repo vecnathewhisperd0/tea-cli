@@ -38,42 +38,36 @@ func (r TeaRepo) TeaCreateBranch(localBranchName, remoteBranchName, remoteName s
 }
 
 // TeaCheckout checks out the given branch in the worktree.
-func (r TeaRepo) TeaCheckout(branchName string) error {
+func (r TeaRepo) TeaCheckout(ref git_plumbing.ReferenceName) error {
 	tree, err := r.Worktree()
 	if err != nil {
 		return err
 	}
-	localBranchRefName := git_plumbing.NewBranchReferenceName(branchName)
-	return tree.Checkout(&git.CheckoutOptions{Branch: localBranchRefName})
+	return tree.Checkout(&git.CheckoutOptions{Branch: ref})
 }
 
-// TeaDeleteBranch removes the given branch locally, and if `remoteBranch` is
-// not empty deletes it at it's remote repo.
-func (r TeaRepo) TeaDeleteBranch(branch *git_config.Branch, remoteBranch string, auth git_transport.AuthMethod) error {
+// TeaDeleteLocalBranch removes the given branch locally
+func (r TeaRepo) TeaDeleteLocalBranch(branch *git_config.Branch) error {
 	err := r.DeleteBranch(branch.Name)
 	// if the branch is not found that's ok, as .git/config may have no entry if
 	// no remote tracking branch is configured for it (eg push without -u flag)
 	if err != nil && err.Error() != "branch not found" {
 		return err
 	}
-	err = r.Storer.RemoveReference(git_plumbing.NewBranchReferenceName(branch.Name))
-	if err != nil {
-		return err
-	}
+	return r.Storer.RemoveReference(git_plumbing.NewBranchReferenceName(branch.Name))
+}
 
-	if remoteBranch != "" {
-		// delete remote branch via git protocol:
-		// an empty source in the refspec means remote deletion to git 🙃
-		refspec := fmt.Sprintf(":%s", git_plumbing.NewBranchReferenceName(remoteBranch))
-		err = r.Push(&git.PushOptions{
-			RemoteName: branch.Remote,
-			RefSpecs:   []git_config.RefSpec{git_config.RefSpec(refspec)},
-			Prune:      true,
-			Auth:       auth,
-		})
-	}
-
-	return err
+// TeaDeleteRemoteBranch removes the given branch on the given remote via git protocol
+func (r TeaRepo) TeaDeleteRemoteBranch(remoteName, remoteBranch string, auth git_transport.AuthMethod) error {
+	// delete remote branch via git protocol:
+	// an empty source in the refspec means remote deletion to git 🙃
+	refspec := fmt.Sprintf(":%s", git_plumbing.NewBranchReferenceName(remoteBranch))
+	return r.Push(&git.PushOptions{
+		RemoteName: remoteName,
+		RefSpecs:   []git_config.RefSpec{git_config.RefSpec(refspec)},
+		Prune:      true,
+		Auth:       auth,
+	})
 }
 
 // TeaFindBranchBySha returns a branch that is at the the given SHA and syncs to the
@@ -229,5 +223,5 @@ func (r TeaRepo) TeaGetCurrentBranchName() (string, error) {
 		return "", fmt.Errorf("active ref is no branch")
 	}
 
-	return strings.TrimPrefix(localHead.Name().String(), "refs/heads/"), nil
+	return localHead.Name().Short(), nil
 }

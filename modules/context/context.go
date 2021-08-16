@@ -20,21 +20,28 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	errNotAGiteaRepo = errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
+)
+
 // TeaContext contains all context derived during command initialization and wraps cli.Context
 type TeaContext struct {
 	*cli.Context
-	Login     *config.Login
-	RepoSlug  string       // <owner>/<repo>
-	Owner     string       // repo owner as derived from context
-	Repo      string       // repo name as derived from context or provided in flag
-	Output    string       // value of output flag
-	LocalRepo *git.TeaRepo // maybe, we have opened it already anyway
+	Login     *config.Login // config data & client for selected login
+	RepoSlug  string        // <owner>/<repo>, optional
+	Owner     string        // repo owner as derived from context or provided in flag, optional
+	Repo      string        // repo name as derived from context or provided in flag, optional
+	Output    string        // value of output flag
+	LocalRepo *git.TeaRepo  // is set if flags specified a local repo via --repo, or if $PWD is a git repo
 }
 
 // GetListOptions return ListOptions based on PaginationFlags
 func (ctx *TeaContext) GetListOptions() gitea.ListOptions {
 	page := ctx.Int("page")
 	limit := ctx.Int("limit")
+	if limit < 0 {
+		limit = 0
+	}
 	if limit != 0 && page == 0 {
 		page = 1
 	}
@@ -75,14 +82,16 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 	loginFlag := ctx.String("login")
 	remoteFlag := ctx.String("remote")
 
-	var repoSlug string
-	var repoPath string // empty means PWD
-	var repoFlagPathExists bool
+	var (
+		c                  TeaContext
+		err                error
+		repoPath           string // empty means PWD
+		repoFlagPathExists bool
+	)
 
 	// check if repoFlag can be interpreted as path to local repo.
 	if len(repoFlag) != 0 {
-		repoFlagPathExists, err := utils.PathExists(repoFlag)
-		if err != nil {
+		if repoFlagPathExists, err = utils.DirExists(repoFlag); err != nil {
 			log.Fatal(err.Error())
 		}
 		if repoFlagPathExists {
@@ -90,38 +99,53 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		}
 	}
 
-	// try to read git repo & extract context, ignoring if PWD is not a repo
-	localRepo, login, repoSlug, err := contextFromLocalRepo(repoPath, remoteFlag)
-	if err != nil && err != gogit.ErrRepositoryNotExists {
-		log.Fatal(err.Error())
+	if len(repoFlag) == 0 || repoFlagPathExists {
+		// try to read git repo & extract context, ignoring if PWD is not a repo
+		if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
+			if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
+				// we can deal with that, commands needing the optional values use ctx.Ensure()
+			} else {
+				log.Fatal(err.Error())
+			}
+		}
 	}
 
-	// if repoFlag is not a path, use it to override repoSlug
 	if len(repoFlag) != 0 && !repoFlagPathExists {
-		repoSlug = repoFlag
+		// if repoFlag is not a valid path, use it to override repoSlug
+		c.RepoSlug = repoFlag
 	}
 
 	// override login from flag, or use default login if repo based detection failed
 	if len(loginFlag) != 0 {
-		login = config.GetLoginByName(loginFlag)
-		if login == nil {
+		c.Login = config.GetLoginByName(loginFlag)
+		if c.Login == nil {
 			log.Fatalf("Login name '%s' does not exist", loginFlag)
 		}
-	} else if login == nil {
-		if login, err = config.GetDefaultLogin(); err != nil {
-			log.Fatal(err.Error())
+	} else if c.Login == nil {
+		if c.Login, err = config.GetDefaultLogin(); err != nil {
+			if err.Error() == "No available login" {
+				// TODO: maybe we can directly start interact.CreateLogin() (only if
+				// we're sure we can interactively!), as gh cli does.
+				fmt.Println(`No gitea login configured. To start using tea, first run
+  tea login add
+and then run your command again.`)
+			}
+			os.Exit(1)
 		}
+		fmt.Printf("NOTE: no gitea login detected, falling back to login '%s'\n", c.Login.Name)
 	}
 
 	// parse reposlug (owner falling back to login owner if reposlug contains only repo name)
-	owner, reponame := utils.GetOwnerAndRepo(repoSlug, login.User)
+	c.Owner, c.Repo = utils.GetOwnerAndRepo(c.RepoSlug, c.Login.User)
 
-	return &TeaContext{ctx, login, repoSlug, owner, reponame, ctx.String("output"), localRepo}
+	c.Context = ctx
+	c.Output = ctx.String("output")
+	return &c
 }
 
 // contextFromLocalRepo discovers login & repo slug from the default branch remote of the given local repo
-func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *config.Login, string, error) {
-	repo, err := git.RepoFromPath(repoValue)
+func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.Login, string, error) {
+	repo, err := git.RepoFromPath(repoPath)
 	if err != nil {
 		return nil, nil, "", err
 	}
@@ -180,5 +204,5 @@ func contextFromLocalRepo(repoValue, remoteValue string) (*git.TeaRepo, *config.
 		}
 	}
 
-	return repo, nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
+	return repo, nil, "", errNotAGiteaRepo
 }

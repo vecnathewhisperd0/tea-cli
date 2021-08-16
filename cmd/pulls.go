@@ -7,11 +7,12 @@ package cmd
 import (
 	"fmt"
 
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/pulls"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
+	"code.gitea.io/tea/modules/workaround"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -21,16 +22,28 @@ import (
 var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Aliases:     []string{"pull", "pr"},
-	Usage:       "List, create, checkout and clean pull requests",
-	Description: `List, create, checkout and clean pull requests`,
+	Category:    catEntities,
+	Usage:       "Manage and checkout pull requests",
+	Description: `Lists PRs when called without argument. If PR index is provided, will show it in detail.`,
 	ArgsUsage:   "[<pull index>]",
 	Action:      runPulls,
-	Flags:       flags.IssuePRFlags,
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:  "comments",
+			Usage: "Wether to display comments (will prompt if not provided & run interactively)",
+		},
+	}, pulls.CmdPullsList.Flags...),
 	Subcommands: []*cli.Command{
 		&pulls.CmdPullsList,
 		&pulls.CmdPullsCheckout,
 		&pulls.CmdPullsClean,
 		&pulls.CmdPullsCreate,
+		&pulls.CmdPullsClose,
+		&pulls.CmdPullsReopen,
+		&pulls.CmdPullsReview,
+		&pulls.CmdPullsApprove,
+		&pulls.CmdPullsReject,
+		&pulls.CmdPullsMerge,
 	},
 }
 
@@ -54,6 +67,9 @@ func runPullDetail(cmd *cli.Context, index string) error {
 	if err != nil {
 		return err
 	}
+	if err := workaround.FixPullHeadSha(client, pr); err != nil {
+		return err
+	}
 
 	reviews, _, err := client.ListPullReviews(ctx.Owner, ctx.Repo, idx, gitea.ListPullReviewsOptions{})
 	if err != nil {
@@ -66,5 +82,13 @@ func runPullDetail(cmd *cli.Context, index string) error {
 	}
 
 	print.PullDetails(pr, reviews, ci)
+
+	if pr.Comments > 0 {
+		err = interact.ShowCommentsMaybeInteractive(ctx, idx, pr.Comments)
+		if err != nil {
+			fmt.Printf("error loading comments: %v\n", err)
+		}
+	}
+
 	return nil
 }

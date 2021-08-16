@@ -19,9 +19,10 @@ import (
 var CmdAutocomplete = cli.Command{
 	Name:        "shellcompletion",
 	Aliases:     []string{"autocomplete"},
+	Category:    catSetup,
 	Usage:       "Install shell completion for tea",
 	Description: "Install shell completion for tea",
-	ArgsUsage:   "<shell type> (bash, zsh, powershell)",
+	ArgsUsage:   "<shell type> (bash, zsh, powershell, fish)",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:  "install",
@@ -39,20 +40,26 @@ func runAutocompleteAdd(ctx *cli.Context) error {
 	case "zsh":
 		remoteFile = "contrib/autocomplete.zsh"
 		localFile = "autocomplete.zsh"
-		cmds = "echo 'PROG=tea _CLI_ZSH_AUTOCOMPLETE_HACK=1 source %s' >> ~/.zshrc && source ~/.zshrc"
+		cmds = "echo 'PROG=tea _CLI_ZSH_AUTOCOMPLETE_HACK=1 source \"%s\"' >> ~/.zshrc && source ~/.zshrc"
 
 	case "bash":
 		remoteFile = "contrib/autocomplete.sh"
 		localFile = "autocomplete.sh"
-		cmds = "echo 'PROG=tea source %s' >> ~/.bashrc && source ~/.bashrc"
+		cmds = "echo 'PROG=tea source \"%s\"' >> ~/.bashrc && source ~/.bashrc"
 
 	case "powershell":
 		remoteFile = "contrib/autocomplete.ps1"
 		localFile = "tea.ps1"
 		cmds = "\"& %s\" >> $profile"
 
+	case "fish":
+		// fish is different, in that urfave/cli provides a generator for the shell script needed.
+		// this also means that the fish completion can become out of sync with the tea binary!
+		// writing to this directory suffices, as fish reads files there on startup, no cmds needed.
+		return writeFishAutoCompleteFile(ctx)
+
 	default:
-		return fmt.Errorf("Must specify valid shell type")
+		return fmt.Errorf("Must specify valid %s", ctx.Command.ArgsUsage)
 	}
 
 	localPath, err := xdg.ConfigFile("tea/" + localFile)
@@ -61,8 +68,7 @@ func runAutocompleteAdd(ctx *cli.Context) error {
 	}
 
 	cmds = fmt.Sprintf(cmds, localPath)
-
-	if err := saveAutoCompleteFile(remoteFile, localPath); err != nil {
+	if err = writeRemoteAutoCompleteFile(remoteFile, localPath); err != nil {
 		return err
 	}
 
@@ -84,7 +90,7 @@ func runAutocompleteAdd(ctx *cli.Context) error {
 	return nil
 }
 
-func saveAutoCompleteFile(file, destPath string) error {
+func writeRemoteAutoCompleteFile(file, destPath string) error {
 	url := fmt.Sprintf("https://gitea.com/gitea/tea/raw/branch/master/%s", file)
 	fmt.Println("Fetching " + url)
 
@@ -102,4 +108,31 @@ func saveAutoCompleteFile(file, destPath string) error {
 
 	_, err = io.Copy(writer, res.Body)
 	return err
+}
+
+func writeFishAutoCompleteFile(ctx *cli.Context) error {
+	// NOTE: to make sure this file is in sync with tea commands, we'd need to
+	//   - check if the file exists
+	//   - if it does, check if the tea version that wrote it is the currently running version
+	//   - if not, rewrite the file
+	//   on each application run
+	// NOTE: this generates a completion that also suggests file names, which looks kinda messy..
+	script, err := ctx.App.ToFishCompletion()
+	if err != nil {
+		return err
+	}
+
+	localPath, err := xdg.ConfigFile("fish/conf.d/tea_completion.fish")
+	if err != nil {
+		return err
+	}
+	writer, err := os.Create(localPath)
+	if err != nil {
+		return err
+	}
+	if _, err = io.WriteString(writer, script); err != nil {
+		return err
+	}
+	fmt.Printf("Installed tab completion to %s\n", localPath)
+	return nil
 }

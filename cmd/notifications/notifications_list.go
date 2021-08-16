@@ -5,11 +5,9 @@
 package notifications
 
 import (
-	"fmt"
 	"log"
 
-	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -17,30 +15,28 @@ import (
 )
 
 //listNotifications will get the notifications based on status
-func listNotifications(ctx *cli.Context, status []gitea.NotifyStatus) error {
+func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus) error {
+	var news []*gitea.NotificationThread
+	var err error
+
+	ctx := context.InitCommand(cmd)
+	client := ctx.Login.Client()
+	all := ctx.Bool("all")
 
 	//This enforces pagination.
-	listOpts := flags.GetListOptions(ctx)
+	listOpts := ctx.GetListOptions()
 	if listOpts.Page == 0 {
 		listOpts.Page = 1
 	}
 
-	var news []*gitea.NotificationThread
-	var err error
-
-	var allRelated = ctx.Bool("all")
-	fmt.Printf("allRelated: %t\n", allRelated)
-
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	if allRelated {
-		fmt.Printf("login: %s owner: %s repo:%s\n", login.Name, owner, repo)
-		news, _, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
+	if all {
+		news, _, err = client.ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
 		})
 	} else {
-		fmt.Printf("login: %s owner: %s repo:%s\n", login.Name, owner, repo)
-		news, _, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
+		ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+		news, _, err = client.ListRepoNotifications(ctx.Owner, ctx.Repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
 		})
@@ -49,6 +45,6 @@ func listNotifications(ctx *cli.Context, status []gitea.NotifyStatus) error {
 		log.Fatal(err)
 	}
 
-	print.NotificationsList(news, flags.GlobalOutputValue, allRelated)
+	print.NotificationsList(news, ctx.Output, all)
 	return nil
 }

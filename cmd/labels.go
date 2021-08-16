@@ -15,6 +15,7 @@ import (
 var CmdLabels = cli.Command{
 	Name:        "labels",
 	Aliases:     []string{"label"},
+	Category:    catEntities,
 	Usage:       "Manage issue labels",
 	Description: `Manage issue labels`,
 	Action:      runLabels,
@@ -24,6 +25,7 @@ var CmdLabels = cli.Command{
 		&labels.CmdLabelUpdate,
 		&labels.CmdLabelDelete,
 	},
+	Flags: labels.CmdLabelsList.Flags,
 }
 
 func runLabels(ctx *cli.Context) error {

@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/milestones"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -17,6 +16,7 @@ import (
 var CmdMilestones = cli.Command{
 	Name:        "milestones",
 	Aliases:     []string{"milestone", "ms"},
+	Category:    catEntities,
 	Usage:       "List and create milestones",
 	Description: `List and create milestones`,
 	ArgsUsage:   "[<milestone name>]",
@@ -29,7 +29,7 @@ var CmdMilestones = cli.Command{
 		&milestones.CmdMilestonesReopen,
 		&milestones.CmdMilestonesIssues,
 	},
-	Flags: flags.AllDefaultFlags,
+	Flags: milestones.CmdMilestonesList.Flags,
 }
 
 func runMilestones(ctx *cli.Context) error {

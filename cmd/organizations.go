@@ -16,6 +16,7 @@ import (
 var CmdOrgs = cli.Command{
 	Name:        "organizations",
 	Aliases:     []string{"organization", "org"},
+	Category:    catEntities,
 	Usage:       "List, create, delete organizations",
 	Description: "Show organization details",
 	ArgsUsage:   "[<organization>]",
@@ -24,6 +25,7 @@ var CmdOrgs = cli.Command{
 		&organizations.CmdOrganizationList,
 		&organizations.CmdOrganizationDelete,
 	},
+	Flags: organizations.CmdOrganizationList.Flags,
 }
 
 func runOrganizations(ctx *cli.Context) error {
