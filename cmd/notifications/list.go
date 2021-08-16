@@ -5,8 +5,9 @@
 package notifications
 
 import (
-	"code.gitea.io/sdk/gitea"
 	"fmt"
+
+	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 

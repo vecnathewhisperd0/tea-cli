@@ -5,13 +5,8 @@
 package cmd
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/notifications"
-	"code.gitea.io/tea/modules/context"
-	"code.gitea.io/tea/modules/print"
 
-	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
@@ -22,7 +17,7 @@ var CmdNotifications = cli.Command{
 	Category:    catHelpers,
 	Usage:       "Show notifications",
 	Description: "Show notifications, by default based of the current repo",
-	Action:      runNotifications,
+	Action:      notifications.RunNotificationsList,
 	Subcommands: []*cli.Command{
 		&notifications.CmdNotificationsList,
 		&notifications.CmdNotificationsPinned,
@@ -36,54 +31,8 @@ var CmdNotifications = cli.Command{
 			Usage:   "show all notifications of related gitea instance",
 		},
 		&cli.StringFlag{
-			Name:        "state",
-			Usage:       "set milestone state (default is open)",
-			DefaultText: "open",
+			Name:  "state",
+			Usage: "set notification state (default is all), pinned,read,unread",
 		},
 	}),
-}
-
-func runNotifications(cmd *cli.Context) error {
-	var news []*gitea.NotificationThread
-	var err error
-
-	ctx := context.InitCommand(cmd)
-	client := ctx.Login.Client()
-
-	listOpts := ctx.GetListOptions()
-	if listOpts.Page == 0 {
-		listOpts.Page = 1
-	}
-
-	var status []gitea.NotifyStatus
-	if ctx.Bool("read") {
-		status = []gitea.NotifyStatus{gitea.NotifyStatusRead}
-	}
-	if ctx.Bool("pinned") {
-		status = append(status, gitea.NotifyStatusPinned)
-	}
-
-	if ctx.Bool("all") {
-		news, _, err = client.ListNotifications(gitea.ListNotificationOptions{
-			ListOptions: listOpts,
-			Status:      status,
-		})
-	} else {
-		ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
-		news, _, err = client.ListRepoNotifications(ctx.Owner, ctx.Repo, gitea.ListNotificationOptions{
-			ListOptions: listOpts,
-			Status:      status,
-		})
-	}
-	if err != nil {
-		return err
-	}
-
-	print.NotificationsList(news, ctx.Output, ctx.Bool("all"))
-	return nil
-}
-
-func runNotificationsDetails(ctx *cli.Context) error {
-	log.Fatal("Use tea notif --help to see all available commands.")
-	return nil
 }
