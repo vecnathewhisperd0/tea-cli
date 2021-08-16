@@ -5,6 +5,7 @@
 package cmd
 
 import (
+	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/notifications"
 
 	"github.com/urfave/cli/v2"
@@ -24,15 +25,10 @@ var CmdNotifications = cli.Command{
 		&notifications.CmdNotificationsRead,
 		&notifications.CmdNotificationsUnread,
 	},
-	Flags: append([]cli.Flag{
-		&cli.BoolFlag{
-			Name:    "all",
-			Aliases: []string{"a"},
-			Usage:   "show all notifications of related gitea instance",
-		},
+	Flags: append(flags.NotificationFlags,
 		&cli.StringFlag{
 			Name:  "state",
 			Usage: "set notification state (default is all), pinned,read,unread",
 		},
-	}),
+	),
 }
