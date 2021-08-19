@@ -14,16 +14,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-//listNotifications will get the notifications based on status
+// listNotifications will get the notifications based on status
 func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus) error {
 	var news []*gitea.NotificationThread
 	var err error
 
 	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
-	all := ctx.Bool("all")
+	all := ctx.Bool("for-user")
 
-	//This enforces pagination.
+	// This enforces pagination (see https://github.com/go-gitea/gitea/issues/16733)
 	listOpts := ctx.GetListOptions()
 	if listOpts.Page == 0 {
 		listOpts.Page = 1
@@ -33,6 +33,7 @@ func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus) error {
 		news, _, err = client.ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
+			// TODO: SubjectTypes
 		})
 	} else {
 		ctx.Ensure(context.CtxRequirement{RemoteRepo: true})

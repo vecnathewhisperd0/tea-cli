@@ -5,6 +5,9 @@
 package notifications
 
 import (
+	"fmt"
+	"os"
+
 	"code.gitea.io/tea/cmd/flags"
 
 	"code.gitea.io/sdk/gitea"
@@ -18,33 +21,34 @@ var CmdNotificationsList = cli.Command{
 	Usage:       "List notifications",
 	Description: `List notifications`,
 	Action:      RunNotificationsList,
-	Flags: append(flags.NotificationFlags,
+	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:  "state",
-			Usage: "set notification state (default is all), pinned,read,unread",
+			Name:        "state",
+			Aliases:     []string{"s"},
+			Usage:       "filter by notification state (pinned,read,unread,all)",
+			DefaultText: "pinned + unread",
 		},
-	),
+	}, flags.NotificationFlags...),
 }
-
-// notif ls
-// notif ls --state all
-// notif ls --state pinned
-// notif ls --state read
-// notif ls --state unread
 
 // RunNotificationsList list notifications
 func RunNotificationsList(ctx *cli.Context) error {
 	var states []gitea.NotifyStatus
 
 	switch ctx.String("state") {
+	case "":
+		states = []gitea.NotifyStatus{}
+	case "unread":
+		states = []gitea.NotifyStatus{gitea.NotifyStatusUnread}
 	case "pinned":
 		states = []gitea.NotifyStatus{gitea.NotifyStatusPinned}
 	case "read":
 		states = []gitea.NotifyStatus{gitea.NotifyStatusRead}
-	case "unread":
-		states = []gitea.NotifyStatus{gitea.NotifyStatusUnread}
-	default: // all
+	case "all":
 		states = []gitea.NotifyStatus{gitea.NotifyStatusPinned, gitea.NotifyStatusRead, gitea.NotifyStatusUnread}
+	default:
+		fmt.Printf("Unknown state '%s'\n", ctx.String("state"))
+		os.Exit(1)
 	}
 
 	return listNotifications(ctx, states)

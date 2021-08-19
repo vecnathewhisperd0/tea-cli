@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/notifications"
 
 	"github.com/urfave/cli/v2"
@@ -17,7 +16,7 @@ var CmdNotifications = cli.Command{
 	Aliases:     []string{"notification", "n"},
 	Category:    catHelpers,
 	Usage:       "Show notifications",
-	Description: "Show notifications, by default based of the current repo",
+	Description: "Show notifications, by default based on the current repo if available",
 	Action:      notifications.RunNotificationsList,
 	Subcommands: []*cli.Command{
 		&notifications.CmdNotificationsList,
@@ -25,10 +24,5 @@ var CmdNotifications = cli.Command{
 		&notifications.CmdNotificationsRead,
 		&notifications.CmdNotificationsUnread,
 	},
-	Flags: append(flags.NotificationFlags,
-		&cli.StringFlag{
-			Name:  "state",
-			Usage: "set notification state (default is all), pinned,read,unread",
-		},
-	),
+	Flags: notifications.CmdNotificationsList.Flags,
 }
