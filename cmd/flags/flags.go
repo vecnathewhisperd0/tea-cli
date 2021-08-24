@@ -100,6 +100,27 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
 
+// NotificationFlags defines flags that should be available on notifications.
+var NotificationFlags = append([]cli.Flag{
+	NotificationStateFlag,
+	&cli.BoolFlag{
+		Name:    "mine",
+		Aliases: []string{"m"},
+		Usage:   "Show notifications across all your repositories instead of the current repository only",
+	},
+	&PaginationPageFlag,
+	&PaginationLimitFlag,
+}, AllDefaultFlags...)
+
+// NotificationStateFlag is a csv flag applied to all notification subcommands as filter
+var NotificationStateFlag = NewCsvFlag(
+	"states",
+	"notification states to filter by",
+	[]string{"s"},
+	[]string{"pinned", "unread", "read"},
+	[]string{"unread", "pinned"},
+)
+
 // IssuePREditFlags defines flags for properties of issues and PRs
 var IssuePREditFlags = append([]cli.Flag{
 	&cli.StringFlag{
