@@ -1,4 +1,4 @@
-// Copyright 2020 The Gitea Authors. All rights reserved.
+// Copyright 2021 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -22,11 +22,17 @@ var CmdNotificationsList = cli.Command{
 	Description: `List notifications`,
 	Action:      RunNotificationsList,
 	Flags: append([]cli.Flag{
+		// FIXME: shouldn't --for-user only be applied to the ls command here, instead of all notification operations?
 		&cli.StringFlag{
 			Name:        "state",
 			Aliases:     []string{"s"},
 			Usage:       "filter by notification state (pinned,read,unread,all)",
 			DefaultText: "pinned + unread",
+		},
+		&cli.StringFlag{
+			Name:    "type",
+			Aliases: []string{"t"},
+			Usage:   "filter by subject type (repo,issue,pr,commit)",
 		},
 	}, flags.NotificationFlags...),
 }
@@ -34,6 +40,9 @@ var CmdNotificationsList = cli.Command{
 // RunNotificationsList list notifications
 func RunNotificationsList(ctx *cli.Context) error {
 	var states []gitea.NotifyStatus
+	var types []gitea.NotifySubjectType
+
+	// FIXME: make these commaseparated slice flags..?
 
 	switch ctx.String("state") {
 	case "":
@@ -51,5 +60,21 @@ func RunNotificationsList(ctx *cli.Context) error {
 		os.Exit(1)
 	}
 
-	return listNotifications(ctx, states)
+	switch ctx.String("type") {
+	case "":
+		types = []gitea.NotifySubjectType{}
+	case "commit":
+		types = []gitea.NotifySubjectType{gitea.NotifySubjectCommit}
+	case "issue":
+		types = []gitea.NotifySubjectType{gitea.NotifySubjectIssue}
+	case "pull", "pr":
+		types = []gitea.NotifySubjectType{gitea.NotifySubjectPull}
+	case "repo":
+		types = []gitea.NotifySubjectType{gitea.NotifySubjectRepository}
+	default:
+		fmt.Printf("Unknown type '%s'\n", ctx.String("type"))
+		os.Exit(1)
+	}
+
+	return listNotifications(ctx, states, types)
 }

@@ -20,9 +20,10 @@ var CmdNotifications = cli.Command{
 	Action:      notifications.RunNotificationsList,
 	Subcommands: []*cli.Command{
 		&notifications.CmdNotificationsList,
-		&notifications.CmdNotificationsPinned,
-		&notifications.CmdNotificationsRead,
-		&notifications.CmdNotificationsUnread,
+		&notifications.CmdNotificationsPin,
+		&notifications.CmdNotificationsUnpin,
+		&notifications.CmdNotificationsMarkRead,
+		&notifications.CmdNotificationsMarkUnread,
 	},
 	Flags: notifications.CmdNotificationsList.Flags,
 }

@@ -1,4 +1,4 @@
-// Copyright 2020 The Gitea Authors. All rights reserved.
+// Copyright 2021 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -15,7 +15,7 @@ import (
 )
 
 // listNotifications will get the notifications based on status
-func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus) error {
+func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus, subjects []gitea.NotifySubjectType) error {
 	var news []*gitea.NotificationThread
 	var err error
 
@@ -31,15 +31,16 @@ func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus) error {
 
 	if all {
 		news, _, err = client.ListNotifications(gitea.ListNotificationOptions{
-			ListOptions: listOpts,
-			Status:      status,
-			// TODO: SubjectTypes
+			ListOptions:  listOpts,
+			Status:       status,
+			SubjectTypes: subjects,
 		})
 	} else {
 		ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 		news, _, err = client.ListRepoNotifications(ctx.Owner, ctx.Repo, gitea.ListNotificationOptions{
-			ListOptions: listOpts,
-			Status:      status,
+			ListOptions:  listOpts,
+			Status:       status,
+			SubjectTypes: subjects,
 		})
 	}
 	if err != nil {
