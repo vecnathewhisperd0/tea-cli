@@ -35,7 +35,7 @@ var CmdNotificationsMarkRead = cli.Command{
 	},
 }
 
-// RunNotificationsMarkUnread will mark notifications as unread.
+// CmdNotificationsMarkUnread will mark notifications as unread.
 var CmdNotificationsMarkUnread = cli.Command{
 	Name:        "unread",
 	Aliases:     []string{"u"},
@@ -56,7 +56,7 @@ var CmdNotificationsMarkUnread = cli.Command{
 	},
 }
 
-// RunNotificationsMarkPinned will mark notifications as unread.
+// CmdNotificationsMarkPinned will mark notifications as unread.
 var CmdNotificationsMarkPinned = cli.Command{
 	Name:        "pin",
 	Aliases:     []string{"p"},
@@ -77,7 +77,7 @@ var CmdNotificationsMarkPinned = cli.Command{
 	},
 }
 
-// RunNotificationsUnpin will mark pinned notifications as unread.
+// CmdNotificationsUnpin will mark pinned notifications as unread.
 var CmdNotificationsUnpin = cli.Command{
 	Name:        "unpin",
 	Usage:       "Unpin all pinned or a specific notification",
