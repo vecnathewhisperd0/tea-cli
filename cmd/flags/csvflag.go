@@ -34,8 +34,9 @@ func NewCsvFlag(name, usage string, aliases, availableFields, defaultFields []st
 }
 
 func (f CsvFlag) GetValues(ctx *cli.Context) ([]string, error) {
-	selection := strings.Split(ctx.String(f.Name), ",")
-	if f.AvailableFields != nil {
+	val := ctx.String(f.Name)
+	selection := strings.Split(val, ",")
+	if f.AvailableFields != nil && val != "" {
 		for _, field := range selection {
 			if !utils.Contains(f.AvailableFields, field) {
 				return nil, fmt.Errorf("Invalid field '%s'", field)

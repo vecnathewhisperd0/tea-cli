@@ -5,14 +5,17 @@
 package notifications
 
 import (
-	"fmt"
-	"os"
-
 	"code.gitea.io/tea/cmd/flags"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
+
+var notifStateFlag = flags.NewCsvFlag("states", "notification states to filter by", []string{"s"},
+	[]string{"pinned", "unread", "read"}, []string{"pinned", "unread"})
+
+var notifTypeFlag = flags.NewCsvFlag("types", "subject types to filter by", []string{"t"},
+	[]string{"issue", "pull", "repository", "commit"}, nil)
 
 // CmdNotificationsList represents a sub command of notifications to list notifications
 var CmdNotificationsList = cli.Command{
@@ -22,21 +25,12 @@ var CmdNotificationsList = cli.Command{
 	Description: `List notifications`,
 	Action:      RunNotificationsList,
 	Flags: append([]cli.Flag{
+		notifStateFlag,
+		notifTypeFlag,
 		&cli.BoolFlag{
 			Name:    "mine",
 			Aliases: []string{"m"},
 			Usage:   "Show notifications across all your repositories instead of the current repository only",
-		},
-		&cli.StringFlag{
-			Name:        "state",
-			Aliases:     []string{"s"},
-			Usage:       "filter by notification state (pinned,read,unread,all)",
-			DefaultText: "pinned + unread",
-		},
-		&cli.StringFlag{
-			Name:    "type",
-			Aliases: []string{"t"},
-			Usage:   "filter by subject type (repo,issue,pr,commit)",
 		},
 		&flags.PaginationPageFlag,
 		&flags.PaginationLimitFlag,
@@ -46,40 +40,21 @@ var CmdNotificationsList = cli.Command{
 // RunNotificationsList list notifications
 func RunNotificationsList(ctx *cli.Context) error {
 	var states []gitea.NotifyStatus
-	var types []gitea.NotifySubjectType
-
-	// FIXME: make these commaseparated slice flags..?
-
-	switch ctx.String("state") {
-	case "":
-		states = []gitea.NotifyStatus{}
-	case "unread":
-		states = []gitea.NotifyStatus{gitea.NotifyStatusUnread}
-	case "pinned":
-		states = []gitea.NotifyStatus{gitea.NotifyStatusPinned}
-	case "read":
-		states = []gitea.NotifyStatus{gitea.NotifyStatusRead}
-	case "all":
-		states = []gitea.NotifyStatus{gitea.NotifyStatusPinned, gitea.NotifyStatusRead, gitea.NotifyStatusUnread}
-	default:
-		fmt.Printf("Unknown state '%s'\n", ctx.String("state"))
-		os.Exit(1)
+	statesStr, err := notifStateFlag.GetValues(ctx)
+	if err != nil {
+		return err
+	}
+	for _, s := range statesStr {
+		states = append(states, gitea.NotifyStatus(s))
 	}
 
-	switch ctx.String("type") {
-	case "":
-		types = []gitea.NotifySubjectType{}
-	case "commit":
-		types = []gitea.NotifySubjectType{gitea.NotifySubjectCommit}
-	case "issue":
-		types = []gitea.NotifySubjectType{gitea.NotifySubjectIssue}
-	case "pull", "pr":
-		types = []gitea.NotifySubjectType{gitea.NotifySubjectPull}
-	case "repo":
-		types = []gitea.NotifySubjectType{gitea.NotifySubjectRepository}
-	default:
-		fmt.Printf("Unknown type '%s'\n", ctx.String("type"))
-		os.Exit(1)
+	var types []gitea.NotifySubjectType
+	typesStr, err := notifTypeFlag.GetValues(ctx)
+	if err != nil {
+		return err
+	}
+	for _, t := range typesStr {
+		types = append(types, gitea.NotifySubjectType(t))
 	}
 
 	return listNotifications(ctx, states, types)
