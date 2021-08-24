@@ -22,7 +22,11 @@ var CmdNotificationsList = cli.Command{
 	Description: `List notifications`,
 	Action:      RunNotificationsList,
 	Flags: append([]cli.Flag{
-		// FIXME: shouldn't --for-user only be applied to the ls command here, instead of all notification operations?
+		&cli.BoolFlag{
+			Name:    "mine",
+			Aliases: []string{"m"},
+			Usage:   "Show notifications across all your repositories instead of the current repository only",
+		},
 		&cli.StringFlag{
 			Name:        "state",
 			Aliases:     []string{"s"},
@@ -34,7 +38,9 @@ var CmdNotificationsList = cli.Command{
 			Aliases: []string{"t"},
 			Usage:   "filter by subject type (repo,issue,pr,commit)",
 		},
-	}, flags.NotificationFlags...),
+		&flags.PaginationPageFlag,
+		&flags.PaginationLimitFlag,
+	}, flags.AllDefaultFlags...),
 }
 
 // RunNotificationsList list notifications

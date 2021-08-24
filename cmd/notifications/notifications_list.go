@@ -21,7 +21,7 @@ func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus, subjects [
 
 	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
-	all := ctx.Bool("for-user")
+	all := ctx.Bool("mine")
 
 	// This enforces pagination (see https://github.com/go-gitea/gitea/issues/16733)
 	listOpts := ctx.GetListOptions()

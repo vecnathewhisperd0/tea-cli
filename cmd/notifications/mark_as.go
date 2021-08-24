@@ -17,7 +17,7 @@ var CmdNotificationsMarkRead = cli.Command{
 	Usage:       "Show read notifications only",
 	Description: `Show read notifications only`,
 	Action:      RunNotificationsRead,
-	Flags:       flags.NotificationFlags,
+	Flags:       flags.AllDefaultFlags,
 }
 
 // RunNotificationsRead will show notifications with status read.
@@ -33,7 +33,7 @@ var CmdNotificationsMarkUnread = cli.Command{
 	Usage:       "Show unread notifications only",
 	Description: `Show unread notifications only`,
 	Action:      RunNotificationsUnread,
-	Flags:       flags.NotificationFlags,
+	Flags:       flags.AllDefaultFlags,
 }
 
 // RunNotificationsUnread will show notifications with status unread.

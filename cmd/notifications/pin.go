@@ -16,7 +16,7 @@ var CmdNotificationsUnpin = cli.Command{
 	Usage:       "Remove a notification from pins",
 	Description: `Remove a notification from pins`,
 	Action:      RunNotificationsPinned,
-	Flags:       flags.NotificationFlags,
+	Flags:       flags.AllDefaultFlags,
 }
 
 // CmdNotificationsPin represents a sub command of notifications to pin a notification
@@ -26,7 +26,7 @@ var CmdNotificationsPin = cli.Command{
 	Usage:       "Save a notification as pin",
 	Description: `Save a notification as pin`,
 	Action:      RunNotificationsPinned,
-	Flags:       flags.NotificationFlags,
+	Flags:       flags.AllDefaultFlags,
 }
 
 // RunNotificationsPinned will show notifications with status pinned.

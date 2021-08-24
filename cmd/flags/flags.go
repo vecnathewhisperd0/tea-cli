@@ -100,17 +100,6 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
 
-// NotificationFlags defines flags that should be available on notifications.
-var NotificationFlags = append([]cli.Flag{
-	&cli.BoolFlag{
-		Name:    "for-user",
-		Aliases: []string{"u"},
-		Usage:   "Show notifications across all your repositories instead of the current repository only",
-	},
-	&PaginationPageFlag,
-	&PaginationLimitFlag,
-}, AllDefaultFlags...)
-
 // IssuePREditFlags defines flags for properties of issues and PRs
 var IssuePREditFlags = append([]cli.Flag{
 	&cli.StringFlag{
