@@ -35,7 +35,6 @@ var CmdPullsCreate = cli.Command{
 
 func runPullsCreate(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
-	ctx.Ensure(context.CtxRequirement{LocalRepo: true})
 
 	// no args -> interactive mode
 	if ctx.NumFlags() == 0 {

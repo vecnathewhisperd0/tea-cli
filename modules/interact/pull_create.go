@@ -34,14 +34,16 @@ func CreatePull(login *config.Login, owner, repo string) error {
 	}
 
 	// head
-	localRepo, err := git.RepoForWorkdir()
-	if err != nil {
-		return err
-	}
+	var headOwner, headBranch string
 	promptOpts := survey.WithValidator(survey.Required)
-	headOwner, headBranch, err := task.GetDefaultPRHead(localRepo)
+
+	// TODO: can't we use TeaContext.LocalRepo for this?
+	localRepo, err := git.RepoForWorkdir()
 	if err == nil {
-		promptOpts = nil
+		headOwner, headBranch, err = task.GetDefaultPRHead(localRepo)
+		if err == nil {
+			promptOpts = nil
+		}
 	}
 	promptI = &survey.Input{Message: "Source repo owner:", Default: headOwner}
 	if err := survey.AskOne(promptI, &headOwner); err != nil {
