@@ -31,13 +31,6 @@ var RepoFlag = cli.StringFlag{
 	Usage:   "Override local repository path or gitea repository slug to interact with. Optional",
 }
 
-// RemoteFlag provides flag to specify remote repository
-var RemoteFlag = cli.StringFlag{
-	Name:    "remote",
-	Aliases: []string{"R"},
-	Usage:   "Discover Gitea login from remote. Optional",
-}
-
 // OutputFlag provides flag to specify output type
 var OutputFlag = cli.StringFlag{
 	Name:    "output",
@@ -82,7 +75,6 @@ var LoginOutputFlags = []cli.Flag{
 var LoginRepoFlags = []cli.Flag{
 	&LoginFlag,
 	&RepoFlag,
-	&RemoteFlag,
 }
 
 // AllDefaultFlags defines flags that should be available
@@ -91,7 +83,6 @@ var LoginRepoFlags = []cli.Flag{
 // https://github.com/urfave/cli/issues/585
 var AllDefaultFlags = append([]cli.Flag{
 	&RepoFlag,
-	&RemoteFlag,
 }, LoginOutputFlags...)
 
 // IssuePRFlags defines flags that should be available on issue & pr listing flags.

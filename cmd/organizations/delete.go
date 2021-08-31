@@ -22,7 +22,6 @@ var CmdOrganizationDelete = cli.Command{
 	Action:      RunOrganizationDelete,
 	Flags: []cli.Flag{
 		&flags.LoginFlag,
-		&flags.RemoteFlag,
 	},
 }
 

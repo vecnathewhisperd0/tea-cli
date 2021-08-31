@@ -80,7 +80,6 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 	// these flags are used as overrides to the context detection via local git repo
 	repoFlag := ctx.String("repo")
 	loginFlag := ctx.String("login")
-	remoteFlag := ctx.String("remote")
 
 	var (
 		c                  TeaContext
@@ -101,7 +100,7 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 
 	if len(repoFlag) == 0 || repoFlagPathExists {
 		// try to read git repo & extract context, ignoring if PWD is not a repo
-		if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
+		if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath); err != nil {
 			if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
 				// we can deal with that, commands needing the optional values use ctx.Ensure()
 			} else {
@@ -144,7 +143,7 @@ and then run your command again.`)
 }
 
 // contextFromLocalRepo discovers login & repo slug from the default branch remote of the given local repo
-func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.Login, string, error) {
+func contextFromLocalRepo(repoPath string) (*git.TeaRepo, *config.Login, string, error) {
 	repo, err := git.RepoFromPath(repoPath)
 	if err != nil {
 		return nil, nil, "", err
@@ -160,7 +159,8 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 	}
 
 	// if only one remote exists
-	if len(gitConfig.Remotes) >= 1 && len(remoteValue) == 0 {
+	remoteValue := ""
+	if len(gitConfig.Remotes) >= 1 {
 		for remote := range gitConfig.Remotes {
 			remoteValue = remote
 		}
