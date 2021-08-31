@@ -82,35 +82,20 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 	loginFlag := ctx.String("login")
 
 	var (
-		c                  TeaContext
-		err                error
-		repoPath           string // empty means PWD
-		repoFlagPathExists bool
+		c   TeaContext
+		err error
 	)
 
-	// check if repoFlag can be interpreted as path to local repo.
-	if len(repoFlag) != 0 {
-		if repoFlagPathExists, err = utils.DirExists(repoFlag); err != nil {
+	// try to read git repo & extract context, ignoring if PWD is not a repo
+	if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(""); err != nil {
+		if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
+			// we can deal with that, commands needing the optional values use ctx.Ensure()
+		} else {
 			log.Fatal(err.Error())
 		}
-		if repoFlagPathExists {
-			repoPath = repoFlag
-		}
 	}
 
-	if len(repoFlag) == 0 || repoFlagPathExists {
-		// try to read git repo & extract context, ignoring if PWD is not a repo
-		if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath); err != nil {
-			if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
-				// we can deal with that, commands needing the optional values use ctx.Ensure()
-			} else {
-				log.Fatal(err.Error())
-			}
-		}
-	}
-
-	if len(repoFlag) != 0 && !repoFlagPathExists {
-		// if repoFlag is not a valid path, use it to override repoSlug
+	if len(repoFlag) != 0 {
 		c.RepoSlug = repoFlag
 	}
 

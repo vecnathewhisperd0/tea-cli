@@ -28,7 +28,7 @@ var LoginFlag = cli.StringFlag{
 var RepoFlag = cli.StringFlag{
 	Name:    "repo",
 	Aliases: []string{"r"},
-	Usage:   "Override local repository path or gitea repository slug to interact with. Optional",
+	Usage:   "Override remote repository to interact with. Optional. Format: `repo` or `owner/repo`",
 }
 
 // OutputFlag provides flag to specify output type
