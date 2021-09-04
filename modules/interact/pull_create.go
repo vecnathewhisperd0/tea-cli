@@ -52,8 +52,6 @@ func CreatePull(login *config.Login, owner, repo string) error {
 		return err
 	}
 
-	head = task.GetHeadSpec(headOwner, headBranch, owner)
-
 	opts := gitea.CreateIssueOption{Title: task.GetDefaultPRTitle(head)}
 	if err = promptIssueProperties(login, owner, repo, &opts); err != nil {
 		return err
@@ -65,5 +63,6 @@ func CreatePull(login *config.Login, owner, repo string) error {
 		repo,
 		base,
 		head,
+		headOwner,
 		&opts)
 }

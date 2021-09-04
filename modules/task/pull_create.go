@@ -16,7 +16,7 @@ import (
 )
 
 // CreatePull creates a PR in the given repo and prints the result
-func CreatePull(login *config.Login, repoOwner, repoName, base, head string, opts *gitea.CreateIssueOption) error {
+func CreatePull(login *config.Login, repoOwner, repoName, base, head, headOwner string, opts *gitea.CreateIssueOption) error {
 	// open local git repo
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
@@ -31,13 +31,24 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head string, opt
 		}
 	}
 
-	// default is current one
-	if len(head) == 0 {
-		headOwner, headBranch, err := GetDefaultPRHead(localRepo)
-		if err != nil {
-			return err
-		}
+	headBranch := head
 
+	// default is current branch & associated repo owner
+	defaultHeadOwner, defaultHeadBranch, err := GetDefaultPRHead(localRepo)
+	if err != nil {
+		return err
+	}
+
+	if len(headBranch) == 0 {
+		headBranch = defaultHeadBranch
+	}
+	if len(headOwner) == 0 {
+		headBranch = defaultHeadOwner
+	}
+
+	// only override head if unspecified, or headOwner was set, for backwards
+	// compatibility: still support `owner:branch` inputs for head var
+	if len(head) == 0 || len(headOwner) != 0 {
 		head = GetHeadSpec(headOwner, headBranch, repoOwner)
 	}
 

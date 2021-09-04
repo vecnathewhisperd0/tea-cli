@@ -9,6 +9,7 @@ import (
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
+	"code.gitea.io/tea/modules/utils"
 
 	"github.com/urfave/cli/v2"
 )
@@ -23,7 +24,11 @@ var CmdPullsCreate = cli.Command{
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:  "head",
-			Usage: "Set head branch (default is current one)",
+			Usage: "Set head branch (default is locally checked out branch)",
+		},
+		&cli.StringFlag{
+			Name:  "head-repo",
+			Usage: "Set head repo (default is remote repo for local branch)",
 		},
 		&cli.StringFlag{
 			Name:    "base",
@@ -48,12 +53,16 @@ func runPullsCreate(cmd *cli.Context) error {
 		return err
 	}
 
+	headRepoSlug := ctx.String("head-repo") // may contain `owner` or `owner/repo`
+	headOwner, _ := utils.GetOwnerAndRepo(headRepoSlug, headRepoSlug)
+
 	return task.CreatePull(
 		ctx.Login,
 		ctx.Owner,
 		ctx.Repo,
 		ctx.String("base"),
 		ctx.String("head"),
+		headOwner,
 		opts,
 	)
 }
