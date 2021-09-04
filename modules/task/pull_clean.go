@@ -101,11 +101,12 @@ call me again with the --ignore-sha flag`, remoteBranch)
 		if err != nil {
 			return err
 		}
-		auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
+		url = local_git.ToHttpsURL(url, login.Insecure)
+		auth, err := local_git.GetAuthForURL(url, login.Token)
 		if err != nil {
 			return err
 		}
-		err = r.TeaDeleteRemoteBranch(branch.Remote, remoteBranch, auth)
+		err = r.TeaDeleteRemoteBranch(branch.Remote, remoteBranch, url.String(), auth)
 	}
 	return err
 }

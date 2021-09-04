@@ -16,7 +16,7 @@ import (
 )
 
 // CreateLogin create a login to be stored in config
-func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
+func CreateLogin(name, token, user, passwd, giteaURL string, insecure bool) error {
 	// checks ...
 	// ... if we have a url
 	if len(giteaURL) == 0 {
@@ -52,7 +52,6 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 		URL:      serverURL.String(),
 		Token:    token,
 		Insecure: insecure,
-		SSHKey:   sshKey,
 		Created:  time.Now().Unix(),
 	}
 
@@ -80,13 +79,6 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 	// we do not have a method to get SSH config from api,
 	// so we just use the hostname
 	login.SSHHost = serverURL.Hostname()
-
-	if len(sshKey) == 0 {
-		login.SSHKey, err = findSSHKey(client)
-		if err != nil {
-			fmt.Printf("Warning: problem while finding a SSH key: %s\n", err)
-		}
-	}
 
 	if err = config.AddLogin(&login); err != nil {
 		return err

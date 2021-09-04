@@ -58,12 +58,13 @@ func (r TeaRepo) TeaDeleteLocalBranch(branch *git_config.Branch) error {
 }
 
 // TeaDeleteRemoteBranch removes the given branch on the given remote via git protocol
-func (r TeaRepo) TeaDeleteRemoteBranch(remoteName, remoteBranch string, auth git_transport.AuthMethod) error {
+func (r TeaRepo) TeaDeleteRemoteBranch(remoteName, remoteBranch, remoteURLOverride string, auth git_transport.AuthMethod) error {
 	// delete remote branch via git protocol:
 	// an empty source in the refspec means remote deletion to git 🙃
 	refspec := fmt.Sprintf(":%s", git_plumbing.NewBranchReferenceName(remoteBranch))
 	return r.Push(&git.PushOptions{
 		RemoteName: remoteName,
+		RemoteURL:  remoteURLOverride,
 		RefSpecs:   []git_config.RefSpec{git_config.RefSpec(refspec)},
 		Prune:      true,
 		Auth:       auth,

@@ -15,7 +15,7 @@ import (
 
 // CreateLogin create an login interactive
 func CreateLogin() error {
-	var name, token, user, passwd, sshKey, giteaURL string
+	var name, token, user, passwd, giteaURL string
 	var insecure = false
 
 	promptI := &survey.Input{Message: "URL of Gitea instance: "}
@@ -64,28 +64,13 @@ func CreateLogin() error {
 		}
 	}
 
-	var optSettings bool
 	promptYN = &survey.Confirm{
-		Message: "Set Optional settings: ",
+		Message: "Allow Insecure connections: ",
 		Default: false,
 	}
-	if err = survey.AskOne(promptYN, &optSettings); err != nil {
+	if err = survey.AskOne(promptYN, &insecure); err != nil {
 		return err
 	}
-	if optSettings {
-		promptI = &survey.Input{Message: "SSH Key Path (leave empty for auto-discovery):"}
-		if err := survey.AskOne(promptI, &sshKey); err != nil {
-			return err
-		}
 
-		promptYN = &survey.Confirm{
-			Message: "Allow Insecure connections: ",
-			Default: false,
-		}
-		if err = survey.AskOne(promptYN, &insecure); err != nil {
-			return err
-		}
-	}
-
-	return task.CreateLogin(name, token, user, passwd, sshKey, giteaURL, insecure)
+	return task.CreateLogin(name, token, user, passwd, giteaURL, insecure)
 }

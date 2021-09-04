@@ -49,11 +49,6 @@ var CmdLoginAdd = cli.Command{
 			EnvVars: []string{"GITEA_SERVER_PASSWORD"},
 			Usage:   "Password for basic auth (will create token)",
 		},
-		&cli.StringFlag{
-			Name:    "ssh-key",
-			Aliases: []string{"s"},
-			Usage:   "Path to a SSH key to use, overrides auto-discovery",
-		},
 		&cli.BoolFlag{
 			Name:    "insecure",
 			Aliases: []string{"i"},
@@ -75,7 +70,6 @@ func runLoginAdd(ctx *cli.Context) error {
 		ctx.String("token"),
 		ctx.String("user"),
 		ctx.String("password"),
-		ctx.String("ssh-key"),
 		ctx.String("url"),
 		ctx.Bool("insecure"))
 }

@@ -53,3 +53,13 @@ func ParseURL(rawURL string) (u *url.URL, err error) {
 	p := &URLParser{}
 	return p.Parse(rawURL)
 }
+
+// Takes the output of ParseURL and normalizes it to a gitea https url.
+func ToHttpsURL(u *url.URL, insecure bool) *url.URL {
+	u.User = nil
+	u.Scheme = "https"
+	if insecure {
+		u.Scheme = "http"
+	}
+	return u
+}

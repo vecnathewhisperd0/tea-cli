@@ -90,11 +90,15 @@ func doPRFetch(
 	if err != nil {
 		return "", err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
+	url = local_git.ToHttpsURL(url, login.Insecure)
+	auth, err := local_git.GetAuthForURL(url, login.Token)
 	if err != nil {
 		return "", err
 	}
-	fetchOpts := &git.FetchOptions{Auth: auth}
+	fetchOpts := &git.FetchOptions{
+		Auth:      auth,
+		RemoteURL: url.String(),
+	}
 	if isRemoteDeleted(pr) {
 		// When the head branch is already deleted, pr.Head.Ref points to
 		// `refs/pull/<idx>/head`, where the commits stay available.
