@@ -76,7 +76,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 		}
 	}
 
-	outputMarkdown(out, pr.HTMLURL)
+	outputMarkdown(out, getRepoURL(pr.HTMLURL))
 }
 
 func formatReviews(reviews []*gitea.PullReview) string {
