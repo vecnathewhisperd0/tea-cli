@@ -23,11 +23,13 @@ var StateFlag = cli.StringFlag{
 	DefaultText: "open",
 }
 
+// MilestoneFilterFlag is a CSV flag used to filter issues by milestones
 var MilestoneFilterFlag = NewCsvFlag(
 	"milestones",
 	"milestones to match issues against",
 	[]string{"m"}, nil, nil)
 
+// LabelFilterFlag is a CSV flag used to filter issues by labels
 var LabelFilterFlag = NewCsvFlag(
 	"labels",
 	"labels to match issues against",
