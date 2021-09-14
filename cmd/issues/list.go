@@ -5,11 +5,14 @@
 package issues
 
 import (
+	"time"
+
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
 )
 
@@ -42,10 +45,37 @@ func RunIssuesList(cmd *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
+	var err error
+	var from, until time.Time
+	if ctx.IsSet("from") {
+		from, err = dateparse.ParseLocal(ctx.String("from"))
+		if err != nil {
+			return err
+		}
+	}
+	if ctx.IsSet("until") {
+		until, err = dateparse.ParseLocal(ctx.String("until"))
+		if err != nil {
+			return err
+		}
+	}
+
+	// ignore error, as we don't do any input validation on these flags
+	labels, _ := flags.LabelFilterFlag.GetValues(cmd)
+	milestones, _ := flags.MilestoneFilterFlag.GetValues(cmd)
+
 	issues, _, err := ctx.Login.Client().ListRepoIssues(ctx.Owner, ctx.Repo, gitea.ListIssueOption{
 		ListOptions: ctx.GetListOptions(),
 		State:       state,
 		Type:        gitea.IssueTypeIssue,
+		KeyWord:     ctx.String("keyword"),
+		CreatedBy:   ctx.String("author"),
+		AssignedBy:  ctx.String("assigned-to"),
+		MentionedBy: ctx.String("mentions"),
+		Labels:      labels,
+		Milestones:  milestones,
+		Since:       from,
+		Before:      until,
 	})
 
 	if err != nil {

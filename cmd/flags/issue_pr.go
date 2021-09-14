@@ -23,9 +23,48 @@ var StateFlag = cli.StringFlag{
 	DefaultText: "open",
 }
 
+var MilestoneFilterFlag = NewCsvFlag(
+	"milestones",
+	"milestones to match issues against",
+	[]string{"m"}, nil, nil)
+
+var LabelFilterFlag = NewCsvFlag(
+	"labels",
+	"labels to match issues against",
+	[]string{"L"}, nil, nil)
+
 // IssuePRFlags defines flags that should be available on issue & pr listing flags.
 var IssuePRFlags = append([]cli.Flag{
 	&StateFlag,
+	&cli.StringFlag{
+		Name:    "keyword",
+		Aliases: []string{"k"},
+		Usage:   "Filter by search string",
+	},
+	LabelFilterFlag,
+	MilestoneFilterFlag,
+	&cli.StringFlag{
+		Name:    "author",
+		Aliases: []string{"A"},
+	},
+	&cli.StringFlag{
+		Name:    "assignee",
+		Aliases: []string{"a"},
+	},
+	&cli.StringFlag{
+		Name:    "mentions",
+		Aliases: []string{"M"},
+	},
+	&cli.StringFlag{
+		Name:    "from",
+		Aliases: []string{"F"},
+		Usage:   "Filter by activity after this date",
+	},
+	&cli.StringFlag{
+		Name:    "until",
+		Aliases: []string{"u"},
+		Usage:   "Filter by activity before this date",
+	},
 	&PaginationPageFlag,
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
