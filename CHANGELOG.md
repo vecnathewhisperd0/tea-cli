@@ -1,5 +1,34 @@
 # Changelog
 
+## [v0.8.0](https://gitea.com/gitea/tea/releases/tag/v0.8.0) - 2021-09-22
+
+* BREAKING
+  * Implement notification subcommands (#389)
+* FEATURES
+  * Add `tea pr merge` (#348)
+* BUGFIXES
+  * Don't skip reading the local repo when `--repo` specifies a repo slug (#398)
+  * Fix adding login without token on private instances (#392)
+  * Correctly match login by ssh host with port (#391)
+  * Fix printing issue deadline (#388)
+  * Return useful error on wrong sshkey path (#374)
+  * Fix parsing of `--description` for issue/pr create (#371)
+  * Add missing flags (#369)
+  * Check negative limit command parameter (#358) (#359)
+  * Add missing flags to org & labels subcommands (#357)
+* ENHANCEMENTS
+  * Don't require a body for comment PR reviews (#399)
+  * Accept more main branch names for login detection (#396)
+  * Make local repo optional for `tea pr create`(#393)
+  * Notifications Add State Field (#384)
+  * Improve error messages (#370)
+  * Add tab completion for fish shell (#364)
+  * Text editor selection: follow unix defacto standards (#356)
+* BUILD
+  * Enable release builds for darwin/arm64 (#360)
+* MISC
+  * Update Dependencies (#390)
+
 ## [v0.7.0](https://gitea.com/gitea/tea/releases/tag/v0.7.0) - 2021-03-12
 
 * BREAKING
