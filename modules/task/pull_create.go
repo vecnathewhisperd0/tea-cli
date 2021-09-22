@@ -17,10 +17,10 @@ import (
 )
 
 // CreatePull creates a PR in the given repo and prints the result
-func CreatePull(ctx *context.TeaContext, login *config.Login, repoOwner, repoName, base, head string, opts *gitea.CreateIssueOption) (err error) {
+func CreatePull(ctx *context.TeaContext, base, head string, opts *gitea.CreateIssueOption) (err error) {
 	// default is default branch
 	if len(base) == 0 {
-		base, err = GetDefaultPRBase(login, repoOwner, repoName)
+		base, err = GetDefaultPRBase(ctx.Login, ctx.Owner, ctx.Repo)
 		if err != nil {
 			return err
 		}
@@ -36,7 +36,7 @@ func CreatePull(ctx *context.TeaContext, login *config.Login, repoOwner, repoNam
 			return err
 		}
 
-		head = GetHeadSpec(headOwner, headBranch, repoOwner)
+		head = GetHeadSpec(headOwner, headBranch, ctx.Owner)
 	}
 
 	// head & base may not be the same
@@ -53,7 +53,7 @@ func CreatePull(ctx *context.TeaContext, login *config.Login, repoOwner, repoNam
 		return fmt.Errorf("title is required")
 	}
 
-	pr, _, err := login.Client().CreatePullRequest(repoOwner, repoName, gitea.CreatePullRequestOption{
+	pr, _, err := ctx.Login.Client().CreatePullRequest(ctx.Owner, ctx.Repo, gitea.CreatePullRequestOption{
 		Head:      head,
 		Base:      base,
 		Title:     opts.Title,
@@ -65,7 +65,7 @@ func CreatePull(ctx *context.TeaContext, login *config.Login, repoOwner, repoNam
 	})
 
 	if err != nil {
-		return fmt.Errorf("could not create PR from %s to %s:%s: %s", head, repoOwner, base, err)
+		return fmt.Errorf("could not create PR from %s to %s:%s: %s", head, ctx.Owner, base, err)
 	}
 
 	print.PullDetails(pr, nil, nil)

@@ -13,18 +13,16 @@ import (
 )
 
 // CreatePull interactively creates a PR
-func CreatePull(ctx *context.TeaContext) error {
+func CreatePull(ctx *context.TeaContext) (err error) {
 	var base, head string
 
 	// owner, repo
-	owner, repo, err := promptRepoSlug(ctx.Owner, ctx.Repo)
-	if err != nil {
+	if ctx.Owner, ctx.Repo, err = promptRepoSlug(ctx.Owner, ctx.Repo); err != nil {
 		return err
 	}
 
 	// base
-	base, err = task.GetDefaultPRBase(ctx.Login, owner, repo)
-	if err != nil {
+	if base, err = task.GetDefaultPRBase(ctx.Login, ctx.Owner, ctx.Repo); err != nil {
 		return err
 	}
 	promptI := &survey.Input{Message: "Target branch:", Default: base}
@@ -51,18 +49,15 @@ func CreatePull(ctx *context.TeaContext) error {
 		return err
 	}
 
-	head = task.GetHeadSpec(headOwner, headBranch, owner)
+	head = task.GetHeadSpec(headOwner, headBranch, ctx.Owner)
 
 	opts := gitea.CreateIssueOption{Title: task.GetDefaultPRTitle(head)}
-	if err = promptIssueProperties(ctx.Login, owner, repo, &opts); err != nil {
+	if err = promptIssueProperties(ctx.Login, ctx.Owner, ctx.Repo, &opts); err != nil {
 		return err
 	}
 
 	return task.CreatePull(
 		ctx,
-		ctx.Login,
-		owner,
-		repo,
 		base,
 		head,
 		&opts)

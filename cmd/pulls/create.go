@@ -49,9 +49,6 @@ func runPullsCreate(cmd *cli.Context) error {
 
 	return task.CreatePull(
 		ctx,
-		ctx.Login,
-		ctx.Owner,
-		ctx.Repo,
 		ctx.String("base"),
 		ctx.String("head"),
 		opts,
