@@ -3,7 +3,9 @@
 ## [v0.8.0](https://gitea.com/gitea/tea/releases/tag/v0.8.0) - 2021-09-22
 
 * BREAKING
-  * Implement notification subcommands (#389)
+  * `tea notifications --all` has moved to `tea notifications --mine` (#389)
+  * `tea notifications` now only works with the context of a remote repo. (#389)
+    To run this outside of a local git dir, run either tea n `--mine` or `tea n --repo <my/repo>`
 * FEATURES
   * Add `tea pr merge` (#348)
 * BUGFIXES
