@@ -26,10 +26,13 @@
   * Improve error messages (#370)
   * Add tab completion for fish shell (#364)
   * Text editor selection: follow unix defacto standards (#356)
-* BUILD
-  * Enable release builds for darwin/arm64 (#360)
 * MISC
   * Update Dependencies (#390)
+
+## [v0.7.1](https://gitea.com/gitea/tea/releases/tag/v0.7.1) - 2021-08-27
+
+* BUILD
+  * Enable release builds for darwin/arm64 (#360)
 
 ## [v0.7.0](https://gitea.com/gitea/tea/releases/tag/v0.7.0) - 2021-03-12
 
