@@ -10,19 +10,14 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 )
 
 // CreatePull creates a PR in the given repo and prints the result
-func CreatePull(login *config.Login, repoOwner, repoName, base, head string, opts *gitea.CreateIssueOption) error {
-	// open local git repo
-	localRepo, err := local_git.RepoForWorkdir()
-	if err != nil {
-		return fmt.Errorf("Could not open local repo: %s", err)
-	}
-
+func CreatePull(ctx *context.TeaContext, login *config.Login, repoOwner, repoName, base, head string, opts *gitea.CreateIssueOption) (err error) {
 	// default is default branch
 	if len(base) == 0 {
 		base, err = GetDefaultPRBase(login, repoOwner, repoName)
@@ -33,7 +28,10 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head string, opt
 
 	// default is current one
 	if len(head) == 0 {
-		headOwner, headBranch, err := GetDefaultPRHead(localRepo)
+		if ctx.LocalRepo == nil {
+			return fmt.Errorf("no local git repo detected, please specify head branch")
+		}
+		headOwner, headBranch, err := GetDefaultPRHead(ctx.LocalRepo)
 		if err != nil {
 			return err
 		}
@@ -52,7 +50,7 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head string, opt
 	}
 	// title is required
 	if len(opts.Title) == 0 {
-		return fmt.Errorf("Title is required")
+		return fmt.Errorf("title is required")
 	}
 
 	pr, _, err := login.Client().CreatePullRequest(repoOwner, repoName, gitea.CreatePullRequestOption{
@@ -67,7 +65,7 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head string, opt
 	})
 
 	if err != nil {
-		return fmt.Errorf("Could not create PR from %s to %s:%s: %s", head, repoOwner, base, err)
+		return fmt.Errorf("could not create PR from %s to %s:%s: %s", head, repoOwner, base, err)
 	}
 
 	print.PullDetails(pr, nil, nil)

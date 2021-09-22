@@ -59,6 +59,7 @@ func CreatePull(ctx *context.TeaContext) error {
 	}
 
 	return task.CreatePull(
+		ctx,
 		ctx.Login,
 		owner,
 		repo,
