@@ -38,7 +38,7 @@ func runPullsCreate(cmd *cli.Context) error {
 
 	// no args -> interactive mode
 	if ctx.NumFlags() == 0 {
-		return interact.CreatePull(ctx.Login, ctx.Owner, ctx.Repo)
+		return interact.CreatePull(ctx)
 	}
 
 	// else use args to create PR
