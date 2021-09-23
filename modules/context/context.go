@@ -99,14 +99,13 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		}
 	}
 
-	if len(repoFlag) == 0 || repoFlagPathExists {
-		// try to read git repo & extract context, ignoring if PWD is not a repo
-		if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
-			if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
-				// we can deal with that, commands needing the optional values use ctx.Ensure()
-			} else {
-				log.Fatal(err.Error())
-			}
+	// try to read local git repo & extract context: if repoFlag specifies a valid path, read repo in that dir,
+	// otherwise attempt PWD. if no repo is found, continue with default login
+	if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
+		if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
+			// we can deal with that, commands needing the optional values use ctx.Ensure()
+		} else {
+			log.Fatal(err.Error())
 		}
 	}
 
@@ -166,10 +165,14 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 		}
 		if len(gitConfig.Remotes) > 1 {
 			// if master branch is present, use it as the default remote
-			masterBranch, ok := gitConfig.Branches["master"]
-			if ok {
-				if len(masterBranch.Remote) > 0 {
-					remoteValue = masterBranch.Remote
+			mainBranches := []string{"main", "master", "trunk"}
+			for _, b := range mainBranches {
+				masterBranch, ok := gitConfig.Branches[b]
+				if ok {
+					if len(masterBranch.Remote) > 0 {
+						remoteValue = masterBranch.Remote
+					}
+					break
 				}
 			}
 		}
@@ -185,8 +188,9 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 		return repo, nil, "", err
 	}
 	for _, l := range logins {
+		sshHost := l.GetSSHHost()
 		for _, u := range remoteConfig.URLs {
-			p, err := git.ParseURL(strings.TrimSpace(u))
+			p, err := git.ParseURL(u)
 			if err != nil {
 				return repo, nil, "", fmt.Errorf("Git remote URL parse failed: %s", err.Error())
 			}
@@ -197,8 +201,8 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 					return repo, &l, strings.TrimSuffix(path, ".git"), nil
 				}
 			} else if strings.EqualFold(p.Scheme, "ssh") {
-				if l.GetSSHHost() == strings.Split(p.Host, ":")[0] {
-					return repo, &l, strings.TrimLeft(strings.TrimSuffix(p.Path, ".git"), "/"), nil
+				if sshHost == p.Host {
+					return repo, &l, strings.TrimLeft(p.Path, "/"), nil
 				}
 			}
 		}
