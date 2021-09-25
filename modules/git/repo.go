@@ -6,6 +6,7 @@ package git
 
 import (
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport"
 )
 
 // TeaRepo is a go-git Repository, with an extended high level interface.
@@ -31,5 +32,19 @@ func RepoFromPath(path string) (*TeaRepo, error) {
 		return nil, err
 	}
 
+	return &TeaRepo{repo}, nil
+}
+
+// CloneIntoPath emulates a git clone <url> --depth <n> ...
+func CloneIntoPath(url, path string, auth transport.AuthMethod, depth int, insecure bool) (*TeaRepo, error) {
+	repo, err := git.PlainClone(path, false, &git.CloneOptions{
+		URL:             url,
+		Auth:            auth,
+		Depth:           depth,
+		InsecureSkipTLS: insecure,
+	})
+	if err != nil {
+		return nil, err
+	}
 	return &TeaRepo{repo}, nil
 }
