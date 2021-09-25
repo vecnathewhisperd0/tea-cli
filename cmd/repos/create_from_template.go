@@ -16,7 +16,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// CmdRepoCreate represents a sub command of repos to create one
+// CmdRepoCreateFromTemplate represents a sub command of repos to generate one from a template repo
 var CmdRepoCreateFromTemplate = cli.Command{
 	Name:        "create-from-template",
 	Aliases:     []string{"ct"},
