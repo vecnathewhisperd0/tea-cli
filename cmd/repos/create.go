@@ -108,7 +108,7 @@ func runRepoCreate(cmd *cli.Context) error {
 		case "collaborator+committer":
 			trustmodel = gitea.TrustModelCollaboratorCommitter
 		default:
-			return fmt.Errorf("unkown trustmodel type '%s'", ctx.String("trustmodel"))
+			return fmt.Errorf("unknown trustmodel type '%s'", ctx.String("trustmodel"))
 		}
 	}
 
