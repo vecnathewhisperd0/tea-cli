@@ -6,7 +6,6 @@ package print
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -114,44 +113,108 @@ func formatReviews(reviews []*gitea.PullReview) string {
 }
 
 // PullsList prints a listing of pulls
-func PullsList(prs []*gitea.PullRequest, output string) {
-	t := tableWithHeader(
-		"Index",
-		"Title",
-		"State",
-		"Author",
-		"Milestone",
-		"Updated",
-		"Labels",
-	)
+func PullsList(prs []*gitea.PullRequest, output string, fields []string) {
+	printPulls(prs, output, fields)
+}
 
-	for _, pr := range prs {
-		if pr == nil {
-			continue
-		}
-		author := pr.Poster.FullName
-		if len(author) == 0 {
-			author = pr.Poster.UserName
-		}
-		mile := ""
-		if pr.Milestone != nil {
-			mile = pr.Milestone.Title
-		}
-		labels := make([]string, len(pr.Labels))
-		for i, l := range pr.Labels {
-			labels[i] = formatLabel(l, !isMachineReadable(output), "")
-		}
+// PullFields are all available fields to print with PullsList()
+var PullFields = []string{
+	"index",
+	"state",
+	"author",
+	"author-id",
+	"url",
 
-		t.addRow(
-			strconv.FormatInt(pr.Index, 10),
-			pr.Title,
-			string(pr.State),
-			author,
-			mile,
-			FormatTime(*pr.Updated),
-			strings.Join(labels, " "),
-		)
+	"title",
+	"body",
+
+	"mergeable",
+
+	"created",
+	"updated",
+	"deadline",
+
+	"assignees",
+	"milestone",
+	"labels",
+	"comments",
+}
+
+func printPulls(pulls []*gitea.PullRequest, output string, fields []string) {
+	labelMap := map[int64]*gitea.Label{}
+	var printables = make([]printable, len(pulls))
+
+	for i, x := range pulls {
+		// pre-serialize labels for performance
+		for _, label := range x.Labels {
+			if _, ok := labelMap[label.ID]; !ok {
+				labelMap[label.ID] = label
+			}
+		}
+		// store items with printable interface
+		printables[i] = &printablePull{x, &labelMap}
 	}
 
+	t := tableFromItems(fields, printables, isMachineReadable(output))
 	t.print(output)
+}
+
+type printablePull struct {
+	*gitea.PullRequest
+	formattedLabels *map[int64]*gitea.Label
+}
+
+func (x printablePull) FormatField(field string, machineReadable bool) string {
+	switch field {
+	case "index":
+		return fmt.Sprintf("%d", x.Index)
+	case "state":
+		return string(x.State)
+	case "kind":
+		if x.PullRequest != nil {
+			return "Pull"
+		}
+		return "Issue"
+	case "author":
+		return formatUserName(x.Poster)
+	case "author-id":
+		return x.Poster.UserName
+	case "url":
+		return x.HTMLURL
+	case "title":
+		return x.Title
+	case "body":
+		return x.Body
+	case "created":
+		return FormatTime(*x.Created)
+	case "updated":
+		return FormatTime(*x.Updated)
+	case "deadline":
+		if x.Deadline == nil {
+			return ""
+		}
+		return FormatTime(*x.Deadline)
+	case "milestone":
+		if x.Milestone != nil {
+			return x.Milestone.Title
+		}
+		return ""
+	case "labels":
+		var labels = make([]string, len(x.Labels))
+		for i, l := range x.Labels {
+			labels[i] = formatLabel((*x.formattedLabels)[l.ID], !machineReadable, "")
+		}
+		return strings.Join(labels, " ")
+	case "assignees":
+		var assignees = make([]string, len(x.Assignees))
+		for i, a := range x.Assignees {
+			assignees[i] = formatUserName(a)
+		}
+		return strings.Join(assignees, " ")
+	case "comments":
+		return fmt.Sprintf("%d", x.Comments)
+	case "mergeable":
+		return formatBoolean(x.Mergeable, !machineReadable)
+	}
+	return ""
 }

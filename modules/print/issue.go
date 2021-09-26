@@ -52,30 +52,30 @@ var IssueFields = []string{
 }
 
 func printIssues(issues []*gitea.Issue, output string, fields []string) {
-	labelMap := map[int64]string{}
+	labelMap := map[int64]*gitea.Label{}
 	var printables = make([]printable, len(issues))
 
 	for i, x := range issues {
 		// pre-serialize labels for performance
 		for _, label := range x.Labels {
 			if _, ok := labelMap[label.ID]; !ok {
-				labelMap[label.ID] = formatLabel(label, !isMachineReadable(output), "")
+				labelMap[label.ID] = label
 			}
 		}
 		// store items with printable interface
 		printables[i] = &printableIssue{x, &labelMap}
 	}
 
-	t := tableFromItems(fields, printables)
+	t := tableFromItems(fields, printables, isMachineReadable(output))
 	t.print(output)
 }
 
 type printableIssue struct {
 	*gitea.Issue
-	formattedLabels *map[int64]string
+	formattedLabels *map[int64]*gitea.Label
 }
 
-func (x printableIssue) FormatField(field string) string {
+func (x printableIssue) FormatField(field string, machineReadable bool) string {
 	switch field {
 	case "index":
 		return fmt.Sprintf("%d", x.Index)
@@ -113,7 +113,7 @@ func (x printableIssue) FormatField(field string) string {
 	case "labels":
 		var labels = make([]string, len(x.Labels))
 		for i, l := range x.Labels {
-			labels[i] = (*x.formattedLabels)[l.ID]
+			labels[i] = formatLabel((*x.formattedLabels)[l.ID], !machineReadable, "")
 		}
 		return strings.Join(labels, " ")
 	case "assignees":

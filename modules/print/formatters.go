@@ -72,3 +72,16 @@ func formatUserName(u *gitea.User) string {
 	}
 	return u.FullName
 }
+
+func formatBoolean(b bool, allowIcons bool) string {
+	if !allowIcons {
+		return fmt.Sprintf("%v", b)
+	}
+
+	var styled string
+	if styled = "✓"; !b {
+		styled = "❌"
+	}
+
+	return styled
+}
