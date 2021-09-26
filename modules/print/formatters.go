@@ -79,8 +79,8 @@ func formatBoolean(b bool, allowIcons bool) string {
 	}
 
 	var styled string
-	if styled = "✓"; !b {
-		styled = "❌"
+	if styled = "✔"; !b {
+		styled = "✖"
 	}
 
 	return styled
