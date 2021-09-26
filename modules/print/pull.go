@@ -122,6 +122,7 @@ func PullsList(prs []*gitea.PullRequest, output string) {
 		"Author",
 		"Milestone",
 		"Updated",
+		"Labels",
 	)
 
 	for _, pr := range prs {
@@ -136,6 +137,11 @@ func PullsList(prs []*gitea.PullRequest, output string) {
 		if pr.Milestone != nil {
 			mile = pr.Milestone.Title
 		}
+		labels := make([]string, len(pr.Labels))
+		for i, l := range pr.Labels {
+			labels[i] = formatLabel(l, !isMachineReadable(output), "")
+		}
+
 		t.addRow(
 			strconv.FormatInt(pr.Index, 10),
 			pr.Title,
@@ -143,6 +149,7 @@ func PullsList(prs []*gitea.PullRequest, output string) {
 			author,
 			mile,
 			FormatTime(*pr.Updated),
+			strings.Join(labels, " "),
 		)
 	}
 
