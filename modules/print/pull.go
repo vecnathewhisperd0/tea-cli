@@ -137,6 +137,11 @@ var PullFields = []string{
 	"body",
 
 	"mergeable",
+	"base",
+	"base-commit",
+	"head",
+	"diff",
+	"patch",
 
 	"created",
 	"updated",
@@ -219,6 +224,16 @@ func (x printablePull) FormatField(field string, machineReadable bool) string {
 		return fmt.Sprintf("%d", x.Comments)
 	case "mergeable":
 		return formatBoolean(x.Mergeable, !machineReadable)
+	case "base":
+		return x.Base.Ref
+	case "base-commit":
+		return x.MergeBase
+	case "head":
+		return formatPRHead(x.PullRequest)
+	case "diff":
+		return x.DiffURL
+	case "patch":
+		return x.PatchURL
 	}
 	return ""
 }
