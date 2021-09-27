@@ -141,27 +141,28 @@ var PullFields = []string{
 }
 
 func printPulls(pulls []*gitea.PullRequest, output string, fields []string) {
-	labelMap := map[int64]*gitea.Label{}
+	labelMap := map[int64]string{}
 	var printables = make([]printable, len(pulls))
+	machineReadable := isMachineReadable(output)
 
 	for i, x := range pulls {
 		// pre-serialize labels for performance
 		for _, label := range x.Labels {
 			if _, ok := labelMap[label.ID]; !ok {
-				labelMap[label.ID] = label
+				labelMap[label.ID] = formatLabel(label, !machineReadable, "")
 			}
 		}
 		// store items with printable interface
 		printables[i] = &printablePull{x, &labelMap}
 	}
 
-	t := tableFromItems(fields, printables, isMachineReadable(output))
+	t := tableFromItems(fields, printables, machineReadable)
 	t.print(output)
 }
 
 type printablePull struct {
 	*gitea.PullRequest
-	formattedLabels *map[int64]*gitea.Label
+	formattedLabels *map[int64]string
 }
 
 func (x printablePull) FormatField(field string, machineReadable bool) string {
@@ -197,7 +198,7 @@ func (x printablePull) FormatField(field string, machineReadable bool) string {
 	case "labels":
 		var labels = make([]string, len(x.Labels))
 		for i, l := range x.Labels {
-			labels[i] = formatLabel((*x.formattedLabels)[l.ID], !machineReadable, "")
+			labels[i] = (*x.formattedLabels)[l.ID]
 		}
 		return strings.Join(labels, " ")
 	case "assignees":
