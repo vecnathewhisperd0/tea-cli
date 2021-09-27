@@ -22,19 +22,8 @@ var ciStatusSymbols = map[gitea.StatusState]string{
 // PullDetails print an pull rendered to stdout
 func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *gitea.CombinedStatus) {
 	base := pr.Base.Name
-	head := pr.Head.Name
-	if pr.Head.RepoID != pr.Base.RepoID {
-		if pr.Head.Repository != nil {
-			head = pr.Head.Repository.Owner.UserName + ":" + head
-		} else {
-			head = "delete:" + head
-		}
-	}
-
-	state := pr.State
-	if pr.Merged != nil {
-		state = "merged"
-	}
+	head := formatPRHead(pr)
+	state := formatPRState(pr)
 
 	out := fmt.Sprintf(
 		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n\n",
@@ -76,6 +65,25 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 	}
 
 	outputMarkdown(out, pr.HTMLURL)
+}
+
+func formatPRHead(pr *gitea.PullRequest) string {
+	head := pr.Head.Name
+	if pr.Head.RepoID != pr.Base.RepoID {
+		if pr.Head.Repository != nil {
+			head = pr.Head.Repository.Owner.UserName + ":" + head
+		} else {
+			head = "delete:" + head
+		}
+	}
+	return head
+}
+
+func formatPRState(pr *gitea.PullRequest) string {
+	if pr.Merged != nil {
+		return "merged"
+	}
+	return string(pr.State)
 }
 
 func formatReviews(reviews []*gitea.PullReview) string {
@@ -170,7 +178,7 @@ func (x printablePull) FormatField(field string, machineReadable bool) string {
 	case "index":
 		return fmt.Sprintf("%d", x.Index)
 	case "state":
-		return string(x.State)
+		return formatPRState(x.PullRequest)
 	case "author":
 		return formatUserName(x.Poster)
 	case "author-id":
