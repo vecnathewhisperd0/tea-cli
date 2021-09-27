@@ -223,7 +223,8 @@ func (x printablePull) FormatField(field string, machineReadable bool) string {
 	case "comments":
 		return fmt.Sprintf("%d", x.Comments)
 	case "mergeable":
-		return formatBoolean(x.Mergeable, !machineReadable)
+		isMergeable := x.Mergeable && x.State == gitea.StateOpen
+		return formatBoolean(isMergeable, !machineReadable)
 	case "base":
 		return x.Base.Ref
 	case "base-commit":
