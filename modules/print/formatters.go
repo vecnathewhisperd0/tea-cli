@@ -78,8 +78,8 @@ func formatBoolean(b bool, allowIcons bool) string {
 		return fmt.Sprintf("%v", b)
 	}
 
-	var styled string
-	if styled = "✔"; !b {
+	styled := "✔"
+	if !b {
 		styled = "✖"
 	}
 
