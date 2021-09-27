@@ -170,11 +170,6 @@ func (x printablePull) FormatField(field string, machineReadable bool) string {
 		return fmt.Sprintf("%d", x.Index)
 	case "state":
 		return string(x.State)
-	case "kind":
-		if x.PullRequest != nil {
-			return "Pull"
-		}
-		return "Issue"
 	case "author":
 		return formatUserName(x.Poster)
 	case "author-id":
