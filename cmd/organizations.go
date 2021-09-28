@@ -23,6 +23,7 @@ var CmdOrgs = cli.Command{
 	Action:      runOrganizations,
 	Subcommands: []*cli.Command{
 		&organizations.CmdOrganizationList,
+		&organizations.CmdOrganizationCreate,
 		&organizations.CmdOrganizationDelete,
 	},
 	Flags: organizations.CmdOrganizationList.Flags,
