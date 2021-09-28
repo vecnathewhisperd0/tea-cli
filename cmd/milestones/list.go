@@ -13,6 +13,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var fieldsFlag = flags.FieldsFlag(print.MilestoneFields, []string{
+	"title", "open/closed issues", "due date",
+})
+
 // CmdMilestonesList represents a sub command of milestones to list milestones
 var CmdMilestonesList = cli.Command{
 	Name:        "list",
@@ -21,6 +25,7 @@ var CmdMilestonesList = cli.Command{
 	Description: `List milestones of the repository`,
 	Action:      RunMilestonesList,
 	Flags: append([]cli.Flag{
+		fieldsFlag,
 		&cli.StringFlag{
 			Name:        "state",
 			Usage:       "Filter by milestone state (all|open|closed)",
@@ -36,10 +41,18 @@ func RunMilestonesList(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
+	fields, err := fieldsFlag.GetValues(cmd)
+	if err != nil {
+		return err
+	}
+
 	state := gitea.StateOpen
 	switch ctx.String("state") {
 	case "all":
 		state = gitea.StateAll
+		if !fieldsFlag.IsSet() { // add to default fields
+			fields = append(fields, "state")
+		}
 	case "closed":
 		state = gitea.StateClosed
 	}
@@ -54,6 +67,6 @@ func RunMilestonesList(cmd *cli.Context) error {
 		return err
 	}
 
-	print.MilestonesList(milestones, ctx.Output, state)
+	print.MilestonesList(milestones, ctx.Output, fields)
 	return nil
 }
