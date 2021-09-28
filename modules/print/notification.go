@@ -17,7 +17,7 @@ func NotificationsList(news []*gitea.NotificationThread, output string, fields [
 	for i, x := range news {
 		printables[i] = &printableNotification{x}
 	}
-	t := tableFromItems(fields, printables)
+	t := tableFromItems(fields, printables, isMachineReadable(output))
 	t.print(output)
 }
 
@@ -42,7 +42,7 @@ type printableNotification struct {
 	*gitea.NotificationThread
 }
 
-func (n printableNotification) FormatField(field string) string {
+func (n printableNotification) FormatField(field string, machineReadable bool) string {
 	switch field {
 	case "id":
 		return fmt.Sprintf("%d", n.ID)

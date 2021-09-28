@@ -29,7 +29,7 @@ func MilestonesList(news []*gitea.Milestone, output string, fields []string) {
 	for i, x := range news {
 		printables[i] = &printableMilestone{x}
 	}
-	t := tableFromItems(fields, printables)
+	t := tableFromItems(fields, printables, isMachineReadable(output))
 	t.sort(0, true)
 	t.print(output)
 }
@@ -53,7 +53,7 @@ type printableMilestone struct {
 	*gitea.Milestone
 }
 
-func (m printableMilestone) FormatField(field string) string {
+func (m printableMilestone) FormatField(field string, machineReadable bool) string {
 	switch field {
 	case "title":
 		return m.Title
