@@ -32,11 +32,6 @@ var CmdIssuesList = cli.Command{
 
 // RunIssuesList list issues
 func RunIssuesList(cmd *cli.Context) error {
-	return DoIssuePRListing(cmd, gitea.IssueTypeIssue, issueFieldsFlag)
-}
-
-// DoIssuePRListing lists issues + PRs of the repo in a generic way, and handles parsing of all filter flags.
-func DoIssuePRListing(cmd *cli.Context, kind gitea.IssueType, fieldsFlag *flags.CsvFlag) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
@@ -72,7 +67,7 @@ func DoIssuePRListing(cmd *cli.Context, kind gitea.IssueType, fieldsFlag *flags.
 	issues, _, err := ctx.Login.Client().ListRepoIssues(ctx.Owner, ctx.Repo, gitea.ListIssueOption{
 		ListOptions: ctx.GetListOptions(),
 		State:       state,
-		Type:        kind,
+		Type:        gitea.IssueTypeIssue,
 		KeyWord:     ctx.String("keyword"),
 		CreatedBy:   ctx.String("author"),
 		AssignedBy:  ctx.String("assigned-to"),
