@@ -9,6 +9,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -70,7 +71,7 @@ func RunOrganizationCreate(cmd *cli.Context) error {
 		return fmt.Errorf("unknown visibility '%s'", ctx.String("visibility"))
 	}
 
-	_, _, err := ctx.Login.Client().CreateOrg(gitea.CreateOrgOption{
+	org, _, err := ctx.Login.Client().CreateOrg(gitea.CreateOrgOption{
 		Name: ctx.Args().First(),
 		// FullName: , // not really meaningful for orgs (not displayed in webui, use description instead?)
 		Description:               ctx.String("description"),
@@ -83,7 +84,7 @@ func RunOrganizationCreate(cmd *cli.Context) error {
 		return err
 	}
 
-	// TODO: print resulting org.
+	print.OrganizationDetails(org)
 
 	return err
 }
