@@ -25,6 +25,7 @@ func NotificationsList(news []*gitea.NotificationThread, output string, fields [
 var NotificationFields = []string{
 	"id",
 	"status",
+	"updated",
 
 	// these are about the notification subject
 	"index",
@@ -32,6 +33,9 @@ var NotificationFields = []string{
 	"state",
 	"title",
 	"repository",
+	// "url1",
+	// "url2",
+	// "url3",
 }
 
 type printableNotification struct {
@@ -51,6 +55,9 @@ func (n printableNotification) FormatField(field string) string {
 			status = "unread"
 		}
 		return status
+
+	case "updated":
+		return FormatTime(n.UpdatedAt)
 
 	case "index":
 		var index string
@@ -74,7 +81,15 @@ func (n printableNotification) FormatField(field string) string {
 
 	case "repo", "repository":
 		return n.Repository.FullName
-	}
 
+		// NOTE: these are all API URLs, we are interested in web UI URLs only...
+		// case "url1":
+		// 	return n.URL
+		// case "url2":
+		// 	return n.Subject.URL
+		// case "url3":
+		// 	return n.Subject.LatestCommentURL
+
+	}
 	return ""
 }
