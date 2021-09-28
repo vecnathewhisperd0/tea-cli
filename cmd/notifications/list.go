@@ -15,6 +15,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var notifFieldsFlag = flags.FieldsFlag(print.NotificationFields, []string{
+	"id", "status", "index", "type", "state", "title",
+})
+
 var notifTypeFlag = flags.NewCsvFlag("types", "subject types to filter by", []string{"t"},
 	[]string{"issue", "pull", "repository", "commit"}, nil)
 
@@ -25,7 +29,10 @@ var CmdNotificationsList = cli.Command{
 	Usage:       "List notifications",
 	Description: `List notifications`,
 	Action:      RunNotificationsList,
-	Flags:       append([]cli.Flag{notifTypeFlag}, flags.NotificationFlags...),
+	Flags: append([]cli.Flag{
+		notifFieldsFlag,
+		notifTypeFlag,
+	}, flags.NotificationFlags...),
 }
 
 // RunNotificationsList list notifications
@@ -66,7 +73,17 @@ func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus, subjects [
 		listOpts.Page = 1
 	}
 
+	fields, err := notifFieldsFlag.GetValues(cmd)
+	if err != nil {
+		return err
+	}
+
 	if all {
+		// add repository to the default fields
+		if !notifFieldsFlag.IsSet() {
+			fields = append(fields, "repository")
+		}
+
 		news, _, err = client.ListNotifications(gitea.ListNotificationOptions{
 			ListOptions:  listOpts,
 			Status:       status,
@@ -84,6 +101,6 @@ func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus, subjects [
 		log.Fatal(err)
 	}
 
-	print.NotificationsList(news, ctx.Output, all)
+	print.NotificationsList(news, ctx.Output, fields)
 	return nil
 }
