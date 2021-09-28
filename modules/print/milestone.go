@@ -42,6 +42,11 @@ var MilestoneFields = []string{
 	"closed items",
 	"open/closed issues",
 	"due date",
+	"description",
+	"created",
+	"updated",
+	"closed",
+	"id",
 }
 
 type printableMilestone struct {
@@ -60,9 +65,23 @@ func (m printableMilestone) FormatField(field string) string {
 		return fmt.Sprintf("%d", m.ClosedIssues)
 	case "open/closed issues": // for backwards compatibility
 		return fmt.Sprintf("%d/%d", m.OpenIssues, m.ClosedIssues)
-	case "due date":
+	case "deadline", "due date":
 		if m.Deadline != nil && !m.Deadline.IsZero() {
 			return FormatTime(*m.Deadline)
+		}
+	case "id":
+		return fmt.Sprintf("%d", m.ID)
+	case "description":
+		return m.Description
+	case "created":
+		return FormatTime(m.Created)
+	case "updated":
+		if m.Updated != nil {
+			return FormatTime(*m.Updated)
+		}
+	case "closed":
+		if m.Closed != nil {
+			return FormatTime(*m.Closed)
 		}
 	}
 	return ""
