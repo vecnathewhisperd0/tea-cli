@@ -20,7 +20,7 @@ var CmdPullsList = cli.Command{
 	Usage:       "List pull requests of the repository",
 	Description: `List pull requests of the repository`,
 	Action:      RunPullsList,
-	Flags:       flags.IssuePRFlags,
+	Flags:       flags.PRListingFlags,
 }
 
 // RunPullsList return list of pulls

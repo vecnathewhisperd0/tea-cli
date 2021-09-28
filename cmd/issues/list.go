@@ -27,7 +27,7 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      RunIssuesList,
-	Flags:       append([]cli.Flag{issueFieldsFlag}, flags.IssuePRFlags...),
+	Flags:       append([]cli.Flag{issueFieldsFlag}, flags.IssueListingFlags...),
 }
 
 // RunIssuesList list issues

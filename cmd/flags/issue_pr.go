@@ -35,8 +35,15 @@ var LabelFilterFlag = NewCsvFlag(
 	"labels to match issues against",
 	[]string{"L"}, nil, nil)
 
-// IssuePRFlags defines flags that should be available on issue & pr listing flags.
-var IssuePRFlags = append([]cli.Flag{
+// PRListingFlags defines flags that should be available on pr listing flags.
+var PRListingFlags = append([]cli.Flag{
+	&StateFlag,
+	&PaginationPageFlag,
+	&PaginationLimitFlag,
+}, AllDefaultFlags...)
+
+// IssueListingFlags defines flags that should be available on issue listing flags.
+var IssueListingFlags = append([]cli.Flag{
 	&StateFlag,
 	&cli.StringFlag{
 		Name:    "keyword",
