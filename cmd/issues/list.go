@@ -5,6 +5,7 @@
 package issues
 
 import (
+	"fmt"
 	"time"
 
 	"code.gitea.io/tea/cmd/flags"
@@ -39,10 +40,24 @@ func RunIssuesList(cmd *cli.Context) error {
 	switch ctx.String("state") {
 	case "all":
 		state = gitea.StateAll
-	case "open":
+	case "", "open":
 		state = gitea.StateOpen
 	case "closed":
 		state = gitea.StateClosed
+	default:
+		return fmt.Errorf("unknown state '%s'", ctx.String("state"))
+	}
+
+	kind := gitea.IssueTypeIssue
+	switch ctx.String("kind") {
+	case "", "issues", "issue":
+		kind = gitea.IssueTypeIssue
+	case "pulls", "pull", "pr":
+		kind = gitea.IssueTypePull
+	case "all":
+		kind = gitea.IssueTypeAll
+	default:
+		return fmt.Errorf("unknown kind '%s'", ctx.String("kind"))
 	}
 
 	var err error
@@ -67,7 +82,7 @@ func RunIssuesList(cmd *cli.Context) error {
 	issues, _, err := ctx.Login.Client().ListRepoIssues(ctx.Owner, ctx.Repo, gitea.ListIssueOption{
 		ListOptions: ctx.GetListOptions(),
 		State:       state,
-		Type:        gitea.IssueTypeIssue,
+		Type:        kind,
 		KeyWord:     ctx.String("keyword"),
 		CreatedBy:   ctx.String("author"),
 		AssignedBy:  ctx.String("assigned-to"),

@@ -46,6 +46,12 @@ var PRListingFlags = append([]cli.Flag{
 var IssueListingFlags = append([]cli.Flag{
 	&StateFlag,
 	&cli.StringFlag{
+		Name:        "kind",
+		Aliases:     []string{"K"},
+		Usage:       "Wether to return `issues`, `pulls`, or `all` (you can use this to apply advanced search filters to PRs)",
+		DefaultText: "issues",
+	},
+	&cli.StringFlag{
 		Name:    "keyword",
 		Aliases: []string{"k"},
 		Usage:   "Filter by search string",
