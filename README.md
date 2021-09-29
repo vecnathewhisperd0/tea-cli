@@ -58,7 +58,7 @@
    tea open milestones                 # open web ui for milestones
 
    # send gitea desktop notifications every 5 minutes (bash + libnotify)
-   while :; do tea notifications --all -o simple | xargs -i notify-send {}; sleep 300; done
+   while :; do tea notifications --mine -o simple | xargs -i notify-send {}; sleep 300; done
 
  ABOUT
    Written & maintained by The Gitea Authors.
@@ -100,7 +100,7 @@ To compile the sources yourself run the following:
 ```sh
 git clone https://gitea.com/gitea/tea.git
 cd tea
-make
+make STATIC=true
 ```
 
 ## Contributing
