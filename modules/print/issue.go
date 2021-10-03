@@ -9,11 +9,12 @@ import (
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/enescakir/emoji"
 )
 
 // IssueDetails print an issue rendered to stdout
-func IssueDetails(issue *gitea.Issue) {
-	outputMarkdown(fmt.Sprintf(
+func IssueDetails(issue *gitea.Issue, reactions []*gitea.Reaction) {
+	out := fmt.Sprintf(
 		"# #%d %s (%s)\n@%s created %s\n\n%s\n",
 		issue.Index,
 		issue.Title,
@@ -21,7 +22,27 @@ func IssueDetails(issue *gitea.Issue) {
 		issue.Poster.UserName,
 		FormatTime(issue.Created),
 		issue.Body,
-	), issue.HTMLURL)
+	)
+
+	if len(reactions) > 0 {
+		out += fmt.Sprintf("\n---\n\n%s\n", formatReactions(reactions))
+	}
+
+	outputMarkdown(out, issue.HTMLURL)
+}
+
+func formatReactions(reactions []*gitea.Reaction) string {
+	reactionCounts := make(map[string]uint16)
+	for _, r := range reactions {
+		reactionCounts[r.Reaction] += 1
+	}
+
+	reactionStrings := make([]string, 0, len(reactionCounts))
+	for reaction, count := range reactionCounts {
+		reactionStrings = append(reactionStrings, fmt.Sprintf("%dx :%s:", count, reaction))
+	}
+
+	return emoji.Parse(strings.Join(reactionStrings, "  |  "))
 }
 
 // IssuesPullsList prints a listing of issues & pulls
@@ -54,19 +75,20 @@ var IssueFields = []string{
 func printIssues(issues []*gitea.Issue, output string, fields []string) {
 	labelMap := map[int64]string{}
 	var printables = make([]printable, len(issues))
+	machineReadable := isMachineReadable(output)
 
 	for i, x := range issues {
 		// pre-serialize labels for performance
 		for _, label := range x.Labels {
 			if _, ok := labelMap[label.ID]; !ok {
-				labelMap[label.ID] = formatLabel(label, !isMachineReadable(output), "")
+				labelMap[label.ID] = formatLabel(label, !machineReadable, "")
 			}
 		}
 		// store items with printable interface
 		printables[i] = &printableIssue{x, &labelMap}
 	}
 
-	t := tableFromItems(fields, printables)
+	t := tableFromItems(fields, printables, machineReadable)
 	t.print(output)
 }
 
@@ -75,7 +97,7 @@ type printableIssue struct {
 	formattedLabels *map[int64]string
 }
 
-func (x printableIssue) FormatField(field string) string {
+func (x printableIssue) FormatField(field string, machineReadable bool) string {
 	switch field {
 	case "index":
 		return fmt.Sprintf("%d", x.Index)
