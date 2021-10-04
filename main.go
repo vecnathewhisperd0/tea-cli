@@ -35,6 +35,7 @@ func main() {
 		&cmd.CmdLogin,
 		&cmd.CmdLogout,
 		&cmd.CmdAutocomplete,
+		&cmd.CmdWhoami,
 
 		&cmd.CmdIssues,
 		&cmd.CmdPulls,
@@ -108,7 +109,7 @@ var helpTemplate = bold(`
    tea open milestones                 # open web ui for milestones
 
    # send gitea desktop notifications every 5 minutes (bash + libnotify)
-   while :; do tea notifications --all -o simple | xargs -i notify-send {}; sleep 300; done
+   while :; do tea notifications --mine -o simple | xargs -i notify-send {}; sleep 300; done
 
  ABOUT
    Written & maintained by The Gitea Authors.
