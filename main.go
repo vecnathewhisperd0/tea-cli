@@ -49,6 +49,8 @@ func main() {
 
 		&cmd.CmdOpen,
 		&cmd.CmdNotifications,
+
+		&cmd.CmdAdmin,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
