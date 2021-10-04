@@ -108,11 +108,11 @@ func (x printableUser) FormatField(field string, machineReadable bool) string {
 	case "language":
 		return x.Language
 	case "is_admin":
-		return formatBoolean(x.IsAdmin, true)
+		return formatBoolean(x.IsAdmin, !machineReadable)
 	case "restricted":
-		return formatBoolean(x.Restricted, true)
+		return formatBoolean(x.Restricted, !machineReadable)
 	case "prohibit_login":
-		return formatBoolean(x.ProhibitLogin, true)
+		return formatBoolean(x.ProhibitLogin, !machineReadable)
 	case "location":
 		return x.Location
 	case "website":
