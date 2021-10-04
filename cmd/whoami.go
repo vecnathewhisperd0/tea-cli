@@ -11,11 +11,11 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// CmdTrackedTimes represents the command to operate repositories' times.
+// CmdWhoami represents the command to show current logged in user
 var CmdWhoami = cli.Command{
 	Name:        "whoami",
 	Category:    catSetup,
-	Description: `.`,
+	Description: `For debugging purposes, show the user that is currently logged in.`,
 	Usage:       "Show current logged in user",
 	Action: func(cmd *cli.Context) error {
 		ctx := context.InitCommand(cmd)

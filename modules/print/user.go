@@ -10,7 +10,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 )
 
-// RepoDetails print an repo formatted to stdout
+// UserDetails print a formatted user to stdout
 func UserDetails(user *gitea.User) {
 	title := "# " + user.UserName
 	if user.IsAdmin {
@@ -52,7 +52,7 @@ func UserDetails(user *gitea.User) {
 	), "")
 }
 
-// ReposList prints a listing of the repos
+// UserList prints a listing of the users
 func UserList(user []*gitea.User, output string, fields []string) {
 	var printables = make([]printable, len(user))
 	for i, u := range user {
@@ -108,11 +108,11 @@ func (x printableUser) FormatField(field string, machineReadable bool) string {
 	case "language":
 		return x.Language
 	case "is_admin":
-		return fmt.Sprintf("%t", x.IsAdmin)
+		return formatBoolean(x.IsAdmin, true)
 	case "restricted":
-		return fmt.Sprintf("%t", x.Restricted)
+		return formatBoolean(x.Restricted, true)
 	case "prohibit_login":
-		return fmt.Sprintf("%t", x.ProhibitLogin)
+		return formatBoolean(x.ProhibitLogin, true)
 	case "location":
 		return x.Location
 	case "website":
