@@ -31,7 +31,7 @@ var CmdUserList = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-// RunUserList list user organizations
+// RunUserList list users
 func RunUserList(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
