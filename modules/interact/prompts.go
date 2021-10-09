@@ -14,9 +14,25 @@ import (
 	"github.com/araddon/dateparse"
 )
 
+type Multiline struct {
+	Message   string
+	Default   string
+	Syntax    string
+	UseEditor bool
+}
+
 // PromptMultiline runs a textfield-style prompt and blocks until input was made.
-func PromptMultiline(message string) (content string, err error) {
-	err = survey.AskOne(&survey.Multiline{Message: message}, &content)
+// It switches between the inline text version and a texteditor based on `editor`
+func NewMultiline(opts Multiline) (prompt survey.Prompt) {
+	if opts.UseEditor {
+		prompt = &survey.Editor{
+			Message:  opts.Message,
+			Default:  opts.Default,
+			FileName: "*." + opts.Syntax,
+		}
+	} else {
+		prompt = &survey.Multiline{Message: opts.Message, Default: opts.Default}
+	}
 	return
 }
 
