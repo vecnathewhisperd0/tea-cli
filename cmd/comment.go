@@ -9,14 +9,14 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"code.gitea.io/tea/modules/config"
-	"code.gitea.io/tea/modules/interact"
-
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
+
+	"code.gitea.io/sdk/gitea"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/urfave/cli/v2"
 )

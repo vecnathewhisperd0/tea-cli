@@ -14,6 +14,7 @@ import (
 	"github.com/araddon/dateparse"
 )
 
+// Multiline represents options for a prompt that expects multiline input
 type Multiline struct {
 	Message   string
 	Default   string
@@ -21,8 +22,8 @@ type Multiline struct {
 	UseEditor bool
 }
 
-// PromptMultiline runs a textfield-style prompt and blocks until input was made.
-// It switches between the inline text version and a texteditor based on `editor`
+// NewMultiline creates a prompt that switches between the inline multiline text
+// and a texteditor based prompt
 func NewMultiline(opts Multiline) (prompt survey.Prompt) {
 	if opts.UseEditor {
 		prompt = &survey.Editor{

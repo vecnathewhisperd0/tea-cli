@@ -17,6 +17,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Preferences that are stored in and read from the config file
 type Preferences struct {
 	// Prefer using an external text editor over inline multiline prompts
 	Editor bool `yaml:"editor"`
@@ -61,6 +62,7 @@ func GetConfigPath() string {
 	return configFilePath
 }
 
+// GetPreferences returns preferences based on the config file
 func GetPreferences() Preferences {
 	return config.Prefs
 }
