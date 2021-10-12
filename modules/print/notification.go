@@ -33,9 +33,6 @@ var NotificationFields = []string{
 	"state",
 	"title",
 	"repository",
-	// "url1",
-	// "url2",
-	// "url3",
 }
 
 type printableNotification struct {
@@ -81,15 +78,6 @@ func (n printableNotification) FormatField(field string, machineReadable bool) s
 
 	case "repo", "repository":
 		return n.Repository.FullName
-
-		// NOTE: these are all API URLs, we are interested in web UI URLs only...
-		// case "url1":
-		// 	return n.URL
-		// case "url2":
-		// 	return n.Subject.URL
-		// case "url3":
-		// 	return n.Subject.LatestCommentURL
-
 	}
 	return ""
 }
