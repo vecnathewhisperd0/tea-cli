@@ -28,7 +28,6 @@ var CmdRepos = cli.Command{
 		&repos.CmdReposSearch,
 		&repos.CmdRepoCreate,
 		&repos.CmdRepoFork,
-		&repos.CmdRepoClone,
 	},
 	Flags: repos.CmdReposListFlags,
 }

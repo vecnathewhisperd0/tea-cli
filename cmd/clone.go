@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package repos
+package cmd
 
 import (
 	"code.gitea.io/tea/cmd/flags"
@@ -18,7 +18,8 @@ var CmdRepoClone = cli.Command{
 	Name:        "clone",
 	Aliases:     []string{"C"},
 	Usage:       "Clone a repository locally",
-	Description: "Clone a repository locally, without a local git installation required (defaults to PWD)",
+	Description: "Clone a repository locally, without a local git installation required",
+	Category:    catHelpers,
 	Action:      runRepoClone,
 	ArgsUsage:   "[target dir]",
 	Flags: append([]cli.Flag{
