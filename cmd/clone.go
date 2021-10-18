@@ -20,13 +20,22 @@ import (
 
 // CmdRepoClone represents a sub command of repos to create a local copy
 var CmdRepoClone = cli.Command{
-	Name:        "clone",
-	Aliases:     []string{"C"},
-	Usage:       "Clone a repository locally",
-	Description: "Clone a repository locally, without a local git installation required",
-	Category:    catHelpers,
-	Action:      runRepoClone,
-	ArgsUsage:   "[target dir]",
+	Name:    "clone",
+	Aliases: []string{"C"},
+	Usage:   "Clone a repository locally",
+	Description: `Clone a repository locally, without a local git installation required.
+	The repo slug can hold different formats:
+		gitea/tea
+		tea
+		gitea.com/gitea/tea
+		git@gitea.com:gitea/tea
+		https://gitea.com/gitea/tea
+		ssh://gitea.com:22/gitea/tea
+	When a host is specified in the repo-slug, it will override the login specified with --login.
+	`,
+	Category:  catHelpers,
+	Action:    runRepoClone,
+	ArgsUsage: "<repo-slug> [target dir]",
 	Flags: []cli.Flag{
 		&cli.IntFlag{
 			Name:    "depth",
@@ -52,13 +61,7 @@ func runRepoClone(cmd *cli.Context) error {
 		repo  string
 	)
 
-	// parse first arg as repo specifier. can be one of
-	// tea                 (default login + user of that login)
-	// gitea/tea           (default login)
-	// gitea.com/gitea/tea (finds matching login)
-	// https://gitea.com/gitea/tea
-	// ssh://git@gitea.com/gitea/tea
-	// git@gitea.com:gitea/tea
+	// parse first arg as repo specifier
 	repoSlug := args.Get(0)
 	url, err := git.ParseURL(repoSlug)
 	if err != nil {
