@@ -5,10 +5,15 @@
 package cmd
 
 import (
+	"fmt"
+
 	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
+	"code.gitea.io/tea/modules/utils"
 
 	"github.com/urfave/cli/v2"
 )
@@ -22,24 +27,57 @@ var CmdRepoClone = cli.Command{
 	Category:    catHelpers,
 	Action:      runRepoClone,
 	ArgsUsage:   "[target dir]",
-	Flags: append([]cli.Flag{
+	Flags: []cli.Flag{
 		&cli.IntFlag{
 			Name:    "depth",
 			Aliases: []string{"d"},
 			Usage:   "num commits to fetch, defaults to all",
 		},
-	}, flags.LoginRepoFlags...),
+		&flags.LoginFlag,
+	},
 }
 
 func runRepoClone(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
-	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
-	_, err := task.RepoClone(
-		ctx.Args().First(),
-		ctx.Login,
-		ctx.Owner,
-		ctx.Repo,
+	args := ctx.Args()
+	if args.Len() < 1 {
+		return cli.ShowCommandHelp(cmd, "clone")
+	}
+	dir := args.Get(1)
+
+	var (
+		login *config.Login = ctx.Login
+		owner string        = ctx.Login.User
+		repo  string
+	)
+
+	// parse first arg as repo specifier. can be one of
+	// tea                 (default login + user of that login)
+	// gitea/tea           (default login)
+	// gitea.com/gitea/tea (finds matching login)
+	// https://gitea.com/gitea/tea
+	// ssh://git@gitea.com/gitea/tea
+	// git@gitea.com:gitea/tea
+	repoSlug := args.Get(0)
+	url, err := git.ParseURL(repoSlug)
+	if err != nil {
+		return err
+	}
+
+	owner, repo = utils.GetOwnerAndRepo(url.Path, login.User)
+	if url.Host != "" {
+		login = config.GetLoginByHost(url.Host)
+		if login == nil {
+			return fmt.Errorf("No login configured matching host '%s', run `tea login add` first.", url.Host)
+		}
+	}
+
+	_, err = task.RepoClone(
+		dir,
+		login,
+		owner,
+		repo,
 		interact.PromptPassword,
 		ctx.Int("depth"),
 	)
