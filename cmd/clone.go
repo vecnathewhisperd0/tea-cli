@@ -24,14 +24,14 @@ var CmdRepoClone = cli.Command{
 	Aliases: []string{"C"},
 	Usage:   "Clone a repository locally",
 	Description: `Clone a repository locally, without a local git installation required.
-	The repo slug can hold different formats:
-		gitea/tea
-		tea
-		gitea.com/gitea/tea
-		git@gitea.com:gitea/tea
-		https://gitea.com/gitea/tea
-		ssh://gitea.com:22/gitea/tea
-	When a host is specified in the repo-slug, it will override the login specified with --login.
+The repo slug can be specified in different formats:
+	gitea/tea
+	tea
+	gitea.com/gitea/tea
+	git@gitea.com:gitea/tea
+	https://gitea.com/gitea/tea
+	ssh://gitea.com:22/gitea/tea
+When a host is specified in the repo-slug, it will override the login specified with --login.
 	`,
 	Category:  catHelpers,
 	Action:    runRepoClone,
