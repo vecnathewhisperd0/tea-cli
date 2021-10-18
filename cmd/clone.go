@@ -72,7 +72,7 @@ func runRepoClone(cmd *cli.Context) error {
 	if url.Host != "" {
 		login = config.GetLoginByHost(url.Host)
 		if login == nil {
-			return fmt.Errorf("No login configured matching host '%s', run `tea login add` first.", url.Host)
+			return fmt.Errorf("No login configured matching host '%s', run `tea login add` first", url.Host)
 		}
 	}
 
