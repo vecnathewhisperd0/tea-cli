@@ -22,7 +22,6 @@
    upstream repo. tea assumes that local git state is published on the remote before
    doing operations with tea.    Configuration is persisted in $XDG_CONFIG_HOME/tea.
 
-
  COMMANDS
    help, h  Shows a list of commands or help for one command
    ENTITIES:
@@ -38,6 +37,7 @@
    HELPERS:
      open, o                         Open something of the repository in web browser
      notifications, notification, n  Show notifications
+     clone, C                        Clone a repository locally
    SETUP:
      logins, login                  Log in to a Gitea server
      logout                         Log out from a Gitea server
