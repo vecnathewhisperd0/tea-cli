@@ -13,6 +13,7 @@ labels:
     - [ ] the issue only occured after updating gitea recently
 - operating system:
 - I make use of...
+    - [ ] non-standard default branch names (no `main`,`master`, or `trunk`)
     - [ ] .ssh/config or .gitconfig host aliases in my git remotes
     - [ ] ssh_agent or similar
     - [ ] non-standard ports for gitea and/or ssh
