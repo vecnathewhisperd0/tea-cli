@@ -6,11 +6,19 @@ package print
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/muesli/termenv"
 )
+
+// captures the repo URL part <host>/<owner>/<repo> of an url
+var repoURLRegex = regexp.MustCompile("^([[:alnum:]]+://[^/]+(?:/[[:alnum:]]+){2})/.*")
+
+func getRepoURL(resourceURL string) string {
+	return repoURLRegex.ReplaceAllString(resourceURL, "$1/")
+}
 
 // formatSize get kb in int and return string
 func formatSize(kb int64) string {
@@ -71,4 +79,17 @@ func formatUserName(u *gitea.User) string {
 		return u.UserName
 	}
 	return u.FullName
+}
+
+func formatBoolean(b bool, allowIcons bool) string {
+	if !allowIcons {
+		return fmt.Sprintf("%v", b)
+	}
+
+	styled := "✔"
+	if !b {
+		styled = "✖"
+	}
+
+	return styled
 }

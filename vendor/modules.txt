@@ -74,7 +74,7 @@ github.com/araddon/dateparse
 # github.com/aymerick/douceur v0.2.0
 github.com/aymerick/douceur/css
 github.com/aymerick/douceur/parser
-# github.com/charmbracelet/glamour v0.3.0 => github.com/noerw/glamour v0.3.0-patch
+# github.com/charmbracelet/glamour v0.3.0
 github.com/charmbracelet/glamour
 github.com/charmbracelet/glamour/ansi
 # github.com/cpuguy83/go-md2man/v2 v2.0.1
@@ -93,6 +93,8 @@ github.com/emirpasic/gods/lists/arraylist
 github.com/emirpasic/gods/trees
 github.com/emirpasic/gods/trees/binaryheap
 github.com/emirpasic/gods/utils
+# github.com/enescakir/emoji v1.0.0
+github.com/enescakir/emoji
 # github.com/go-git/gcfg v1.5.0
 github.com/go-git/gcfg
 github.com/go-git/gcfg/scanner

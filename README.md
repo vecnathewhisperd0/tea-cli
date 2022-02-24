@@ -8,16 +8,19 @@
 
 ```
    tea - command line tool to interact with Gitea
-   version 0.7.0-preview
+   version 0.8.0-preview
 
  USAGE
    tea command [subcommand] [command options] [arguments...]
 
  DESCRIPTION
-   tea is a productivity helper for Gitea.  It can be used to manage most entities on one
-   or multiple Gitea instances and provides local helpers like 'tea pull checkout'.
-   tea makes use of context provided by the repository in $PWD if available, but is still
-   usable independently of $PWD. Configuration is persisted in $XDG_CONFIG_HOME/tea.
+   tea is a productivity helper for Gitea. It can be used to manage most entities on
+   one or multiple Gitea instances & provides local helpers like 'tea pr checkout'.
+   
+   tea tries to make use of context provided by the repository in $PWD if available.
+   tea works best in a upstream/fork workflow, when the local main branch tracks the
+   upstream repo. tea assumes that local git state is published on the remote before
+   doing operations with tea.    Configuration is persisted in $XDG_CONFIG_HOME/tea.
 
  COMMANDS
    help, h  Shows a list of commands or help for one command
@@ -30,13 +33,16 @@
      times, time, t                    Operate on tracked times of a repository's issues & pulls
      organizations, organization, org  List, create, delete organizations
      repos, repo                       Show repository details
+     comment, c                        Add a comment to an issue / pr
    HELPERS:
      open, o                         Open something of the repository in web browser
      notifications, notification, n  Show notifications
+     clone, C                        Clone a repository locally
    SETUP:
      logins, login                  Log in to a Gitea server
      logout                         Log out from a Gitea server
      shellcompletion, autocomplete  Install shell completion for tea
+     whoami                         Show current logged in user
 
  OPTIONS
    --help, -h     show help (default: false)
@@ -58,7 +64,7 @@
    tea open milestones                 # open web ui for milestones
 
    # send gitea desktop notifications every 5 minutes (bash + libnotify)
-   while :; do tea notifications --all -o simple | xargs -i notify-send {}; sleep 300; done
+   while :; do tea notifications --mine -o simple | xargs -i notify-send {}; sleep 300; done
 
  ABOUT
    Written & maintained by The Gitea Authors.
@@ -79,29 +85,32 @@ There are different ways to get `tea`:
       brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
       brew install tea
       ```
-    - arch linux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea), thirdparty)
+    - arch linux ([gitea-tea-git](https://aur.archlinux.org/packages/gitea-tea-git), thirdparty)
     - alpine linux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge), thirdparty)
 
 2. Use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
-3. Install from source (go 1.13 or newer is required):
-    ```sh
-    go get code.gitea.io/tea
-    go install code.gitea.io/tea
-    ```
+3. Install from source: [see *Compilation*](#compilation)
 
 4. Docker (thirdparty): [tgerczei/tea](https://hub.docker.com/r/tgerczei/tea)
 
 ## Compilation
 
-Make sure you have installed a current go version.
-To compile the sources yourself run the following:
+Make sure you have a current go version installed (1.13 or newer).
 
-```sh
-git clone https://gitea.com/gitea/tea.git
-cd tea
-make
-```
+- To compile the source yourself with the recommended flags & tags:
+  ```sh
+  git clone https://gitea.com/gitea/tea.git # or: tea clone gitea.com/gitea/tea ;)
+  cd tea
+  make
+  ```
+  Note that GNU Make (gmake on OpenBSD) is required.
+
+- For a quick installation without `git` & `make`:
+  ```sh
+  go get code.gitea.io/tea
+  go install code.gitea.io/tea
+  ```
 
 ## Contributing
 
