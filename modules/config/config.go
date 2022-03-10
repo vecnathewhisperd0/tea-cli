@@ -21,6 +21,10 @@ import (
 type Preferences struct {
 	// Prefer using an external text editor over inline multiline prompts
 	Editor bool `yaml:"editor"`
+	// Prefer a specific git remote to use for selecting a repository on gitea,
+	// instead of relying on the remote associated with main/master/trunk branch.
+	// The --remote flag still has precedence over this value.
+	DefaultRemote string `yaml:"default_remote"`
 }
 
 // LocalConfig represents local configurations
@@ -64,6 +68,7 @@ func GetConfigPath() string {
 
 // GetPreferences returns preferences based on the config file
 func GetPreferences() Preferences {
+	loadConfig()
 	return config.Prefs
 }
 

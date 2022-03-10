@@ -99,6 +99,10 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		}
 	}
 
+	if len(remoteFlag) == 0 {
+		remoteFlag = config.GetPreferences().DefaultRemote
+	}
+
 	// try to read local git repo & extract context: if repoFlag specifies a valid path, read repo in that dir,
 	// otherwise attempt PWD. if no repo is found, continue with default login
 	if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
