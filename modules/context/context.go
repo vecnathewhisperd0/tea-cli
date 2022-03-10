@@ -158,8 +158,10 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 		return repo, nil, "", errors.New("No remote(s) found in this Git repository")
 	}
 
-	// if only one remote exists
+	// When no preferred value is given, choose a remote to find a
+	// matching login based on its URL.
 	if len(gitConfig.Remotes) >= 1 && len(remoteValue) == 0 {
+		// make sure a value is set.
 		for remote := range gitConfig.Remotes {
 			remoteValue = remote
 		}
