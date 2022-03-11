@@ -161,10 +161,6 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 	// When no preferred value is given, choose a remote to find a
 	// matching login based on its URL.
 	if len(gitConfig.Remotes) >= 1 && len(remoteValue) == 0 {
-		// make sure a value is set.
-		for remote := range gitConfig.Remotes {
-			remoteValue = remote
-		}
 		if len(gitConfig.Remotes) > 1 {
 			// if master branch is present, use it as the default remote
 			mainBranches := []string{"main", "master", "trunk"}
@@ -175,6 +171,19 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 						remoteValue = masterBranch.Remote
 					}
 					break
+				}
+			}
+			// if no branch has matched, default to origin or upstream remote.
+			if len(remoteValue) == 0 {
+				if _, ok := gitConfig.Remotes["upstream"]; ok {
+					remoteValue = "upstream"
+				} else if _, ok := gitConfig.Remotes["origin"]; ok {
+					remoteValue = "origin"
+				} else {
+					// make sure a value is set.
+					for remote := range gitConfig.Remotes {
+						remoteValue = remote
+					}
 				}
 			}
 		}
