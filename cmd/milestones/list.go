@@ -50,7 +50,7 @@ func RunMilestonesList(cmd *cli.Context) error {
 	switch ctx.String("state") {
 	case "all":
 		state = gitea.StateAll
-		if !fieldsFlag.IsSet() { // add to default fields
+		if !cmd.IsSet("fields") { // add to default fields
 			fields = append(fields, "state")
 		}
 	case "closed":

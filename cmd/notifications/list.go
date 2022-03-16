@@ -80,7 +80,7 @@ func listNotifications(cmd *cli.Context, status []gitea.NotifyStatus, subjects [
 
 	if all {
 		// add repository to the default fields
-		if !notifFieldsFlag.IsSet() {
+		if !cmd.IsSet("fields") {
 			fields = append(fields, "repository")
 		}
 
