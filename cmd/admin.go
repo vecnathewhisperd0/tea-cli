@@ -15,6 +15,7 @@ import (
 // The command itself has no functionality, but hosts subcommands.
 var CmdAdmin = cli.Command{
 	Name:     "admin",
+	Usage:    "Operations requiring admin access on the Gitea instance",
 	Aliases:  []string{"a"},
 	Category: catHelpers,
 	Action: func(cmd *cli.Context) error {
@@ -28,6 +29,7 @@ var CmdAdmin = cli.Command{
 var cmdAdminUsers = cli.Command{
 	Name:    "users",
 	Aliases: []string{"u"},
+	Usage:   "Manage registered users",
 	Action: func(ctx *cli.Context) error {
 		if ctx.Args().Len() == 1 {
 			return runAdminUserDetail(ctx, ctx.Args().First())
