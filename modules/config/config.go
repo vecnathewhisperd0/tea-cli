@@ -20,16 +20,16 @@ import (
 // FlagDefaults defines all flags that can be overridden with a default value
 // via the config file
 type FlagDefaults struct {
+	// Prefer a specific git remote to use for selecting a repository on gitea,
+	// instead of relying on the remote associated with main/master/trunk branch.
+	// The --remote flag still has precedence over this value.
 	Remote string `yaml:"remote"`
 }
 
 // Preferences that are stored in and read from the config file
 type Preferences struct {
 	// Prefer using an external text editor over inline multiline prompts
-	Editor bool `yaml:"editor"`
-	// Prefer a specific git remote to use for selecting a repository on gitea,
-	// instead of relying on the remote associated with main/master/trunk branch.
-	// The --remote flag still has precedence over this value.
+	Editor       bool         `yaml:"editor"`
 	FlagDefaults FlagDefaults `yaml:"flag_defaults"`
 }
 
