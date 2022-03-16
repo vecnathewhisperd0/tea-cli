@@ -100,7 +100,7 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 	}
 
 	if len(remoteFlag) == 0 {
-		remoteFlag = config.GetPreferences().DefaultRemote
+		remoteFlag = config.GetPreferences().FlagDefaults.Remote
 	}
 
 	// try to read local git repo & extract context: if repoFlag specifies a valid path, read repo in that dir,
