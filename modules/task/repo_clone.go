@@ -61,11 +61,11 @@ func RepoClone(
 	var upstreamURL string
 	var upstreamBranch string
 	if repoMeta.Fork && repoMeta.Parent != nil {
-		if upstreamURLRaw, err := cloneURL(repoMeta.Parent, login); err != nil {
+		upstreamURLRaw, err := cloneURL(repoMeta.Parent, login)
+		if err != nil {
 			return nil, err
-		} else {
-			upstreamURL = upstreamURLRaw.String()
 		}
+		upstreamURL = upstreamURLRaw.String()
 		upstreamBranch = repoMeta.Parent.DefaultBranch
 	} else if repoMeta.Mirror && len(repoMeta.OriginalURL) != 0 {
 		upstreamURL = repoMeta.OriginalURL
