@@ -57,16 +57,24 @@ func RepoClone(
 		return nil, err
 	}
 
-	// set up upstream remote for forks
+	// set up upstream remote for forks and mirrors
+	var upstreamURL string
+	var upstreamBranch string
 	if repoMeta.Fork && repoMeta.Parent != nil {
-		upstreamURL, err := cloneURL(repoMeta.Parent, login)
-		if err != nil {
+		if upstreamURLRaw, err := cloneURL(repoMeta.Parent, login); err != nil {
 			return nil, err
+		} else {
+			upstreamURL = upstreamURLRaw.String()
 		}
-		upstreamBranch := repoMeta.Parent.DefaultBranch
+		upstreamBranch = repoMeta.Parent.DefaultBranch
+	} else if repoMeta.Mirror && len(repoMeta.OriginalURL) != 0 {
+		upstreamURL = repoMeta.OriginalURL
+		upstreamBranch = repoMeta.DefaultBranch
+	}
+	if len(upstreamURL) != 0 {
 		repo.CreateRemote(&git_config.RemoteConfig{
 			Name: "upstream",
-			URLs: []string{upstreamURL.String()},
+			URLs: []string{upstreamURL},
 		})
 		repoConf, err := repo.Config()
 		if err != nil {
