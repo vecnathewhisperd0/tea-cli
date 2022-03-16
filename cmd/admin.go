@@ -5,6 +5,9 @@
 package cmd
 
 import (
+	"code.gitea.io/tea/cmd/admin/users"
+	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/print"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,4 +23,31 @@ var CmdAdmin = cli.Command{
 	Subcommands: []*cli.Command{
 		&cmdAdminUsers,
 	},
+}
+
+var cmdAdminUsers = cli.Command{
+	Name:    "users",
+	Aliases: []string{"u"},
+	Action: func(ctx *cli.Context) error {
+		if ctx.Args().Len() == 1 {
+			return runAdminUserDetail(ctx, ctx.Args().First())
+		}
+		return users.RunUserList(ctx)
+	},
+	Subcommands: []*cli.Command{
+		&users.CmdUserList,
+	},
+	Flags: users.CmdUserList.Flags,
+}
+
+func runAdminUserDetail(cmd *cli.Context, u string) error {
+	ctx := context.InitCommand(cmd)
+	client := ctx.Login.Client()
+	user, _, err := client.GetUserInfo(u)
+	if err != nil {
+		return err
+	}
+
+	print.UserDetails(user)
+	return nil
 }
