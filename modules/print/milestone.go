@@ -38,10 +38,10 @@ func MilestonesList(news []*gitea.Milestone, output string, fields []string) {
 var MilestoneFields = []string{
 	"title",
 	"state",
-	"open items",
-	"closed items",
-	"open/closed issues",
-	"due date",
+	"items_open",
+	"items_closed",
+	"items",
+	"duedate",
 	"description",
 	"created",
 	"updated",
@@ -59,13 +59,13 @@ func (m printableMilestone) FormatField(field string, machineReadable bool) stri
 		return m.Title
 	case "state":
 		return string(m.State)
-	case "open items":
+	case "items_open":
 		return fmt.Sprintf("%d", m.OpenIssues)
-	case "closed items":
+	case "items_closed":
 		return fmt.Sprintf("%d", m.ClosedIssues)
-	case "open/closed issues": // for backwards compatibility
+	case "items":
 		return fmt.Sprintf("%d/%d", m.OpenIssues, m.ClosedIssues)
-	case "deadline", "due date":
+	case "duedate":
 		if m.Deadline != nil && !m.Deadline.IsZero() {
 			return FormatTime(*m.Deadline)
 		}

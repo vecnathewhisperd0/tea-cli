@@ -14,7 +14,7 @@ import (
 )
 
 var fieldsFlag = flags.FieldsFlag(print.MilestoneFields, []string{
-	"title", "open/closed issues", "due date",
+	"title", "items", "duedate",
 })
 
 // CmdMilestonesList represents a sub command of milestones to list milestones
