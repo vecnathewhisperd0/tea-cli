@@ -34,16 +34,16 @@ var CmdUserList = cli.Command{
 // RunUserList list users
 func RunUserList(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
-	client := ctx.Login.Client()
 
-	users, _, err := client.AdminListUsers(gitea.AdminListUsersOptions{
-		ListOptions: ctx.GetListOptions(),
-	})
+	fields, err := userFieldsFlag.GetValues(cmd)
 	if err != nil {
 		return err
 	}
 
-	fields, err := userFieldsFlag.GetValues(cmd)
+	client := ctx.Login.Client()
+	users, _, err := client.AdminListUsers(gitea.AdminListUsersOptions{
+		ListOptions: ctx.GetListOptions(),
+	})
 	if err != nil {
 		return err
 	}

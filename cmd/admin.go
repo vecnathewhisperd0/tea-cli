@@ -8,15 +8,14 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// CmdAdmin represents the admin sub-commands
+// CmdAdmin represents the namespace of admin commands.
+// The command itself has no functionality, but hosts subcommands.
 var CmdAdmin = cli.Command{
 	Name:     "admin",
 	Aliases:  []string{"a"},
-	Category: catAdmin,
+	Category: catHelpers,
 	Action: func(cmd *cli.Context) error {
-		// TODO: this is just a stub for all admin actions
-		//       there is no default admin action
-		return nil
+		return cli.ShowSubcommandHelp(cmd)
 	},
 	Subcommands: []*cli.Command{
 		&cmdAdminUsers,
