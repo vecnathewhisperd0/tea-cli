@@ -9,7 +9,7 @@ platform:
 steps:
 - name: build
   pull: always
-  image: golang:1.16
+  image: golang:1.17
   environment:
       GOPROXY: https://goproxy.cn
   commands:
@@ -27,7 +27,7 @@ steps:
     - pull_request
 
 - name: unit-test
-  image: golang:1.16
+  image: golang:1.17
   commands:
   - make unit-test-coverage
   settings:
@@ -40,7 +40,7 @@ steps:
     - pull_request
 
 - name: release-test
-  image: golang:1.16
+  image: golang:1.17
   commands:
   - make test
   settings:
@@ -54,7 +54,7 @@ steps:
 
 - name: tag-test
   pull: always
-  image: golang:1.16
+  image: golang:1.17
   commands:
   - make test
   settings:
@@ -64,7 +64,7 @@ steps:
     - tag
 
 - name: static
-  image: golang:1.16
+  image: golang:1.17
   environment:
     GOPROXY: https://goproxy.cn
   commands:
@@ -96,7 +96,7 @@ steps:
 
 - name: tag-release
   pull: always
-  image: plugins/s3:1
+  image: woodpeckerci/plugin-s3:latest
   settings:
     acl: public-read
     bucket: gitea-artifacts
@@ -116,12 +116,11 @@ steps:
 
 - name: release-branch-release
   pull: always
-  image: plugins/s3:1
+  image: woodpeckerci/plugin-s3:latest
   settings:
     acl: public-read
     bucket: gitea-artifacts
-    endpoint: https://storage.gitea.io
-    path_style: true
+    endpoint: https://ams3.digitaloceanspaces.com
     source: "dist/release/*"
     strip_prefix: dist/release/
     target: "/tea/${DRONE_BRANCH##release/v}"
@@ -138,12 +137,11 @@ steps:
 
 - name: release
   pull: always
-  image: plugins/s3:1
+  image: woodpeckerci/plugin-s3:latest
   settings:
     acl: public-read
     bucket: gitea-artifacts
-    endpoint: https://storage.gitea.io
-    path_style: true
+    endpoint: https://ams3.digitaloceanspaces.com
     source: "dist/release/*"
     strip_prefix: dist/release/
     target: /tea/master
