@@ -125,7 +125,9 @@ func fetchIssueSelectables(login *config.Login, owner, repo string, done chan is
 	}
 
 	// FIXME: this should ideally be ListAssignees(), https://github.com/go-gitea/gitea/issues/14856
-	colabs, _, err := c.ListCollaborators(owner, repo, gitea.ListCollaboratorsOptions{})
+	colabs, _, err := c.ListCollaborators(owner, repo, gitea.ListCollaboratorsOptions{
+		ListOptions: gitea.ListOptions{Page: -1},
+	})
 	if err != nil {
 		r.Err = err
 		done <- r
@@ -150,7 +152,9 @@ func fetchIssueSelectables(login *config.Login, owner, repo string, done chan is
 		r.MilestoneList[i] = m.Title
 	}
 
-	labels, _, err := c.ListRepoLabels(owner, repo, gitea.ListLabelsOptions{})
+	labels, _, err := c.ListRepoLabels(owner, repo, gitea.ListLabelsOptions{
+		ListOptions: gitea.ListOptions{Page: -1},
+	})
 	if err != nil {
 		r.Err = err
 		done <- r
