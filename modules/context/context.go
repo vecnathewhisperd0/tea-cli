@@ -189,6 +189,7 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 	if len(remoteValue) == 0 {
 		for remote := range gitConfig.Remotes {
 			remoteValue = remote
+			break
 		}
 	}
 
