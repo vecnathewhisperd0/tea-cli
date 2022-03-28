@@ -96,15 +96,6 @@ unit-test-coverage:
 vendor:
 	$(GO) mod tidy && $(GO) mod vendor
 
-.PHONY: test-vendor
-test-vendor: vendor
-	@diff=$$(git diff vendor/); \
-	if [ -n "$$diff" ]; then \
-		echo "Please run 'make vendor' and commit the result:"; \
-		echo "$${diff}"; \
-		exit 1; \
-	fi;
-
 .PHONY: check
 check: test
 

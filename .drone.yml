@@ -7,6 +7,14 @@ platform:
   arch: amd64
 
 steps:
+- name: vendor
+  pull: always
+  image: golang:1.18
+  environment:
+    GOPROXY: https://goproxy.io # proxy.golang.org is blocked in China, this proxy is not
+  commands:
+  - make vendor # use vendor folder as cache
+
 - name: build
   pull: always
   image: golang:1.18
@@ -18,7 +26,6 @@ steps:
   - make lint
   - make fmt-check
   - make misspell-check
-  - make test-vendor
   - make build
   when:
     event:
