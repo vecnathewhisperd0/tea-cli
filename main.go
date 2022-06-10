@@ -30,7 +30,7 @@ func main() {
 	app.Usage = "command line tool to interact with Gitea"
 	app.Description = appDescription
 	app.CustomAppHelpTemplate = helpTemplate
-	app.Version = Version + formatBuiltWith(Tags)
+	app.Version = formatVersion()
 	app.Commands = []*cli.Command{
 		&cmd.CmdLogin,
 		&cmd.CmdLogout,
@@ -61,12 +61,14 @@ func main() {
 	}
 }
 
-func formatBuiltWith(Tags string) string {
+func formatVersion() string {
+	version := Version
+
 	if len(Tags) == 0 {
-		return ""
+		return version
 	}
 
-	return " built with: " + strings.Replace(Tags, " ", ", ", -1)
+	return version + " built with: " + strings.Replace(Tags, " ", ", ", -1)
 }
 
 var appDescription = `tea is a productivity helper for Gitea. It can be used to manage most entities on
