@@ -1,10 +1,10 @@
 module code.gitea.io/tea
 
-go 1.17
+go 1.18
 
 require (
 	code.gitea.io/gitea-vet v0.2.1
-	code.gitea.io/sdk/gitea v0.15.1
+	code.gitea.io/sdk/gitea v0.15.1-0.20220530220844-359c771ce3d2
 	gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 	github.com/AlecAivazis/survey/v2 v2.3.1
 	github.com/adrg/xdg v0.3.3

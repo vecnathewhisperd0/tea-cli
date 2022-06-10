@@ -1,7 +1,7 @@
 code.gitea.io/gitea-vet v0.2.1 h1:b30by7+3SkmiftK0RjuXqFvZg2q4p68uoPGuxhzBN0s=
 code.gitea.io/gitea-vet v0.2.1/go.mod h1:zcNbT/aJEmivCAhfmkHOlT645KNOf9W2KnkLgFjGGfE=
-code.gitea.io/sdk/gitea v0.15.1 h1:WJreC7YYuxbn0UDaPuWIe/mtiNKTvLN8MLkaw71yx/M=
-code.gitea.io/sdk/gitea v0.15.1/go.mod h1:klY2LVI3s3NChzIk/MzMn7G1FHrfU7qd63iSMVoHRBA=
+code.gitea.io/sdk/gitea v0.15.1-0.20220530220844-359c771ce3d2 h1:zzvs7avrzxCtHZ6RyAfoogMLMDbjLCfPd2cG5kshXkQ=
+code.gitea.io/sdk/gitea v0.15.1-0.20220530220844-359c771ce3d2/go.mod h1:meYWFEkIHx/qUEOlIZ2VQmC7EC3ocEVs5IvXQ0qrItQ=
 gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b h1:CLYsMGcGLohESQDMth+RgJ4cB3CCHToxnj0zBbvB3sE=
 gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b/go.mod h1:Fc8iyPm4NINRWujeIk2bTfcbGc4ZYY29/oMAAGcr4qI=
 github.com/AlecAivazis/survey/v2 v2.3.1 h1:lzkuHA60pER7L4eYL8qQJor4bUWlJe4V0gqAT19tdOA=
@@ -73,7 +73,6 @@ github.com/google/go-cmp v0.3.0 h1:crn/baboCvb5fXaQ0IJ1SGTsTVrWpDsCWC8EGETZijY=
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/gorilla/css v1.0.0 h1:BQqNyPTi50JCFMTw/b67hByjMVXZRwGha6wxVGkeihY=
 github.com/gorilla/css v1.0.0/go.mod h1:Dn721qIggHpt4+EFCcTLTU/vk5ySda2ReITrtgBl60c=
-github.com/hashicorp/go-version v1.2.1/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/hashicorp/go-version v1.5.0 h1:O293SZ2Eg+AAYijkVK3jR786Am1bhDEh2GHT0tIVE5E=
 github.com/hashicorp/go-version v1.5.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/hinshun/vt10x v0.0.0-20180616224451-1954e6464174 h1:WlZsjVhE8Af9IcZDGgJGQpNflI3+MJSBhsgT5PCtzBQ=
