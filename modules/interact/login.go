@@ -15,8 +15,10 @@ import (
 
 // CreateLogin create an login interactive
 func CreateLogin() error {
-	var name, token, user, passwd, sshKey, giteaURL string
+	var name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyAgentPub string
+	var sshCert = false
 	var insecure = false
+	var sshKeyAgent = false
 
 	promptI := &survey.Input{Message: "URL of Gitea instance: "}
 	if err := survey.AskOne(promptI, &giteaURL, survey.WithValidator(survey.Required)); err != nil {
@@ -38,29 +40,63 @@ func CreateLogin() error {
 		return err
 	}
 
-	var hasToken bool
 	promptYN := &survey.Confirm{
-		Message: "Do you have an access token?",
+		Message: "Do you want to use your SSH certificate to login? (needs a running ssh-agent with certificate loaded)",
 		Default: false,
 	}
-	if err = survey.AskOne(promptYN, &hasToken); err != nil {
+	if err = survey.AskOne(promptYN, &sshCert); err != nil {
 		return err
 	}
 
-	if hasToken {
-		promptI = &survey.Input{Message: "Token: "}
-		if err := survey.AskOne(promptI, &token, survey.WithValidator(survey.Required)); err != nil {
+	if sshCert {
+		promptI = &survey.Input{Message: "Which SSH certificate principal to use? (if not specified the first one detected will be used): "}
+		if err = survey.AskOne(promptI, &sshCertPrincipal); err != nil {
 			return err
 		}
-	} else {
-		promptI = &survey.Input{Message: "Username: "}
-		if err = survey.AskOne(promptI, &user, survey.WithValidator(survey.Required)); err != nil {
+	}
+
+	if !sshCert {
+		promptYN := &survey.Confirm{
+			Message: "Do you want to use your SSH key to login? (needs a running ssh-agent with your key loaded)",
+			Default: false,
+		}
+		if err = survey.AskOne(promptYN, &sshKeyAgent); err != nil {
 			return err
 		}
 
-		promptPW := &survey.Password{Message: "Password: "}
-		if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
+		if sshKeyAgent {
+			promptI = &survey.Input{Message: "Which SSH key ? (paste your public key or fingerprint): "}
+			if err = survey.AskOne(promptI, &sshKeyAgentPub, survey.WithValidator(survey.Required)); err != nil {
+				return err
+			}
+		}
+	}
+
+	if !sshCert && !sshKeyAgent {
+		var hasToken bool
+		promptYN = &survey.Confirm{
+			Message: "Do you have an access token?",
+			Default: false,
+		}
+		if err = survey.AskOne(promptYN, &hasToken); err != nil {
 			return err
+		}
+
+		if hasToken {
+			promptI = &survey.Input{Message: "Token: "}
+			if err := survey.AskOne(promptI, &token, survey.WithValidator(survey.Required)); err != nil {
+				return err
+			}
+		} else {
+			promptI = &survey.Input{Message: "Username: "}
+			if err = survey.AskOne(promptI, &user, survey.WithValidator(survey.Required)); err != nil {
+				return err
+			}
+
+			promptPW := &survey.Password{Message: "Password: "}
+			if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -87,5 +123,5 @@ func CreateLogin() error {
 		}
 	}
 
-	return task.CreateLogin(name, token, user, passwd, sshKey, giteaURL, insecure)
+	return task.CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyAgentPub, insecure, sshCert, sshKeyAgent)
 }

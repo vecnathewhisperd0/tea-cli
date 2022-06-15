@@ -25,8 +25,12 @@ type Login struct {
 	Default bool   `yaml:"default"`
 	SSHHost string `yaml:"ssh_host"`
 	// optional path to the private key
-	SSHKey   string `yaml:"ssh_key"`
-	Insecure bool   `yaml:"insecure"`
+	SSHKey           string `yaml:"ssh_key"`
+	Insecure         bool   `yaml:"insecure"`
+	SSHCert          bool   `yaml:"ssh_certificate"`
+	SSHCertPrincipal string `yaml:"ssh_certificate_principal"`
+	SSHKeyAgent      bool   `yaml:"ssh_key_agent"`
+	SSHKeyAgentPub   string `yaml:"ssh_key_agent_pub"`
 	// User is username from gitea
 	User string `yaml:"user"`
 	// Created is auto created unix timestamp
@@ -176,6 +180,13 @@ func (l *Login) Client(options ...gitea.ClientOption) *gitea.Client {
 	}
 
 	options = append(options, gitea.SetToken(l.Token), gitea.SetHTTPClient(httpClient))
+
+	if l.SSHCert {
+		options = append(options, gitea.UseSSHCert(l.SSHCertPrincipal))
+	}
+	if l.SSHKeyAgent {
+		options = append(options, gitea.UseSSHPubkey(l.SSHKeyAgentPub))
+	}
 
 	client, err := gitea.NewClient(l.URL, options...)
 	if err != nil {
