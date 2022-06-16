@@ -66,4 +66,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
-replace code.gitea.io/sdk/gitea => gitea.com/42wim/go-sdk/gitea v0.0.0-20220615192105-8c821f6c3419
+replace code.gitea.io/sdk/gitea => gitea.com/42wim/go-sdk/gitea v0.0.0-20220616000741-57eaee10e1a9
+
+// replace code.gitea.io/sdk/gitea => ../go-sdk-main/gitea

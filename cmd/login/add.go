@@ -100,6 +100,5 @@ func runLoginAdd(ctx *cli.Context) error {
 		ctx.String("ssh-certificate-principal"),
 		ctx.String("ssh-key-agent-public-key"),
 		ctx.Bool("insecure"),
-		ctx.Bool("ssh-certificate"),
 		sshKeyAgent)
 }
