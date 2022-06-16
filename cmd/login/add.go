@@ -52,25 +52,20 @@ var CmdLoginAdd = cli.Command{
 		&cli.StringFlag{
 			Name:    "ssh-key",
 			Aliases: []string{"s"},
-			Usage:   "Path to a SSH key to use, overrides auto-discovery",
+			Usage:   "Path to a SSH key/certificate to use, overrides auto-discovery",
 		},
 		&cli.BoolFlag{
 			Name:    "insecure",
 			Aliases: []string{"i"},
 			Usage:   "Disable TLS verification",
 		},
-		&cli.BoolFlag{
-			Name:    "ssh-certificate",
-			Aliases: []string{"c"},
-			Usage:   "Use SSH certificate to login (needs a running ssh-agent with certificate loaded)",
-		},
 		&cli.StringFlag{
-			Name:    "ssh-certificate-principal",
-			Aliases: []string{"p"},
+			Name:    "ssh-agent-principal",
+			Aliases: []string{"c"},
 			Usage:   "Use SSH certificate with specified principal to login (needs a running ssh-agent with certificate loaded)\nIf not specified first found principal will be used",
 		},
 		&cli.StringFlag{
-			Name:    "ssh-key-agent-public-key",
+			Name:    "ssh-agent-key",
 			Aliases: []string{"a"},
 			Usage:   "Use SSH public key or SSH fingerprint to login (needs a running ssh-agent with ssh key loaded)",
 		},
@@ -84,9 +79,9 @@ func runLoginAdd(ctx *cli.Context) error {
 		return interact.CreateLogin()
 	}
 
-	sshKeyAgent := false
-	if ctx.String("ssh-key-agent-public-key") != "" {
-		sshKeyAgent = true
+	sshAgent := false
+	if ctx.String("ssh-agent-key") != "" || ctx.String("ssh-agent-principal") != "" {
+		sshAgent = true
 	}
 
 	// else use args to add login
@@ -97,8 +92,8 @@ func runLoginAdd(ctx *cli.Context) error {
 		ctx.String("password"),
 		ctx.String("ssh-key"),
 		ctx.String("url"),
-		ctx.String("ssh-certificate-principal"),
-		ctx.String("ssh-key-agent-public-key"),
+		ctx.String("ssh-agent-principal"),
+		ctx.String("ssh-agent-key"),
 		ctx.Bool("insecure"),
-		sshKeyAgent)
+		sshAgent)
 }
