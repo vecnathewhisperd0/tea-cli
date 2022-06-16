@@ -14,7 +14,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// LoadSSHPubkey lsts all the ssh keys in the ssh agent and the ~/.ssh/*.pub files
+// ListSSHPubkey lists all the ssh keys in the ssh agent and the ~/.ssh/*.pub files
 // It returns a list of SSH keys in the format of:
 // "fingerprint keytype comment - principals: principals (ssh-agent or path to pubkey file)"
 func ListSSHPubkey() []string {
