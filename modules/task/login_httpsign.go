@@ -14,6 +14,9 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// LoadSSHPubkey lsts all the ssh keys in the ssh agent and the ~/.ssh/*.pub files
+// It returns a list of SSH keys in the format of:
+// "fingerprint keytype comment - principals: principals (ssh-agent or path to pubkey file)"
 func ListSSHPubkey() []string {
 	var keys []string
 
@@ -84,9 +87,9 @@ func parseKeys(pkinput []byte, sshPath string) string {
 		principals := pkey.(*ssh.Certificate).ValidPrincipals
 		return ssh.FingerprintSHA256(pkey) + " " + pkey.Type() + " " + comment +
 			" - principals: " + strings.Join(principals, ",") + " (" + sshPath + ")"
-	} else {
-		return ssh.FingerprintSHA256(pkey) + " " + pkey.Type() + " " + comment + " (" + sshPath + ")"
 	}
+
+	return ssh.FingerprintSHA256(pkey) + " " + pkey.Type() + " " + comment + " (" + sshPath + ")"
 }
 
 func getCertPrincipals(pkey ssh.PublicKey) []string {
