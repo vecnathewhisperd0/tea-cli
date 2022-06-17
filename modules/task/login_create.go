@@ -49,6 +49,12 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, 
 		return fmt.Errorf("Unable to parse URL: %s", err)
 	}
 
+	// check if it's a certificate the principal doesn't matter as the user
+	// has explicitly selected this private key
+	if _, err := os.Stat(sshKey + "-cert.pub"); err == nil {
+		sshCertPrincipal = "yes"
+	}
+
 	login := config.Login{
 		Name:              name,
 		URL:               serverURL.String(),

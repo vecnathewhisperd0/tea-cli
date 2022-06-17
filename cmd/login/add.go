@@ -62,7 +62,7 @@ var CmdLoginAdd = cli.Command{
 		&cli.StringFlag{
 			Name:    "ssh-agent-principal",
 			Aliases: []string{"c"},
-			Usage:   "Use SSH certificate with specified principal to login (needs a running ssh-agent with certificate loaded)\nIf not specified first found principal will be used",
+			Usage:   "Use SSH certificate with specified principal to login (needs a running ssh-agent with certificate loaded)",
 		},
 		&cli.StringFlag{
 			Name:    "ssh-agent-key",
