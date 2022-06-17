@@ -91,8 +91,8 @@ func CreateLogin() error {
 					sshAgent = true
 					sshKey = ""
 				} else {
-					sshKey = regexp.MustCompile(`(.*?)$`).FindStringSubmatch(sshKey)[1]
-					sshKey = strings.TrimSuffix(sshKey, ".pub")
+					sshKey = regexp.MustCompile(`\((.*?)\)$`).FindStringSubmatch(sshKey)[1]
+					sshKey = strings.TrimSuffix(sshKey, "-cert.pub")
 				}
 			} else {
 				sshKeyFingerprint = regexp.MustCompile(`(SHA256:.*?)\s`).FindStringSubmatch(sshKey)[1]
