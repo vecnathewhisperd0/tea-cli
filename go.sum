@@ -1,7 +1,7 @@
 code.gitea.io/gitea-vet v0.2.1 h1:b30by7+3SkmiftK0RjuXqFvZg2q4p68uoPGuxhzBN0s=
 code.gitea.io/gitea-vet v0.2.1/go.mod h1:zcNbT/aJEmivCAhfmkHOlT645KNOf9W2KnkLgFjGGfE=
-gitea.com/42wim/go-sdk/gitea v0.0.0-20220617000604-9af3e24dc159 h1:mVtX6XQS+0t0+mOWf3QV/EcLYcbXD4KPQ3rqamqfp1A=
-gitea.com/42wim/go-sdk/gitea v0.0.0-20220617000604-9af3e24dc159/go.mod h1:aRmrQC3CAHdJAU1LQt0C9zqzqI8tUB/5oQtNE746aYE=
+gitea.com/42wim/go-sdk/gitea v0.0.0-20220624190204-04147197ae82 h1:UGJ8WiqXGm0Di7nNoN5UqYtYA1BiccBMqJxRfEAB3WI=
+gitea.com/42wim/go-sdk/gitea v0.0.0-20220624190204-04147197ae82/go.mod h1:aRmrQC3CAHdJAU1LQt0C9zqzqI8tUB/5oQtNE746aYE=
 gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b h1:CLYsMGcGLohESQDMth+RgJ4cB3CCHToxnj0zBbvB3sE=
 gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b/go.mod h1:Fc8iyPm4NINRWujeIk2bTfcbGc4ZYY29/oMAAGcr4qI=
 github.com/AlecAivazis/survey/v2 v2.3.1 h1:lzkuHA60pER7L4eYL8qQJor4bUWlJe4V0gqAT19tdOA=
