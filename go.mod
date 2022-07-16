@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	code.gitea.io/gitea-vet v0.2.1
-	code.gitea.io/sdk/gitea v0.15.1-0.20220530220844-359c771ce3d2
+	code.gitea.io/sdk/gitea v0.15.1-0.20220712164508-e5f0c189f2c7
 	gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 	github.com/AlecAivazis/survey/v2 v2.3.1
 	github.com/adrg/xdg v0.3.3
@@ -65,7 +65,3 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
-
-replace code.gitea.io/sdk/gitea => gitea.com/42wim/go-sdk/gitea v0.0.0-20220624190204-04147197ae82
-
-// replace code.gitea.io/sdk/gitea => ../go-sdk-main/gitea
