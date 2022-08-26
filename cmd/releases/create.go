@@ -23,6 +23,7 @@ var CmdReleaseCreate = cli.Command{
 	Aliases:     []string{"c"},
 	Usage:       "Create a release",
 	Description: `Create a release`,
+	ArgsUsage:   " ", // command does not accept arguments
 	Action:      runReleaseCreate,
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
