@@ -26,8 +26,8 @@ func IndexOf(haystack []string, needle string) int {
 }
 
 // IsKeyEncrypted checks if the key is encrypted
-func IsKeyEncrypted(sshKey string) (bool, error) {
-	priv, err := os.ReadFile(sshKey)
+func IsKeyEncrypted(keyPath string) (bool, error) {
+	priv, err := os.ReadFile(keyPath)
 	if err != nil {
 		return false, err
 	}
