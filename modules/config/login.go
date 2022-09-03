@@ -30,7 +30,6 @@ type Login struct {
 	SSHKey            string `yaml:"ssh_key"`
 	Insecure          bool   `yaml:"insecure"`
 	SSHCertPrincipal  string `yaml:"ssh_certificate_principal"`
-	SSHAgent          bool   `yaml:"ssh_agent"`
 	SSHKeyFingerprint string `yaml:"ssh_key_agent_pub"`
 	SSHPassphrase     string `yaml:"-"`
 	// User is username from gitea

@@ -63,7 +63,6 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, 
 		SSHKey:            sshKey,
 		SSHCertPrincipal:  sshCertPrincipal,
 		SSHKeyFingerprint: sshKeyFingerprint,
-		SSHAgent:          sshAgent,
 		Created:           time.Now().Unix(),
 	}
 
