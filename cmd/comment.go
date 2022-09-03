@@ -13,6 +13,7 @@ import (
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -56,7 +57,7 @@ func runAddComment(cmd *cli.Context) error {
 			body = strings.Join([]string{body, string(bodyStdin)}, "\n\n")
 		}
 	} else if len(body) == 0 {
-		if err = survey.AskOne(interact.NewMultiline(interact.Multiline{
+		if err = survey.AskOne(prompts.NewMultiline(prompts.Multiline{
 			Message:   "Comment:",
 			Syntax:    "md",
 			UseEditor: config.GetPreferences().Editor,

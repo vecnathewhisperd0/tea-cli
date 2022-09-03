@@ -11,7 +11,7 @@ import (
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/git"
-	"code.gitea.io/tea/modules/interact"
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/task"
 	"code.gitea.io/tea/modules/utils"
 
@@ -81,7 +81,7 @@ func runRepoClone(cmd *cli.Context) error {
 		login,
 		owner,
 		repo,
-		interact.PromptPassword,
+		prompts.Password,
 		ctx.Int("depth"),
 	)
 

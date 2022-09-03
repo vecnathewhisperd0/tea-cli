@@ -7,6 +7,7 @@ package interact
 import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/task"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -17,7 +18,7 @@ func CreatePull(ctx *context.TeaContext) (err error) {
 	var base, head string
 
 	// owner, repo
-	if ctx.Owner, ctx.Repo, err = promptRepoSlug(ctx.Owner, ctx.Repo); err != nil {
+	if ctx.Owner, ctx.Repo, err = prompts.RepoSlug(ctx.Owner, ctx.Repo); err != nil {
 		return err
 	}
 

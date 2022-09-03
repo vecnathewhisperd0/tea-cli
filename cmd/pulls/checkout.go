@@ -9,7 +9,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
-	"code.gitea.io/tea/modules/interact"
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/task"
 	"code.gitea.io/tea/modules/utils"
 
@@ -47,5 +47,5 @@ func runPullsCheckout(cmd *cli.Context) error {
 		return err
 	}
 
-	return task.PullCheckout(ctx.Login, ctx.Owner, ctx.Repo, ctx.Bool("branch"), idx, interact.PromptPassword)
+	return task.PullCheckout(ctx.Login, ctx.Owner, ctx.Repo, ctx.Bool("branch"), idx, prompts.Password)
 }

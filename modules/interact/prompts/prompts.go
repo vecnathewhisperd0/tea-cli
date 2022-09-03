@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package interact
+package prompts
 
 import (
 	"fmt"
@@ -37,15 +37,15 @@ func NewMultiline(opts Multiline) (prompt survey.Prompt) {
 	return
 }
 
-// PromptPassword asks for a password and blocks until input was made.
-func PromptPassword(name string) (pass string, err error) {
+// Password asks for a password and blocks until input was made.
+func Password(name string) (pass string, err error) {
 	promptPW := &survey.Password{Message: name + " password:"}
 	err = survey.AskOne(promptPW, &pass, survey.WithValidator(survey.Required))
 	return
 }
 
 // promptRepoSlug interactively prompts for a Gitea repository or returns the current one
-func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
+func RepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
 	prompt := "Target repo:"
 	defaultVal := ""
 	required := true
@@ -88,9 +88,9 @@ func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err e
 	return
 }
 
-// promptDatetime prompts for a date or datetime string.
+// Datetime prompts for a date or datetime string.
 // Supports all formats understood by araddon/dateparse.
-func promptDatetime(prompt string) (val *time.Time, err error) {
+func Datetime(prompt string) (val *time.Time, err error) {
 	var input string
 	err = survey.AskOne(
 		&survey.Input{Message: prompt},
@@ -114,8 +114,8 @@ func promptDatetime(prompt string) (val *time.Time, err error) {
 	return
 }
 
-// promptSelect creates a generic multiselect prompt, with processing of custom values.
-func promptMultiSelect(prompt string, options []string, customVal string) ([]string, error) {
+// MultiSelect creates a generic multiselect prompt, with processing of custom values.
+func MultiSelect(prompt string, options []string, customVal string) ([]string, error) {
 	var selection []string
 	promptA := &survey.MultiSelect{
 		Message: prompt,
@@ -128,8 +128,8 @@ func promptMultiSelect(prompt string, options []string, customVal string) ([]str
 	return promptCustomVal(prompt, customVal, selection)
 }
 
-// promptSelect creates a generic select prompt, with processing of custom values or none-option.
-func promptSelect(prompt string, options []string, customVal, noneVal string) (string, error) {
+// Select creates a generic select prompt, with processing of custom values or none-option.
+func Select(prompt string, options []string, customVal, noneVal string) (string, error) {
 	var selection string
 	promptA := &survey.Select{
 		Message: prompt,
@@ -169,14 +169,14 @@ func makeSelectOpts(opts []string, customVal, noneVal string) []string {
 func promptCustomVal(prompt, customVal string, selection []string) ([]string, error) {
 	// check for custom value & prompt again with text input
 	// HACK until https://github.com/AlecAivazis/survey/issues/339 is implemented
-	if otherIndex := utils.IndexOf(selection, customVal); otherIndex != -1 {
-		var customAssignees string
-		promptA := &survey.Input{Message: prompt, Help: "comma separated list"}
-		if err := survey.AskOne(promptA, &customAssignees); err != nil {
+	if customIndex := utils.IndexOf(selection, customVal); customIndex != -1 {
+		var input string
+		promptA := &survey.Input{Message: prompt}
+		if err := survey.AskOne(promptA, &input); err != nil {
 			return nil, err
 		}
-		selection = append(selection[:otherIndex], selection[otherIndex+1:]...)
-		selection = append(selection, strings.Split(customAssignees, ",")...)
+		selection = append(selection[:customIndex], selection[customIndex+1:]...)
+		selection = append(selection, strings.Split(input, ",")...)
 	}
 	return selection, nil
 }

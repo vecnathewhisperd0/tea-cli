@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/task"
 
 	"code.gitea.io/sdk/gitea"
@@ -20,7 +21,7 @@ func CreateMilestone(login *config.Login, owner, repo string) error {
 	var deadline *time.Time
 
 	// owner, repo
-	owner, repo, err := promptRepoSlug(owner, repo)
+	owner, repo, err := prompts.RepoSlug(owner, repo)
 	if err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func CreateMilestone(login *config.Login, owner, repo string) error {
 	}
 
 	// description
-	promptM := NewMultiline(Multiline{
+	promptM := prompts.NewMultiline(prompts.Multiline{
 		Message:   "Milestone description:",
 		Syntax:    "md",
 		UseEditor: config.GetPreferences().Editor,
@@ -43,7 +44,7 @@ func CreateMilestone(login *config.Login, owner, repo string) error {
 	}
 
 	// deadline
-	if deadline, err = promptDatetime("Milestone deadline:"); err != nil {
+	if deadline, err = prompts.Datetime("Milestone deadline:"); err != nil {
 		return err
 	}
 

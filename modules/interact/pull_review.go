@@ -10,6 +10,7 @@ import (
 
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/task"
 
 	"code.gitea.io/sdk/gitea"
@@ -56,7 +57,7 @@ func ReviewPull(ctx *context.TeaContext, idx int64) error {
 	if (state == gitea.ReviewStateComment && len(codeComments) == 0) || state == gitea.ReviewStateRequestChanges {
 		promptOpts = survey.WithValidator(survey.Required)
 	}
-	err = survey.AskOne(NewMultiline(Multiline{
+	err = survey.AskOne(prompts.NewMultiline(prompts.Multiline{
 		Message:   "Concluding comment:",
 		Syntax:    "md",
 		UseEditor: config.GetPreferences().Editor,

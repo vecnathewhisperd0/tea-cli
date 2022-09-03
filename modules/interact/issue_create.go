@@ -7,6 +7,7 @@ package interact
 import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/task"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -14,7 +15,7 @@ import (
 
 // CreateIssue interactively creates an issue
 func CreateIssue(login *config.Login, owner, repo string) error {
-	owner, repo, err := promptRepoSlug(owner, repo)
+	owner, repo, err := prompts.RepoSlug(owner, repo)
 	if err != nil {
 		return err
 	}
@@ -43,7 +44,7 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 	}
 
 	// description
-	promptD := NewMultiline(Multiline{
+	promptD := prompts.NewMultiline(prompts.Multiline{
 		Message:   "Issue description:",
 		Default:   o.Body,
 		Syntax:    "md",
@@ -65,13 +66,13 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 	}
 
 	// assignees
-	if o.Assignees, err = promptMultiSelect("Assignees:", selectables.Assignees, "[other]"); err != nil {
+	if o.Assignees, err = prompts.MultiSelect("Assignees:", selectables.Assignees, "[other]"); err != nil {
 		return err
 	}
 
 	// milestone
 	if len(selectables.MilestoneList) != 0 {
-		if milestoneName, err = promptSelect("Milestone:", selectables.MilestoneList, "", "[none]"); err != nil {
+		if milestoneName, err = prompts.Select("Milestone:", selectables.MilestoneList, "", "[none]"); err != nil {
 			return err
 		}
 		o.Milestone = selectables.MilestoneMap[milestoneName]
@@ -90,7 +91,7 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 	}
 
 	// deadline
-	if o.Deadline, err = promptDatetime("Due date:"); err != nil {
+	if o.Deadline, err = prompts.Datetime("Due date:"); err != nil {
 		return err
 	}
 
