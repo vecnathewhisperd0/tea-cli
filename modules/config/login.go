@@ -21,14 +21,17 @@ import (
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
 type Login struct {
-	Name    string `yaml:"name"`
-	URL     string `yaml:"url"`
-	Token   string `yaml:"token"`
-	Default bool   `yaml:"default"`
-	SSHHost string `yaml:"ssh_host"`
-	// optional path to the private key
+	Name     string `yaml:"name"`
+	URL      string `yaml:"url"`
+	Token    string `yaml:"token"`
+	Default  bool   `yaml:"default"`
+	Insecure bool   `yaml:"insecure"`
+	SSHHost  string `yaml:"ssh_host"`
+	// FIXME: would be nice to have all ssh things in a struct.
+	// but we'll need to provide backwards compat.. with ssh_key string..
+	// if set, tea will prefer SSH over HTTP transport.
+	// TODO: rename to SSHKey    string `yaml:"ssh_key"`
 	SSHKey            string `yaml:"ssh_key"`
-	Insecure          bool   `yaml:"insecure"`
 	SSHCertPrincipal  string `yaml:"ssh_certificate_principal"`
 	SSHKeyFingerprint string `yaml:"ssh_key_agent_pub"`
 	SSHPassphrase     string `yaml:"-"`

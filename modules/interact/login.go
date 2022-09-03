@@ -9,9 +9,18 @@ import (
 	"regexp"
 	"strings"
 
+	"code.gitea.io/tea/modules/interact/prompts"
 	"code.gitea.io/tea/modules/task"
 
 	"github.com/AlecAivazis/survey/v2"
+)
+
+type LoginMethod string
+
+const (
+	LoginMethodToken    LoginMethod = "access token"
+	LoginMethodSsh      LoginMethod = "ssh-key or -certificate"
+	LoginMethodPassword LoginMethod = "username & password"
 )
 
 // CreateLogin create an login interactive
@@ -40,66 +49,55 @@ func CreateLogin() error {
 		return err
 	}
 
-	loginMethod, err := promptSelect("Login with: ", []string{"token", "ssh-key/certificate"}, "", "")
+	loginMethod, err := prompts.Select("Login with: ", []string{
+		string(LoginMethodSsh),
+		string(LoginMethodToken),
+		string(LoginMethodPassword),
+	}, "", "")
 	if err != nil {
 		return err
 	}
 
-	switch loginMethod {
-	case "token":
-		var hasToken bool
-		promptYN := &survey.Confirm{
-			Message: "Do you have an access token?",
-			Default: false,
+	switch LoginMethod(loginMethod) {
+	case LoginMethodToken:
+		promptI = &survey.Input{Message: "Token: "}
+		if err := survey.AskOne(promptI, &token, survey.WithValidator(survey.Required)); err != nil {
+			return err
 		}
-		if err = survey.AskOne(promptYN, &hasToken); err != nil {
+	case LoginMethodPassword:
+		promptI = &survey.Input{Message: "Username: "}
+		if err = survey.AskOne(promptI, &user, survey.WithValidator(survey.Required)); err != nil {
 			return err
 		}
 
-		if hasToken {
-			promptI = &survey.Input{Message: "Token: "}
-			if err := survey.AskOne(promptI, &token, survey.WithValidator(survey.Required)); err != nil {
-				return err
+		promptPW := &survey.Password{Message: "Password: "}
+		if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
+			return err
+		}
+	case LoginMethodSsh:
+		sshKey, err = prompts.Select("Select SSH-key / -certificate: ", task.ListSSHPubkey(), "[custom filepath]", "")
+		if err != nil {
+			return err
+		}
+		fmt.Println(sshKey)
+
+		if strings.Contains(sshKey, "(ssh-agent)") {
+			sshAgent = true
+			sshKey = ""
+		}
+		if strings.Contains(sshKey, "principals") {
+			sshCertPrincipal = regexp.MustCompile(`.*?principals: (.*?)[,|\s]`).FindStringSubmatch(sshKey)[1]
+			if !sshAgent {
+				// CLEANUP: should rewrite this with a SSHKey struct with .String() method etc?
+				sshKey = regexp.MustCompile(`\((.*?)\)$`).FindStringSubmatch(sshKey)[1]
+				sshKey = strings.TrimSuffix(sshKey, "-cert.pub")
+				fmt.Println(sshKey)
 			}
 		} else {
-			promptI = &survey.Input{Message: "Username: "}
-			if err = survey.AskOne(promptI, &user, survey.WithValidator(survey.Required)); err != nil {
-				return err
-			}
-
-			promptPW := &survey.Password{Message: "Password: "}
-			if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
-				return err
-			}
-		}
-	case "ssh-key/certificate":
-		promptI = &survey.Input{Message: "SSH Key/Certificate Path (leave empty for auto-discovery in ~/.ssh and ssh-agent):"}
-		if err := survey.AskOne(promptI, &sshKey); err != nil {
-			return err
-		}
-
-		if sshKey == "" {
-			sshKey, err = promptSelect("Select ssh-key: ", task.ListSSHPubkey(), "", "")
-			if err != nil {
-				return err
-			}
-
-			// ssh certificate
-			if strings.Contains(sshKey, "principals") {
-				sshCertPrincipal = regexp.MustCompile(`.*?principals: (.*?)[,|\s]`).FindStringSubmatch(sshKey)[1]
-				if strings.Contains(sshKey, "(ssh-agent)") {
-					sshAgent = true
-					sshKey = ""
-				} else {
-					sshKey = regexp.MustCompile(`\((.*?)\)$`).FindStringSubmatch(sshKey)[1]
-					sshKey = strings.TrimSuffix(sshKey, "-cert.pub")
-				}
-			} else {
-				sshKeyFingerprint = regexp.MustCompile(`(SHA256:.*?)\s`).FindStringSubmatch(sshKey)[1]
-				if strings.Contains(sshKey, "(ssh-agent)") {
-					sshAgent = true
-					sshKey = ""
-				} else {
+			matches := regexp.MustCompile(`(SHA256:.*?)\s`).FindStringSubmatch(sshKey)
+			if len(matches) > 1 {
+				sshKeyFingerprint = matches[1]
+				if !sshAgent {
 					sshKey = regexp.MustCompile(`\((.*?)\)$`).FindStringSubmatch(sshKey)[1]
 					sshKey = strings.TrimSuffix(sshKey, ".pub")
 				}
@@ -116,13 +114,18 @@ func CreateLogin() error {
 		return err
 	}
 	if optSettings {
-		promptI = &survey.Input{Message: "SSH Key Path (leave empty for auto-discovery):"}
-		if err := survey.AskOne(promptI, &sshKey); err != nil {
-			return err
+		// FIXME: drop this prompt entirely, once go's ssh key signing implementation
+		//  supports all key types or something??
+		//  (at least ecdsa-sha2-nistp521 is unsupported as of 2022-09-03)
+		if LoginMethod(loginMethod) != LoginMethodSsh {
+			promptI = &survey.Input{Message: "SSH Key Path (leave empty for auto-discovery):"}
+			if err := survey.AskOne(promptI, &sshKey); err != nil {
+				return err
+			}
 		}
 
 		promptYN = &survey.Confirm{
-			Message: "Allow Insecure connections: ",
+			Message: "Allow insecure connections: ",
 			Default: false,
 		}
 		if err = survey.AskOne(promptYN, &insecure); err != nil {
