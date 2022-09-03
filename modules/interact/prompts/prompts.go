@@ -135,7 +135,7 @@ func Select(prompt string, options []string, customVal, noneVal string) (string,
 		Message: prompt,
 		Options: makeSelectOpts(options, customVal, noneVal),
 		VimMode: true,
-		Default: noneVal,
+		Default: options[0],
 	}
 	if err := survey.AskOne(promptA, &selection); err != nil {
 		return "", err
