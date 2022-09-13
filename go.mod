@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	code.gitea.io/gitea-vet v0.2.1
-	code.gitea.io/sdk/gitea v0.15.1-0.20220530220844-359c771ce3d2
+	code.gitea.io/sdk/gitea v0.15.1-0.20220831004139-a0127ed0e7fe
 	gitea.com/noerw/unidiff-comments v0.0.0-20220822113322-50f4daa0e35c
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/adrg/xdg v0.4.0
@@ -29,10 +29,11 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/cloudflare/circl v1.2.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/davidmz/go-pageant v1.0.2 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
+	github.com/go-fed/httpsig v1.1.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
