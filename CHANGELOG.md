@@ -7,6 +7,7 @@
   * Return RFC3339 UTC timestamps for machine-readable output (#470)
 * FEATURES
   * Allow editing multiline prompts with external text editor (#429)
+  * Add `tea admin user list` (#427)
   * Add `tea whoami` command (#426)
   * Add `tea org create <name>` (#420)
   * Add `tea clone` (#411)
