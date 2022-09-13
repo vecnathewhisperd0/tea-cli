@@ -19,7 +19,7 @@
   * Fix create milestone with deadline bug (#462)
   * Fix resolving of URLs in markdown (#401)
 * ENHANCEMENTS
-  * markdown: dont emit ansi sequences when not emitting to tty (#491)
+  * Don't emit ANSI sequences when not emitting to TTY for markdown (#491)
   * Show more version info (#486)
   * Add preference `flag_defaults.remote`, refactor (#466)
   * PR listing: add --fields & expose additional fields (#415)
