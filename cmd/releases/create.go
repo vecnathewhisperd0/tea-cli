@@ -69,7 +69,7 @@ func runReleaseCreate(cmd *cli.Context) error {
 	tag := ctx.String("tag")
 	if cmd.Args().Present() {
 		if len(tag) != 0 {
-			return fmt.Errorf("Ambiguous arguments: provide tagname via --tag or argument, but not both.")
+			return fmt.Errorf("ambiguous arguments: provide tagname via --tag or argument, but not both")
 		}
 		tag = cmd.Args().First()
 	}
