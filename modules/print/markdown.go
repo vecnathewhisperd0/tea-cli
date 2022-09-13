@@ -26,6 +26,7 @@ func outputMarkdown(markdown string, baseURL string) error {
 	renderer, err := glamour.NewTermRenderer(
 		styleOption,
 		glamour.WithBaseURL(baseURL),
+		glamour.WithPreservedNewLines(),
 		glamour.WithWordWrap(getWordWrap()),
 	)
 	if err != nil {
