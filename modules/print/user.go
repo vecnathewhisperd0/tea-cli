@@ -127,9 +127,9 @@ func (x printableUser) FormatField(field string, machineReadable bool) string {
 	case "visibility":
 		return string(x.Visibility)
 	case "created_at":
-		return FormatTime(x.Created)
+		return FormatTime(x.Created, machineReadable)
 	case "lastlogin_at":
-		return FormatTime(x.LastLogin)
+		return FormatTime(x.LastLogin, machineReadable)
 	}
 	return ""
 }
