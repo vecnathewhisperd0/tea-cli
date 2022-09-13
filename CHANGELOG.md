@@ -22,6 +22,7 @@
   * Don't emit ANSI sequences when not emitting to TTY for markdown (#491)
   * Show more version info (#486)
   * Add preference `flag_defaults.remote`, refactor (#466)
+  * Add `--fields` to notification & milestone listings (#422)
   * PR listing: add --fields & expose additional fields (#415)
   * Add more flags to `tea repo create` (#409)
   * Implement more issue filters (#400)
