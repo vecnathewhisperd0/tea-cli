@@ -23,6 +23,7 @@ var CmdMilestonesList = cli.Command{
 	Aliases:     []string{"ls"},
 	Usage:       "List milestones of the repository",
 	Description: `List milestones of the repository`,
+	ArgsUsage:   " ", // command does not accept arguments
 	Action:      RunMilestonesList,
 	Flags: append([]cli.Flag{
 		fieldsFlag,

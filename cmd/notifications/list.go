@@ -28,6 +28,7 @@ var CmdNotificationsList = cli.Command{
 	Aliases:     []string{"list"},
 	Usage:       "List notifications",
 	Description: `List notifications`,
+	ArgsUsage:   " ", // command does not accept arguments
 	Action:      RunNotificationsList,
 	Flags: append([]cli.Flag{
 		notifFieldsFlag,
