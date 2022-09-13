@@ -45,19 +45,19 @@ func RunReleasesList(cmd *cli.Context) error {
 }
 
 func getReleaseByTag(owner, repo, tag string, client *gitea.Client) (*gitea.Release, error) {
-	rl, _, err := client.ListReleases(owner, repo, gitea.ListReleasesOptions{})
+	rl, _, err := client.ListReleases(owner, repo, gitea.ListReleasesOptions{
+		ListOptions: gitea.ListOptions{Page: -1},
+	})
 	if err != nil {
 		return nil, err
 	}
 	if len(rl) == 0 {
-		fmt.Println("Repo does not have any release")
-		return nil, nil
+		return nil, fmt.Errorf("Repo does not have any release")
 	}
 	for _, r := range rl {
 		if r.TagName == tag {
 			return r, nil
 		}
 	}
-	fmt.Println("Release tag does not exist")
-	return nil, nil
+	return nil, fmt.Errorf("Release tag does not exist")
 }

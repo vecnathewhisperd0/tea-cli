@@ -24,7 +24,8 @@ endif
 TEA_VERSION_TAG ?= $(shell sed 's/+/_/' <<< $(TEA_VERSION))
 
 TAGS ?=
-LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)" -s -w
+SDK ?= $(shell $(GO) list -f '{{.Version}}' -m code.gitea.io/sdk/gitea)
+LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)" -X "main.SDK=$(SDK)" -s -w
 
 # override to allow passing additional goflags via make CLI
 override GOFLAGS := $(GOFLAGS) -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
@@ -63,24 +64,15 @@ vet:
 	$(GO) vet -vettool=gitea-vet $(PACKAGES)
 
 .PHONY: lint
-lint:
-	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		cd /tmp && $(GO) get -u github.com/mgechev/revive; \
-	fi
+lint: install-lint-tools
 	revive -config .revive.toml -exclude=./vendor/... ./... || exit 1
 
 .PHONY: misspell-check
-misspell-check:
-	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		cd /tmp && $(GO) get -u github.com/client9/misspell/cmd/misspell; \
-	fi
+misspell-check: install-lint-tools
 	misspell -error -i unknwon,destory $(GOFILES)
 
 .PHONY: misspell
-misspell:
-	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		cd /tmp && $(GO) get -u github.com/client9/misspell/cmd/misspell; \
-	fi
+misspell: install-lint-tools
 	misspell -w -i unknwon $(GOFILES)
 
 .PHONY: fmt-check
@@ -105,15 +97,6 @@ unit-test-coverage:
 vendor:
 	$(GO) mod tidy && $(GO) mod vendor
 
-.PHONY: test-vendor
-test-vendor: vendor
-	@diff=$$(git diff vendor/); \
-	if [ -n "$$diff" ]; then \
-		echo "Please run 'make vendor' and commit the result:"; \
-		echo "$${diff}"; \
-		exit 1; \
-	fi;
-
 .PHONY: check
 check: test
 
@@ -133,7 +116,7 @@ build-image:
 	docker build --build-arg VERSION=$(TEA_VERSION) -t gitea/tea:$(TEA_VERSION_TAG) .
 
 .PHONY: release
-release: release-dirs release-os release-compress release-check
+release: release-dirs install-release-tools release-os release-compress release-check
 
 .PHONY: release-dirs
 release-dirs:
@@ -141,18 +124,29 @@ release-dirs:
 
 .PHONY: release-os
 release-os:
-	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		cd /tmp && $(GO) get -u github.com/mitchellh/gox; \
-	fi
 	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
-release-compress:
-	@hash gxz > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		GO111MODULE=off $(GO) get -u github.com/ulikunitz/xz/cmd/gxz; \
-	fi
+release-compress: install-release-tools
 	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "compressing $${file}" && gxz -k -9 $${file}; done;
 
 .PHONY: release-check
-release-check:
+release-check: install-release-tools
 	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "checksumming $${file}" && $(SHASUM) `echo $${file} | sed 's/^..//'` > $${file}.sha256; done;
+
+### tools
+install-release-tools:
+	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) install github.com/mitchellh/gox@latest; \
+	fi
+	@hash gxz > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) install github.com/ulikunitz/xz/cmd/gxz@latest; \
+	fi
+
+install-lint-tools:
+	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) install github.com/mgechev/revive@latest; \
+	fi
+	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) install github.com/client9/misspell/cmd/misspell@latest; \
+	fi

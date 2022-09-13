@@ -54,7 +54,7 @@ func (n printableNotification) FormatField(field string, machineReadable bool) s
 		return status
 
 	case "updated":
-		return FormatTime(n.UpdatedAt)
+		return FormatTime(n.UpdatedAt, machineReadable)
 
 	case "index":
 		var index string

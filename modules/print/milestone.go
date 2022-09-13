@@ -19,7 +19,7 @@ func MilestoneDetails(milestone *gitea.Milestone) {
 		fmt.Printf("\n%s\n", milestone.Description)
 	}
 	if milestone.Deadline != nil && !milestone.Deadline.IsZero() {
-		fmt.Printf("\nDeadline: %s\n", FormatTime(*milestone.Deadline))
+		fmt.Printf("\nDeadline: %s\n", FormatTime(*milestone.Deadline, false))
 	}
 }
 
@@ -67,21 +67,21 @@ func (m printableMilestone) FormatField(field string, machineReadable bool) stri
 		return fmt.Sprintf("%d/%d", m.OpenIssues, m.ClosedIssues)
 	case "duedate":
 		if m.Deadline != nil && !m.Deadline.IsZero() {
-			return FormatTime(*m.Deadline)
+			return FormatTime(*m.Deadline, machineReadable)
 		}
 	case "id":
 		return fmt.Sprintf("%d", m.ID)
 	case "description":
 		return m.Description
 	case "created":
-		return FormatTime(m.Created)
+		return FormatTime(m.Created, machineReadable)
 	case "updated":
 		if m.Updated != nil {
-			return FormatTime(*m.Updated)
+			return FormatTime(*m.Updated, machineReadable)
 		}
 	case "closed":
 		if m.Closed != nil {
-			return FormatTime(*m.Closed)
+			return FormatTime(*m.Closed, machineReadable)
 		}
 	}
 	return ""
