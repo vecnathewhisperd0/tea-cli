@@ -21,6 +21,7 @@ var CmdReleaseList = cli.Command{
 	Aliases:     []string{"ls"},
 	Usage:       "List Releases",
 	Description: "List Releases",
+	ArgsUsage:   " ", // command does not accept arguments
 	Action:      RunReleasesList,
 	Flags: append([]cli.Flag{
 		&flags.PaginationPageFlag,
@@ -45,7 +46,9 @@ func RunReleasesList(cmd *cli.Context) error {
 }
 
 func getReleaseByTag(owner, repo, tag string, client *gitea.Client) (*gitea.Release, error) {
-	rl, _, err := client.ListReleases(owner, repo, gitea.ListReleasesOptions{})
+	rl, _, err := client.ListReleases(owner, repo, gitea.ListReleasesOptions{
+		ListOptions: gitea.ListOptions{Page: -1},
+	})
 	if err != nil {
 		return nil, err
 	}
