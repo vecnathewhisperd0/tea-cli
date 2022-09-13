@@ -25,12 +25,10 @@
   * PR listing: add --fields & expose additional fields (#415)
   * Add more flags to `tea repo create` (#409)
   * Implement more issue filters (#400)
-* BUILD
+* MISC
   * Simplify build & update installation instructions (#437)
-* DOCS
   * Clarify command descriptions when no arguments are taken (#496)
   * Improve Documentation (#433)
-* MISC
   * Use golang v1.18 and drop vendor folder (#478)
   * Correct spelling of "wether" to "whether" in usage output (#453)
 
