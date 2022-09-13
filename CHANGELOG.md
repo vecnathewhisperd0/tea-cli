@@ -1,5 +1,39 @@
 # Changelog
 
+## [v0.9.0](https://gitea.com/gitea/tea/releases/tag/v0.9.0) - 2022-09-13
+
+* BREAKING
+  * Rename master branch to main (#495)
+  * Return RFC3339 UTC timestamps for machine-readable output (#470)
+* FEATURES
+  * Allow editing multiline prompts with external text editor (#429)
+  * Add `tea whoami` command (#426)
+  * Add `tea org create <name>` (#420)
+  * Add `tea clone` (#411)
+  * Add `tea repo fork` (#410)
+  * Add `tea repo create-from-template` (#408)
+* BUGFIXES
+  * Fetch all items where needed. (#475)
+  * Fix running in repos without remote (#472)
+  * Add TSV to machine-readable formats (#467)
+  * Fix create milestone with deadline bug (#462)
+  * Fix resolving of URLs in markdown (#401)
+* ENHANCEMENTS
+  * markdown: dont emit ansi sequences when not emitting to tty (#491)
+  * Show more version info (#486)
+  * Add preference `flag_defaults.remote`, refactor (#466)
+  * PR listing: add --fields & expose additional fields (#415)
+  * Add more flags to `tea repo create` (#409)
+  * Implement more issue filters (#400)
+* BUILD
+  * Simplify build & update installation instructions (#437)
+* DOCS
+  * Clarify command descriptions when no arguments are taken (#496)
+  * Improve Documentation (#433)
+* MISC
+  * Use golang v1.18 and drop vendor folder (#478)
+  * Correct spelling of "wether" to "whether" in usage output (#453)
+
 ## [v0.8.0](https://gitea.com/gitea/tea/releases/tag/v0.8.0) - 2021-09-22
 
 * BREAKING
