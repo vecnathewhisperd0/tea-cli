@@ -17,7 +17,7 @@ var CmdAdmin = cli.Command{
 	Name:     "admin",
 	Usage:    "Operations requiring admin access on the Gitea instance",
 	Aliases:  []string{"a"},
-	Category: catHelpers,
+	Category: catMisc,
 	Action: func(cmd *cli.Context) error {
 		return cli.ShowSubcommandHelp(cmd)
 	},
