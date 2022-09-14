@@ -89,9 +89,8 @@ func (o EditIssueOption) toSdkOptions(ctx *context.TeaContext, client *gitea.Cli
 
 	if issueOptsDirty == true {
 		return &issueOpts, addLabelOpts, rmLabelOpts, nil
-	} else {
-		return nil, addLabelOpts, rmLabelOpts, nil
 	}
+	return nil, addLabelOpts, rmLabelOpts, nil
 }
 
 // EditIssue edits an issue and returns the updated issue.
