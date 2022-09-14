@@ -44,7 +44,7 @@ func Password(name string) (pass string, err error) {
 	return
 }
 
-// promptRepoSlug interactively prompts for a Gitea repository or returns the current one
+// RepoSlug interactively prompts for a Gitea repository or returns the current one
 func RepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
 	prompt := "Target repo:"
 	defaultVal := ""
