@@ -30,7 +30,7 @@ var CmdPullsCreate = cli.Command{
 			Aliases: []string{"b"},
 			Usage:   "Branch name of the PR target (default is repos default branch)",
 		},
-	}, flags.IssuePREditFlags...),
+	}, flags.IssuePRCreateFlags...),
 }
 
 func runPullsCreate(cmd *cli.Context) error {
@@ -42,7 +42,7 @@ func runPullsCreate(cmd *cli.Context) error {
 	}
 
 	// else use args to create PR
-	opts, err := flags.GetIssuePREditFlags(ctx)
+	opts, err := flags.GetIssuePRCreateFlags(ctx)
 	if err != nil {
 		return err
 	}

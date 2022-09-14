@@ -84,8 +84,8 @@ var IssueListingFlags = append([]cli.Flag{
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
 
-// IssuePREditFlags defines flags for properties of issues and PRs
-var IssuePREditFlags = append([]cli.Flag{
+// issuePRFlags defines shared flags between flags IssuePRCreateFlags and IssuePREditFlags
+var issuePRFlags = append([]cli.Flag{
 	&cli.StringFlag{
 		Name:    "title",
 		Aliases: []string{"t"},
@@ -94,6 +94,25 @@ var IssuePREditFlags = append([]cli.Flag{
 		Name:    "description",
 		Aliases: []string{"d"},
 	},
+	&cli.StringFlag{
+		Name:    "referenced-version",
+		Aliases: []string{"v"},
+		Usage:   "commit-hash or tag name to assign",
+	},
+	&cli.StringFlag{
+		Name:    "milestone",
+		Aliases: []string{"m"},
+		Usage:   "Milestone to assign",
+	},
+	&cli.StringFlag{
+		Name:    "deadline",
+		Aliases: []string{"D"},
+		Usage:   "Deadline timestamp to assign",
+	},
+}, LoginRepoFlags...)
+
+// IssuePRCreateFlags defines flags for creation of issues and PRs
+var IssuePRCreateFlags = append([]cli.Flag{
 	&cli.StringFlag{
 		Name:    "assignees",
 		Aliases: []string{"a"},
@@ -104,20 +123,10 @@ var IssuePREditFlags = append([]cli.Flag{
 		Aliases: []string{"L"},
 		Usage:   "Comma-separated list of labels to assign",
 	},
-	&cli.StringFlag{
-		Name:    "deadline",
-		Aliases: []string{"D"},
-		Usage:   "Deadline timestamp to assign",
-	},
-	&cli.StringFlag{
-		Name:    "milestone",
-		Aliases: []string{"m"},
-		Usage:   "Milestone to assign",
-	},
-}, LoginRepoFlags...)
+}, issuePRFlags...)
 
-// GetIssuePREditFlags parses all IssuePREditFlags
-func GetIssuePREditFlags(ctx *context.TeaContext) (*gitea.CreateIssueOption, error) {
+// GetIssuePRCreateFlags parses all IssuePREditFlags
+func GetIssuePRCreateFlags(ctx *context.TeaContext) (*gitea.CreateIssueOption, error) {
 	opts := gitea.CreateIssueOption{
 		Title:     ctx.String("title"),
 		Body:      ctx.String("description"),
