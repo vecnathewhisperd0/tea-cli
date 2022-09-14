@@ -43,7 +43,7 @@ steps:
     GOPROXY: https://goproxy.io # proxy.golang.org is blocked in China, this proxy is not
   when:
     branch:
-    - master
+    - main
     event:
     - push
     - pull_request
@@ -112,7 +112,8 @@ steps:
   settings:
     acl: public-read
     bucket: gitea-artifacts
-    endpoint: https://storage.gitea.io
+    endpoint:
+      from_secret: aws_endpoint
     path_style: true
     source: "dist/release/*"
     strip_prefix: dist/release/
@@ -132,7 +133,8 @@ steps:
   settings:
     acl: public-read
     bucket: gitea-artifacts
-    endpoint: https://ams3.digitaloceanspaces.com
+    endpoint:
+      from_secret: aws_endpoint
     source: "dist/release/*"
     strip_prefix: dist/release/
     target: "/tea/${DRONE_BRANCH##release/v}"
@@ -153,10 +155,11 @@ steps:
   settings:
     acl: public-read
     bucket: gitea-artifacts
-    endpoint: https://ams3.digitaloceanspaces.com
+    endpoint:
+      from_secret: aws_endpoint
     source: "dist/release/*"
     strip_prefix: dist/release/
-    target: /tea/master
+    target: /tea/main
   environment:
     AWS_ACCESS_KEY_ID:
       from_secret: aws_access_key_id
@@ -164,7 +167,7 @@ steps:
       from_secret: aws_secret_access_key
   when:
     branch:
-    - master
+    - main
     event:
     - push
 
