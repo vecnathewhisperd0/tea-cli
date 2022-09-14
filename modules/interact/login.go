@@ -15,19 +15,20 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
-type LoginMethod string
+// loginMethod does represent methods tea do support to auth against gitea
+type loginMethod string
 
 const (
-	LoginMethodToken    LoginMethod = "access token"
-	LoginMethodSsh      LoginMethod = "ssh-key or -certificate"
-	LoginMethodPassword LoginMethod = "username & password"
+	loginMethodToken    loginMethod = "access token"
+	loginMethodSSH      loginMethod = "ssh-key or -certificate"
+	loginMethodPassword loginMethod = "username & password"
 )
 
 // CreateLogin create an login interactive
 func CreateLogin() error {
 	var name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint string
-	var insecure = false
-	var sshAgent = false
+	insecure := false
+	sshAgent := false
 
 	promptI := &survey.Input{Message: "URL of Gitea instance: "}
 	if err := survey.AskOne(promptI, &giteaURL, survey.WithValidator(survey.Required)); err != nil {
@@ -49,22 +50,22 @@ func CreateLogin() error {
 		return err
 	}
 
-	loginMethod, err := prompts.Select("Login with: ", []string{
-		string(LoginMethodSsh),
-		string(LoginMethodToken),
-		string(LoginMethodPassword),
+	lMethod, err := prompts.Select("Login with: ", []string{
+		string(loginMethodSSH),
+		string(loginMethodToken),
+		string(loginMethodPassword),
 	}, "", "")
 	if err != nil {
 		return err
 	}
 
-	switch LoginMethod(loginMethod) {
-	case LoginMethodToken:
+	switch loginMethod(lMethod) {
+	case loginMethodToken:
 		promptI = &survey.Input{Message: "Token: "}
 		if err := survey.AskOne(promptI, &token, survey.WithValidator(survey.Required)); err != nil {
 			return err
 		}
-	case LoginMethodPassword:
+	case loginMethodPassword:
 		promptI = &survey.Input{Message: "Username: "}
 		if err = survey.AskOne(promptI, &user, survey.WithValidator(survey.Required)); err != nil {
 			return err
@@ -74,7 +75,7 @@ func CreateLogin() error {
 		if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
 			return err
 		}
-	case LoginMethodSsh:
+	case loginMethodSSH:
 		sshKey, err = prompts.Select("Select SSH-key / -certificate: ", task.ListSSHPubkey(), "[custom filepath]", "")
 		if err != nil {
 			return err
@@ -117,7 +118,7 @@ func CreateLogin() error {
 		// FIXME: drop this prompt entirely, once go's ssh key signing implementation
 		//  supports all key types or something??
 		//  (at least ecdsa-sha2-nistp521 is unsupported as of 2022-09-03)
-		if LoginMethod(loginMethod) != LoginMethodSsh {
+		if loginMethod(lMethod) != loginMethodSSH {
 			promptI = &survey.Input{Message: "SSH Key Path (leave empty for auto-discovery):"}
 			if err := survey.AskOne(promptI, &sshKey); err != nil {
 				return err
