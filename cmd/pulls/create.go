@@ -30,6 +30,11 @@ var CmdPullsCreate = cli.Command{
 			Aliases: []string{"b"},
 			Usage:   "Branch name of the PR target (default is repos default branch)",
 		},
+		&cli.BoolFlag{
+			Name:    "allow-maintainer-edits",
+			Aliases: []string{"edits"},
+			Usage:   "Enable maintainers to push to the base branch of created pull",
+		},
 	}, flags.IssuePREditFlags...),
 }
 
@@ -51,6 +56,7 @@ func runPullsCreate(cmd *cli.Context) error {
 		ctx,
 		ctx.String("base"),
 		ctx.String("head"),
+		ctx.Bool("allow-maintainer-edits"),
 		opts,
 	)
 }
