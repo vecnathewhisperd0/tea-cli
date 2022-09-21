@@ -12,6 +12,10 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+func OutputMarkdown(markdown string, baseURL string) error {
+	return outputMarkdown(markdown, baseURL)
+}
+
 // outputMarkdown prints markdown to stdout, formatted for terminals.
 // If the input could not be parsed, it is printed unformatted, the error
 // is returned anyway.

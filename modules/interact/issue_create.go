@@ -7,10 +7,11 @@ package interact
 import (
 	"fmt"
 
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/task"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/AlecAivazis/survey/v2"
 )
 
@@ -77,7 +78,42 @@ func promptForIssueTemplate(t *gitea.IssueTemplate, labels map[string]int64) (gi
 	}
 
 	if t.IsForm() {
-		fmt.Println("ERR: issue template forms not yet implemented")
+		var responses []string
+		for _, f := range t.Form {
+			var (
+				promptOpts survey.AskOpt
+				prompt     survey.Prompt
+				input      string
+				// TODO: reuse code from https://github.com/go-gitea/gitea/blob/main/modules/issue/template/template.go#L256-L306
+				responseFormatter = func(in string) string { return in }
+			)
+
+			if f.Validations.Required {
+				promptOpts = survey.WithValidator(survey.Required)
+			}
+
+			switch f.Type {
+			case gitea.IssueFormElementMarkdown:
+				print.OutputMarkdown(f.Attributes.Value, "")
+				continue // not emitted to issue body
+			case gitea.IssueFormElementInput:
+				prompt = &survey.Input{
+					Message: f.Attributes.Label,
+					Help:    f.Attributes.Description,
+					Default: f.Attributes.Value,
+				}
+				responseFormatter = func(answer string) string {
+					return fmt.Sprintf("#### %s\n%s", f.Attributes.Label, answer)
+				}
+			}
+
+			if prompt != nil {
+				if err := survey.AskOne(prompt, &input, promptOpts); err != nil {
+					return opts, err
+				}
+				responses = append(responses, responseFormatter(input))
+			}
+		}
 	} else {
 		// TODO: don't prompt for description again, if we did here.
 		prompt := NewMultiline(Multiline{
