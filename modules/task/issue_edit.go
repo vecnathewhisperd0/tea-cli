@@ -48,7 +48,7 @@ func (o EditIssueOption) toSdkOptions(ctx *context.TeaContext, client *gitea.Cli
 	}
 
 	issueOpts := gitea.EditIssueOption{}
-	var issueOptsDirty = true
+	var issueOptsDirty bool
 	if o.Title != nil {
 		issueOpts.Title = *o.Title
 		issueOptsDirty = true
@@ -63,8 +63,7 @@ func (o EditIssueOption) toSdkOptions(ctx *context.TeaContext, client *gitea.Cli
 	}
 	if o.Milestone != nil {
 		if *o.Milestone == "" {
-			var tmp int64
-			issueOpts.Milestone = &tmp
+			issueOpts.Milestone = gitea.OptionalInt64(0)
 		} else {
 			ms, _, err := client.GetMilestoneByName(ctx.Owner, ctx.Repo, *o.Milestone)
 			if err != nil {
@@ -78,8 +77,7 @@ func (o EditIssueOption) toSdkOptions(ctx *context.TeaContext, client *gitea.Cli
 		issueOpts.Deadline = o.Deadline
 		issueOptsDirty = true
 		if o.Deadline.IsZero() {
-			tmp := true
-			issueOpts.RemoveDeadline = &tmp
+			issueOpts.RemoveDeadline = gitea.OptionalBool(true)
 		}
 	}
 	if o.AddAssignees != nil && len(o.AddAssignees) != 0 {
@@ -87,7 +85,7 @@ func (o EditIssueOption) toSdkOptions(ctx *context.TeaContext, client *gitea.Cli
 		issueOptsDirty = true
 	}
 
-	if issueOptsDirty == true {
+	if issueOptsDirty {
 		return &issueOpts, addLabelOpts, rmLabelOpts, nil
 	}
 	return nil, addLabelOpts, rmLabelOpts, nil
