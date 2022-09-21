@@ -5,6 +5,8 @@
 package interact
 
 import (
+	"fmt"
+
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/task"
@@ -20,11 +22,76 @@ func CreateIssue(login *config.Login, owner, repo string) error {
 	}
 
 	var opts gitea.CreateIssueOption
+
+	// TODO: pass client instance down for speed
+	templates, _, err := login.Client().GetIssueTemplates(owner, repo)
+
+	if err == nil && len(templates) != 0 {
+		// FIXME perf don't do this twice.
+		selectableChan := make(chan (issueSelectables), 1)
+		go fetchIssueSelectables(login, owner, repo, selectableChan)
+
+		var (
+			templateNames   = make([]string, len(templates))
+			templatesByName = map[string]*gitea.IssueTemplate{}
+		)
+		for i, t := range templates {
+			name := t.Name + "\t " + t.About
+			templatesByName[name] = t
+			templateNames[i] = name
+		}
+
+		if selectedTemplate, err := promptSelect("Use issue template?", templateNames, "", "[none]"); err != nil {
+			return err
+		} else if selectedTemplate != "[none]" {
+			// wait until selectables are fetched
+			selectables := <-selectableChan
+			if selectables.Err != nil {
+				return selectables.Err
+			}
+			opts, err = promptForIssueTemplate(templatesByName[selectedTemplate], selectables.LabelMap)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	if err := promptIssueProperties(login, owner, repo, &opts); err != nil {
 		return err
 	}
 
 	return task.CreateIssue(login, owner, repo, opts)
+}
+
+func promptForIssueTemplate(t *gitea.IssueTemplate, labels map[string]int64) (gitea.CreateIssueOption, error) {
+	// map label names to IDs
+	var labelIDs = make([]int64, len(t.IssueLabels))
+	for i, l := range t.IssueLabels {
+		labelIDs[i] = labels[l]
+	}
+
+	opts := gitea.CreateIssueOption{
+		Title:  t.IssueTitle,
+		Ref:    t.IssueRef,
+		Labels: labelIDs,
+	}
+
+	if t.IsForm() {
+		fmt.Println("ERR: issue template forms not yet implemented")
+	} else {
+		// TODO: don't prompt for description again, if we did here.
+		prompt := NewMultiline(Multiline{
+			Message:   "Issue Description",
+			Default:   t.MarkdownContent,
+			Syntax:    "md",
+			UseEditor: config.GetPreferences().Editor,
+		})
+		if err := survey.AskOne(prompt, &opts.Body); err != nil {
+			return opts, err
+		}
+	}
+
+	return opts, nil
 }
 
 func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.CreateIssueOption) error {

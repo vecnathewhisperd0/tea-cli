@@ -27,9 +27,11 @@ type Multiline struct {
 func NewMultiline(opts Multiline) (prompt survey.Prompt) {
 	if opts.UseEditor {
 		prompt = &survey.Editor{
-			Message:  opts.Message,
-			Default:  opts.Default,
-			FileName: "*." + opts.Syntax,
+			Message:       opts.Message,
+			Default:       opts.Default,
+			HideDefault:   true,
+			AppendDefault: true,
+			FileName:      "*." + opts.Syntax,
 		}
 	} else {
 		prompt = &survey.Multiline{Message: opts.Message, Default: opts.Default}
