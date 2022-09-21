@@ -138,7 +138,7 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 
 	// milestone
 	if len(selectables.MilestoneList) != 0 {
-		if milestoneName, err = promptSelect("Milestone:", selectables.MilestoneList, "", "[none]"); err != nil {
+		if milestoneName, err = promptSelect("Milestone:", selectables.MilestoneList, selectables.MilestoneMapInv[o.Milestone], "[none]"); err != nil {
 			return err
 		}
 		o.Milestone = selectables.MilestoneMap[milestoneName]
@@ -146,7 +146,10 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 
 	// labels
 	if len(selectables.LabelList) != 0 {
-		promptL := &survey.MultiSelect{Message: "Labels:", Options: selectables.LabelList, VimMode: true, Default: o.Labels}
+		for _, l := range o.Labels {
+			labels = append(labels, selectables.LabelMapInv[l])
+		}
+		promptL := &survey.MultiSelect{Message: "Labels:", Options: selectables.LabelList, VimMode: true, Default: labels}
 		if err := survey.AskOne(promptL, &labels); err != nil {
 			return err
 		}
@@ -165,13 +168,15 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 }
 
 type issueSelectables struct {
-	Repo          *gitea.Repository
-	Assignees     []string
-	MilestoneList []string
-	MilestoneMap  map[string]int64
-	LabelList     []string
-	LabelMap      map[string]int64
-	Err           error
+	Repo            *gitea.Repository
+	Assignees       []string
+	MilestoneList   []string
+	MilestoneMap    map[string]int64
+	MilestoneMapInv map[int64]string
+	LabelList       []string
+	LabelMap        map[string]int64
+	LabelMapInv     map[int64]string
+	Err             error
 }
 
 func fetchIssueSelectables(login *config.Login, owner, repo string, done chan issueSelectables) {
@@ -209,9 +214,11 @@ func fetchIssueSelectables(login *config.Login, owner, repo string, done chan is
 		return
 	}
 	r.MilestoneMap = make(map[string]int64)
+	r.MilestoneMapInv = make(map[int64]string)
 	r.MilestoneList = make([]string, len(milestones))
 	for i, m := range milestones {
 		r.MilestoneMap[m.Title] = m.ID
+		r.MilestoneMapInv[m.ID] = m.Title
 		r.MilestoneList[i] = m.Title
 	}
 
@@ -224,9 +231,11 @@ func fetchIssueSelectables(login *config.Login, owner, repo string, done chan is
 		return
 	}
 	r.LabelMap = make(map[string]int64)
+	r.LabelMapInv = make(map[int64]string)
 	r.LabelList = make([]string, len(labels))
 	for i, l := range labels {
 		r.LabelMap[l.Name] = l.ID
+		r.LabelMapInv[l.ID] = l.Name
 		r.LabelList[i] = l.Name
 	}
 
