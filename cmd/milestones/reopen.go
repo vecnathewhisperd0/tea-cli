@@ -5,8 +5,11 @@
 package milestones
 
 import (
+	"fmt"
+
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -46,6 +49,12 @@ func editMilestoneStatus(cmd *cli.Context, close bool) error {
 		milestone, _, err := client.EditMilestoneByName(ctx.Owner, ctx.Repo, ms, opts)
 		if err != nil {
 			return err
+		}
+
+		if ctx.Args().Len() > 1 {
+			fmt.Printf("%s/milestone/%d\n", ctx.GetRemoteRepoHTMLURL(), milestone.ID)
+		} else {
+			print.MilestoneDetails(milestone)
 		}
 	}
 	return nil
