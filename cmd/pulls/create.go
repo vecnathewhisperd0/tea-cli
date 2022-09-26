@@ -34,7 +34,7 @@ var CmdPullsCreate = cli.Command{
 			Name:    "allow-maintainer-edits",
 			Aliases: []string{"edits"},
 			Usage:   "Enable maintainers to push to the base branch of created pull",
-			Default: true,
+			Value:   true,
 		},
 	}, flags.IssuePREditFlags...),
 }
