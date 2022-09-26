@@ -42,6 +42,9 @@ func runIssuesEdit(cmd *cli.Context) error {
 	}
 
 	indices, err := utils.ArgsToIndices(ctx.Args().Slice())
+	if err != nil {
+		return err
+	}
 
 	client := ctx.Login.Client()
 	for _, opts.Index = range indices {
