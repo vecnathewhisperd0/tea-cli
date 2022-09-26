@@ -52,7 +52,7 @@ func CreatePull(ctx *context.TeaContext) (err error) {
 		return err
 	}
 
-	promptC := &survey.Confirm{Message: "Allow Maintainers to push to pull base-branch", Default: false}
+	promptC := &survey.Confirm{Message: "Allow Maintainers to push to the base branch", Default: true}
 	if err := survey.AskOne(promptC, &allowMaintainerEdits); err != nil {
 		return err
 	}
