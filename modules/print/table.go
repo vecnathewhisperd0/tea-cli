@@ -87,7 +87,15 @@ func (t *table) print(output string) {
 	case "json":
 		outputJson(t.headers, t.values)
 	default:
-		fmt.Printf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
+		fmt.Printf(`"unknown output type '%s', available types are:
+- csv: comma-separated values
+- simple: space-separated values
+- table: auto-aligned table format (default)
+- tsv: tab-separated values
+- yaml: YAML format
+- json: JSON format
+`, output)
+		os.Exit(1)
 	}
 }
 
