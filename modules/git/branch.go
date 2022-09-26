@@ -212,16 +212,16 @@ func (r TeaRepo) TeaFindBranchRemote(branchName, hash string) (*git.Remote, erro
 	return match, err
 }
 
-// TeaGetCurrentBranchName return the name of the branch witch is currently active
-func (r TeaRepo) TeaGetCurrentBranchName() (string, error) {
+// TeaGetCurrentBranchNameAndSHA return the name and sha of the branch witch is currently active
+func (r TeaRepo) TeaGetCurrentBranchNameAndSHA() (string, string, error) {
 	localHead, err := r.Head()
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	if !localHead.Name().IsBranch() {
-		return "", fmt.Errorf("active ref is no branch")
+		return "", "", fmt.Errorf("active ref is no branch")
 	}
 
-	return localHead.Name().Short(), nil
+	return localHead.Name().Short(), localHead.Hash().String(), nil
 }
