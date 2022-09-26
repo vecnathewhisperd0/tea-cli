@@ -6,6 +6,7 @@ package print
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"sort"
@@ -73,21 +74,25 @@ func (t table) Less(i, j int) bool {
 }
 
 func (t *table) print(output string) {
+	t.fprint(os.Stdout, output)
+}
+
+func (t *table) fprint(f io.Writer, output string) {
 	switch output {
 	case "", "table":
-		outputTable(t.headers, t.values)
+		outputTable(f, t.headers, t.values)
 	case "csv":
-		outputDsv(t.headers, t.values, ",")
+		outputDsv(f, t.headers, t.values, ",")
 	case "simple":
-		outputSimple(t.headers, t.values)
+		outputSimple(f, t.headers, t.values)
 	case "tsv":
-		outputDsv(t.headers, t.values, "\t")
+		outputDsv(f, t.headers, t.values, "\t")
 	case "yml", "yaml":
-		outputYaml(t.headers, t.values)
+		outputYaml(f, t.headers, t.values)
 	case "json":
-		outputJSON(t.headers, t.values)
+		outputJSON(f, t.headers, t.values)
 	default:
-		fmt.Printf(`"unknown output type '%s', available types are:
+		fmt.Fprintf(f, `"unknown output type '%s', available types are:
 - csv: comma-separated values
 - simple: space-separated values
 - table: auto-aligned table format (default)
@@ -100,8 +105,8 @@ func (t *table) print(output string) {
 }
 
 // outputTable prints structured data as table
-func outputTable(headers []string, values [][]string) {
-	table := tablewriter.NewWriter(os.Stdout)
+func outputTable(f io.Writer, headers []string, values [][]string) {
+	table := tablewriter.NewWriter(f)
 	if len(headers) > 0 {
 		table.SetHeader(headers)
 	}
@@ -112,38 +117,38 @@ func outputTable(headers []string, values [][]string) {
 }
 
 // outputSimple prints structured data as space delimited value
-func outputSimple(headers []string, values [][]string) {
+func outputSimple(f io.Writer, headers []string, values [][]string) {
 	for _, value := range values {
-		fmt.Printf(strings.Join(value, " "))
-		fmt.Printf("\n")
+		fmt.Fprint(f, strings.Join(value, " "))
+		fmt.Fprintf(f, "\n")
 	}
 }
 
 // outputDsv prints structured data as delimiter separated value format
-func outputDsv(headers []string, values [][]string, delimiterOpt ...string) {
+func outputDsv(f io.Writer, headers []string, values [][]string, delimiterOpt ...string) {
 	delimiter := ","
 	if len(delimiterOpt) > 0 {
 		delimiter = delimiterOpt[0]
 	}
-	fmt.Println("\"" + strings.Join(headers, "\""+delimiter+"\"") + "\"")
+	fmt.Fprintln(f, "\""+strings.Join(headers, "\""+delimiter+"\"")+"\"")
 	for _, value := range values {
-		fmt.Printf("\"")
-		fmt.Printf(strings.Join(value, "\""+delimiter+"\""))
-		fmt.Printf("\"")
-		fmt.Printf("\n")
+		fmt.Fprintf(f, "\"")
+		fmt.Fprint(f, strings.Join(value, "\""+delimiter+"\""))
+		fmt.Fprintf(f, "\"")
+		fmt.Fprintf(f, "\n")
 	}
 }
 
 // outputYaml prints structured data as yaml
-func outputYaml(headers []string, values [][]string) {
+func outputYaml(f io.Writer, headers []string, values [][]string) {
 	for _, value := range values {
-		fmt.Println("-")
+		fmt.Fprintln(f, "-")
 		for j, val := range value {
 			intVal, _ := strconv.Atoi(val)
 			if strconv.Itoa(intVal) == val {
-				fmt.Printf("    %s: %s\n", headers[j], val)
+				fmt.Fprintf(f, "    %s: %s\n", headers[j], val)
 			} else {
-				fmt.Printf("    %s: '%s'\n", headers[j], val)
+				fmt.Fprintf(f, "    %s: '%s'\n", headers[j], val)
 			}
 		}
 	}
@@ -161,34 +166,34 @@ func toSnakeCase(str string) string {
 }
 
 // outputJSON prints structured data as json
-func outputJSON(headers []string, values [][]string) {
-	fmt.Println("[")
+func outputJSON(f io.Writer, headers []string, values [][]string) {
+	fmt.Fprintln(f, "[")
 	itemCount := len(values)
 	headersCount := len(headers)
 	const space = "  "
 	for i, value := range values {
-		fmt.Printf("%s{\n", space)
+		fmt.Fprintf(f, "%s{\n", space)
 		for j, val := range value {
 			intVal, _ := strconv.Atoi(val)
 			if strconv.Itoa(intVal) == val {
-				fmt.Printf("%s%s\"%s\": %s", space, space, toSnakeCase(headers[j]), val)
+				fmt.Fprintf(f, "%s%s\"%s\": %s", space, space, toSnakeCase(headers[j]), val)
 			} else {
-				fmt.Printf("%s%s\"%s\": \"%s\"", space, space, toSnakeCase(headers[j]), val)
+				fmt.Fprintf(f, "%s%s\"%s\": \"%s\"", space, space, toSnakeCase(headers[j]), val)
 			}
 			if j != headersCount-1 {
-				fmt.Println(",")
+				fmt.Fprintln(f, ",")
 			} else {
-				fmt.Println()
+				fmt.Fprintln(f)
 			}
 		}
 
 		if i != itemCount-1 {
-			fmt.Printf("%s},\n", space)
+			fmt.Fprintf(f, "%s},\n", space)
 		} else {
-			fmt.Printf("%s}\n", space)
+			fmt.Fprintf(f, "%s}\n", space)
 		}
 	}
-	fmt.Println("]")
+	fmt.Fprintln(f, "]")
 }
 
 func isMachineReadable(outputFormat string) bool {
