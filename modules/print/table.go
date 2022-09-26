@@ -85,7 +85,7 @@ func (t *table) print(output string) {
 	case "yml", "yaml":
 		outputYaml(t.headers, t.values)
 	case "json":
-		outputJson(t.headers, t.values)
+		outputJSON(t.headers, t.values)
 	default:
 		fmt.Printf(`"unknown output type '%s', available types are:
 - csv: comma-separated values
@@ -160,8 +160,8 @@ func toSnakeCase(str string) string {
 	return strings.ToLower(snake)
 }
 
-// outputJson prints structured data as json
-func outputJson(headers []string, values [][]string) {
+// outputJSON prints structured data as json
+func outputJSON(headers []string, values [][]string) {
 	fmt.Println("[")
 	itemCount := len(values)
 	headersCount := len(headers)
