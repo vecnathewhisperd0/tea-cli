@@ -173,6 +173,7 @@ func (r TeaRepo) TeaFindBranchByName(branchName, repoURL string) (b *git_config.
 // TeaFindBranchRemote gives the first remote that has a branch with the same name or sha,
 // depending on what is passed in.
 // This function is needed, as git does not always define branches in .git/config with remote entries.
+// Priority order is: first match of sha and branch -> first match of branch -> first match of sha
 func (r TeaRepo) TeaFindBranchRemote(branchName, hash string) (*git.Remote, error) {
 	remotes, err := r.Remotes()
 	if err != nil {
@@ -193,23 +194,45 @@ func (r TeaRepo) TeaFindBranchRemote(branchName, hash string) (*git.Remote, erro
 	}
 	defer iter.Close()
 
-	var match *git.Remote
-	err = iter.ForEach(func(ref *git_plumbing.Reference) error {
+	var shaMatch *git.Remote
+	var branchMatch *git.Remote
+	var fullMatch *git.Remote
+	if err := iter.ForEach(func(ref *git_plumbing.Reference) error {
 		if ref.Name().IsRemote() {
 			names := strings.SplitN(ref.Name().Short(), "/", 2)
 			remote := names[0]
 			branch := names[1]
-			hashMatch := hash != "" && hash == ref.Hash().String()
-			nameMatch := branchName != "" && branchName == branch
-			if hashMatch || nameMatch {
-				match, err = r.Remote(remote)
-				return err
+			if branchMatch == nil && branchName != "" && branchName == branch {
+				if branchMatch, err = r.Remote(remote); err != nil {
+					return err
+				}
+			}
+			if shaMatch == nil && hash != "" && hash == ref.Hash().String() {
+				if shaMatch, err = r.Remote(remote); err != nil {
+					return err
+				}
+			}
+			if fullMatch == nil && branchName != "" && branchName == branch && hash != "" && hash == ref.Hash().String() {
+				if fullMatch, err = r.Remote(remote); err != nil {
+					return err
+				}
+				// stop asap you have a full match
+				return nil
 			}
 		}
 		return nil
-	})
+	}); err != nil {
+		return nil, err
+	}
 
-	return match, err
+	if fullMatch != nil {
+		return fullMatch, nil
+	} else if branchMatch != nil {
+		return branchMatch, nil
+	} else if shaMatch != nil {
+		return shaMatch, nil
+	}
+	return nil, nil
 }
 
 // TeaGetCurrentBranchNameAndSHA return the name and sha of the branch witch is currently active
