@@ -19,8 +19,6 @@ var ciStatusSymbols = map[gitea.StatusState]string{
 	gitea.StatusFailure: "❌ ",
 }
 
-const teamSymbol = "🧑‍🤝‍🧑"
-
 // PullDetails print an pull rendered to stdout
 func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *gitea.CombinedStatus) {
 	base := pr.Base.Name
@@ -125,7 +123,7 @@ func formatReviews(pr *gitea.PullRequest, reviews []*gitea.PullReview) string {
 			// only pulls to orgs can have team reviews
 			org := pr.Base.Repository.Owner
 			reviewByState[r.State] = append(reviewByState[r.State],
-				fmt.Sprintf("%s %s/%s", teamSymbol, org.UserName, r.ReviewerTeam.Name),
+				fmt.Sprintf("%s/%s", org.UserName, r.ReviewerTeam.Name),
 			)
 		}
 	}
