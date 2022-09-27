@@ -70,8 +70,7 @@ func CreatePull(ctx *context.TeaContext, base, head string, allowMaintainerEdits
 		return fmt.Errorf("could not create PR from %s to %s:%s: %s", head, ctx.Owner, base, err)
 	}
 
-	// TODO: if pr.AllowMaintainerEdit != allowMaintainerEdits {
-	if allowMaintainerEdits {
+	if pr.AllowMaintainerEdit != allowMaintainerEdits {
 		pr, _, err = client.EditPullRequest(ctx.Owner, ctx.Repo, pr.Index, gitea.EditPullRequestOption{
 			AllowMaintainerEdit: gitea.OptionalBool(allowMaintainerEdits),
 		})

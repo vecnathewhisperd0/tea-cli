@@ -26,8 +26,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 	state := formatPRState(pr)
 
 	out := fmt.Sprintf(
-		// TODO: "# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\nAllow maintainer to edit: %v\n\n%s\n\n",
-		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n\n",
+		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\nAllow maintainer to edit: %v\n\n%s\n\n",
 		pr.Index,
 		pr.Title,
 		state,
@@ -35,7 +34,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 		FormatTime(*pr.Created, false),
 		base,
 		head,
-		// TODO: pr.AllowMaintainerEdit,
+		pr.AllowMaintainerEdit,
 		pr.Body,
 	)
 
