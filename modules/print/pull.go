@@ -19,6 +19,8 @@ var ciStatusSymbols = map[gitea.StatusState]string{
 	gitea.StatusFailure: "❌ ",
 }
 
+const teamSymbol = "🧑‍🤝‍🧑"
+
 // PullDetails print an pull rendered to stdout
 func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *gitea.CombinedStatus) {
 	base := pr.Base.Name
@@ -41,7 +43,7 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 		out += "---\n"
 	}
 
-	out += formatReviews(reviews)
+	out += formatReviews(pr, reviews)
 
 	if ciStatus != nil {
 		var summary, errors string
@@ -86,35 +88,50 @@ func formatPRState(pr *gitea.PullRequest) string {
 	return string(pr.State)
 }
 
-func formatReviews(reviews []*gitea.PullReview) string {
+func formatReviews(pr *gitea.PullRequest, reviews []*gitea.PullReview) string {
 	result := ""
 	if len(reviews) == 0 {
 		return result
 	}
 
 	// deduplicate reviews by user (via review time & userID),
-	reviewByUser := make(map[int64]*gitea.PullReview)
+	reviewByUserOrTeam := make(map[string]*gitea.PullReview)
 	for _, review := range reviews {
 		switch review.State {
 		case gitea.ReviewStateApproved,
 			gitea.ReviewStateRequestChanges,
 			gitea.ReviewStateRequestReview:
-			if r, ok := reviewByUser[review.Reviewer.ID]; !ok || review.Submitted.After(r.Submitted) {
-				reviewByUser[review.Reviewer.ID] = review
+			if review.Reviewer != nil {
+				if r, ok := reviewByUserOrTeam[review.Reviewer.UserName]; !ok || review.Submitted.After(r.Submitted) {
+					reviewByUserOrTeam[review.Reviewer.UserName] = review
+				}
+			} else if review.ReviewerTeam != nil {
+				if r, ok := reviewByUserOrTeam[review.ReviewerTeam.Name]; !ok || review.Submitted.After(r.Submitted) {
+					reviewByUserOrTeam[review.ReviewerTeam.Name] = review
+				}
 			}
+
 		}
 	}
 
 	// group reviews by type
-	usersByState := make(map[gitea.ReviewStateType][]string)
-	for _, r := range reviewByUser {
-		u := r.Reviewer.UserName
-		users := usersByState[r.State]
-		usersByState[r.State] = append(users, u)
+	reviewByState := make(map[gitea.ReviewStateType][]string)
+	for _, r := range reviewByUserOrTeam {
+		if r.Reviewer != nil {
+			reviewByState[r.State] = append(reviewByState[r.State],
+				r.Reviewer.UserName,
+			)
+		} else if r.ReviewerTeam != nil {
+			// only pulls to orgs can have team reviews
+			org := pr.Base.Repository.Owner
+			reviewByState[r.State] = append(reviewByState[r.State],
+				fmt.Sprintf("%s %s/%s", teamSymbol, org.UserName, r.ReviewerTeam.Name),
+			)
+		}
 	}
 
 	// stringify
-	for state, user := range usersByState {
+	for state, user := range reviewByState {
 		result += fmt.Sprintf("- %s by @%s\n", state, strings.Join(user, ", @"))
 	}
 	return result
