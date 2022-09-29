@@ -99,8 +99,11 @@ func formatReviews(reviews []*gitea.PullReview) string {
 		case gitea.ReviewStateApproved,
 			gitea.ReviewStateRequestChanges,
 			gitea.ReviewStateRequestReview:
-			if r, ok := reviewByUser[review.Reviewer.ID]; !ok || review.Submitted.After(r.Submitted) {
-				reviewByUser[review.Reviewer.ID] = review
+			// only user reviews are supported no team review requests
+			if review.Reviewer != nil {
+				if r, ok := reviewByUser[review.Reviewer.ID]; !ok || review.Submitted.After(r.Submitted) {
+					reviewByUser[review.Reviewer.ID] = review
+				}
 			}
 		}
 	}
