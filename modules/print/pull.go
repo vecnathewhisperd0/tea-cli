@@ -104,12 +104,12 @@ func formatReviews(pr *gitea.PullRequest, reviews []*gitea.PullReview) string {
 			gitea.ReviewStateRequestChanges,
 			gitea.ReviewStateRequestReview:
 			if review.Reviewer != nil {
-				if r, ok := reviewByUserOrTeam[review.Reviewer.UserName]; !ok || review.Submitted.After(r.Submitted) {
-					reviewByUserOrTeam[review.Reviewer.UserName] = review
+				if r, ok := reviewByUserOrTeam[fmt.Sprintf("user_%d", review.Reviewer.ID)]; !ok || review.Submitted.After(r.Submitted) {
+					reviewByUserOrTeam[fmt.Sprintf("user_%d", review.Reviewer.ID)] = review
 				}
 			} else if review.ReviewerTeam != nil {
-				if r, ok := reviewByUserOrTeam[review.ReviewerTeam.Name]; !ok || review.Submitted.After(r.Submitted) {
-					reviewByUserOrTeam[review.ReviewerTeam.Name] = review
+				if r, ok := reviewByUserOrTeam[fmt.Sprintf("team_%d", review.ReviewerTeam.ID)]; !ok || review.Submitted.After(r.Submitted) {
+					reviewByUserOrTeam[fmt.Sprintf("team_%d", review.ReviewerTeam.ID)] = review
 				}
 			}
 
