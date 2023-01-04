@@ -61,7 +61,7 @@ var CmdPullsMerge = cli.Command{
 				return err
 			}
 
-			idx, err = GetPullIndexByBranch(ctx, branch)
+			idx, err = getPullIndexByBranch(ctx, branch)
 			if err != nil {
 				return err
 			}
@@ -83,7 +83,7 @@ var CmdPullsMerge = cli.Command{
 	},
 }
 
-func GetPullIndexByBranch(ctx *context.TeaContext, branch string) (int64, error) {
+func getPullIndexByBranch(ctx *context.TeaContext, branch string) (int64, error) {
 	prs, _, err := ctx.Login.Client().ListRepoPullRequests(ctx.Owner, ctx.Repo, gitea.ListPullRequestsOptions{
 		State: gitea.StateOpen,
 	})
