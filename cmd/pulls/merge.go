@@ -6,12 +6,14 @@ package pulls
 
 import (
 	"fmt"
+	"strings"
 
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/utils"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/urfave/cli/v2"
 )
 
@@ -61,7 +63,7 @@ var CmdPullsMerge = cli.Command{
 				return err
 			}
 
-			idx, err = getPullIndexByBranch(ctx, branch)
+			idx, err = getPullIndex(ctx, branch)
 			if err != nil {
 				return err
 			}
@@ -83,18 +85,50 @@ var CmdPullsMerge = cli.Command{
 	},
 }
 
-func getPullIndexByBranch(ctx *context.TeaContext, branch string) (int64, error) {
+func getPullIndex(ctx *context.TeaContext, branch string) (int64, error) {
 	prs, _, err := ctx.Login.Client().ListRepoPullRequests(ctx.Owner, ctx.Repo, gitea.ListPullRequestsOptions{
 		State: gitea.StateOpen,
 	})
 	if err != nil {
 		return 0, err
 	}
+	if len(prs) == 0 {
+		return 0, fmt.Errorf("No open PRs found")
+	}
 
+	prOptions := make([]string, len(prs))
+
+	// get the PR index for the current branch first
 	for _, pr := range prs {
 		if pr.Head.Ref == branch {
-			return pr.Index, nil
+			prOptions[0] = fmt.Sprintf("#%d: %s", pr.Index, pr.Title)
 		}
 	}
-	return 0, fmt.Errorf("No open PR for branch %s", branch)
+
+	// then get the rest of the PRs
+	i := 1
+	for _, pr := range prs {
+		if pr.Head.Ref != branch {
+			prOptions[i] = fmt.Sprintf("#%d: %s", pr.Index, pr.Title)
+		}
+		i++
+	}
+
+	selected := ""
+	q := &survey.Select{
+		Message:  "Select a PR to merge",
+		Options:  prOptions,
+		PageSize: 10,
+	}
+	survey.AskOne(q, &selected)
+
+	// get the index from the selected option
+	before, _, _ := strings.Cut(selected, ":")
+	before = strings.TrimPrefix(before, "#")
+	idx, err := utils.ArgToIndex(before)
+	if err != nil {
+		return 0, err
+	}
+
+	return idx, nil
 }
