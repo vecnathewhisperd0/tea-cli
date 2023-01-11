@@ -96,22 +96,21 @@ func getPullIndex(ctx *context.TeaContext, branch string) (int64, error) {
 		return 0, fmt.Errorf("No open PRs found")
 	}
 
-	prOptions := make([]string, len(prs))
+	prOptions := make([]string, 0)
 
-	// get the PR index for the current branch first
+	// get the PR indexes where head branch is the current branch
 	for _, pr := range prs {
 		if pr.Head.Ref == branch {
-			prOptions[0] = fmt.Sprintf("#%d: %s", pr.Index, pr.Title)
+			prOptions = append(prOptions, fmt.Sprintf("#%d: %s", pr.Index, pr.Title))
 		}
 	}
 
-	// then get the rest of the PRs
-	i := 1
+	// then get the PR indexes where base branch is the current branch
 	for _, pr := range prs {
-		if pr.Head.Ref != branch {
-			prOptions[i] = fmt.Sprintf("#%d: %s", pr.Index, pr.Title)
+		// don't add the same PR twice, so `pr.Head.Ref != branch`
+		if pr.Base.Ref == branch && pr.Head.Ref != branch {
+			prOptions = append(prOptions, fmt.Sprintf("#%d: %s", pr.Index, pr.Title))
 		}
-		i++
 	}
 
 	selected := ""
