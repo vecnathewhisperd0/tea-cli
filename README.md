@@ -102,6 +102,7 @@ Make sure you have a current go version installed (1.13 or newer).
   ```sh
   git clone https://gitea.com/gitea/tea.git # or: tea clone gitea.com/gitea/tea ;)
   cd tea
+  go mod vendor
   make
   ```
   Note that GNU Make (gmake on OpenBSD) is required.
