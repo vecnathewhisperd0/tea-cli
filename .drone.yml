@@ -7,17 +7,10 @@ platform:
   arch: amd64
 
 steps:
-- name: vendor
-  pull: always
-  image: golang:1.18
-  environment:
-    GOPROXY: https://goproxy.io # proxy.golang.org is blocked in China, this proxy is not
-  commands:
-  - make vendor # use vendor folder as cache
 
 - name: build
   pull: always
-  image: golang:1.18
+  image: golang:1.20
   environment:
     GOPROXY: https://goproxy.io # proxy.golang.org is blocked in China, this proxy is not
   commands:
@@ -34,7 +27,7 @@ steps:
     - pull_request
 
 - name: unit-test
-  image: golang:1.18
+  image: golang:1.20
   commands:
   - make unit-test-coverage
   settings:
@@ -49,7 +42,7 @@ steps:
     - pull_request
 
 - name: release-test
-  image: golang:1.18
+  image: golang:1.20
   commands:
   - make test
   settings:
@@ -65,7 +58,7 @@ steps:
 
 - name: tag-test
   pull: always
-  image: golang:1.18
+  image: golang:1.20
   commands:
   - make test
   settings:
@@ -77,7 +70,7 @@ steps:
     - tag
 
 - name: static
-  image: golang:1.18
+  image: golang:1.20
   environment:
     GOPROXY: https://goproxy.io # proxy.golang.org is blocked in China, this proxy is not
   commands:
@@ -110,11 +103,16 @@ steps:
   pull: always
   image: woodpeckerci/plugin-s3:latest
   settings:
-    acl: public-read
-    bucket: gitea-artifacts
+    acl:
+      from_secret: aws_s3_acl
+    region:
+      from_secret: aws_s3_region
+    bucket:
+      from_secret: aws_s3_bucket
     endpoint:
-      from_secret: aws_endpoint
-    path_style: true
+      from_secret: aws_s3_endpoint
+    path_style:
+      from_secret: aws_s3_path_style
     source: "dist/release/*"
     strip_prefix: dist/release/
     target: "/tea/${DRONE_TAG##v}"
@@ -153,10 +151,16 @@ steps:
   pull: always
   image: woodpeckerci/plugin-s3:latest
   settings:
-    acl: public-read
-    bucket: gitea-artifacts
+    acl:
+      from_secret: aws_s3_acl
+    region:
+      from_secret: aws_s3_region
+    bucket:
+      from_secret: aws_s3_bucket
     endpoint:
-      from_secret: aws_endpoint
+      from_secret: aws_s3_endpoint
+    path_style:
+      from_secret: aws_s3_path_style
     source: "dist/release/*"
     strip_prefix: dist/release/
     target: /tea/main
