@@ -119,7 +119,10 @@ func getPullIndex(ctx *context.TeaContext, branch string) (int64, error) {
 		Options:  prOptions,
 		PageSize: 10,
 	}
-	survey.AskOne(q, &selected)
+	err = survey.AskOne(q, &selected)
+	if err != nil {
+		return 0, err
+	}
 
 	// get the index from the selected option
 	before, _, _ := strings.Cut(selected, ":")
