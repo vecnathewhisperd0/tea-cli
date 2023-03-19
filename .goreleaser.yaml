@@ -58,7 +58,7 @@ builds:
   flags:
   - -trimpath
   ldflags:
-  - -s -w -X code.gitea.io/tea.Version={{ .Version }}
+  - -s -w -X main.Version={{ .Version }}
   binary: >-
     {{ .ProjectName }}-
     {{- .Version }}-
@@ -97,11 +97,16 @@ checksum:
   extra_files:
       - glob: ./**.xz
 
+env_files:
+  # override gitea actions which passes GITHUB_TOKEN to set env var as null
+  github_token: /dev/null
+
 signs:
   -
     signature: "${artifact}.sig"
     artifacts: checksum
     stdin: '{{ .Env.GPGSIGN_PASSPHRASE }}'
+    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
 
 snapshot:
   name_template: "{{ .Branch }}-devel"
