@@ -28,4 +28,4 @@ jobs:
           make test
           make unit-test-coverage
         env:
-          GOPROXY: https://goproxy.io,direct\
+          GOPROXY: https://goproxy.io,direct
