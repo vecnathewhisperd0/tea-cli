@@ -36,3 +36,4 @@ jobs:
           GPGSIGN_PASSPHRASE: ${{ secrets.GPGSIGN_PASSPHRASE }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GITEA_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN:
