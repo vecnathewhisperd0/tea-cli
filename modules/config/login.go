@@ -207,7 +207,10 @@ func (l *Login) Client(options ...gitea.ClientOption) *gitea.Client {
 
 	client, err := gitea.NewClient(l.URL, options...)
 	if err != nil {
-		log.Fatal(err)
+		if !errors.Is(err, gitea.ErrUnknownVersion{}) {
+			log.Fatal(err)
+		}
+		fmt.Println("WARNING: could not detect gitea version!\nINFO: set gitea version: to last supported one")
 	}
 	return client
 }
