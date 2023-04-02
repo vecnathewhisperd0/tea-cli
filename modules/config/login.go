@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -210,7 +211,7 @@ func (l *Login) Client(options ...gitea.ClientOption) *gitea.Client {
 		if !errors.Is(err, gitea.ErrUnknownVersion{}) {
 			log.Fatal(err)
 		}
-		fmt.Println("WARNING: could not detect gitea version!\nINFO: set gitea version: to last supported one")
+		fmt.Fprintln(os.Stderr, "WARNING: could not detect gitea version!\nINFO: set gitea version: to last supported one")
 	}
 	return client
 }
