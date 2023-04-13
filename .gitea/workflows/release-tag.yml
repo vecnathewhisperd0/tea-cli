@@ -23,6 +23,7 @@ jobs:
         with:
           gpg_private_key: ${{ secrets.GPGSIGN_KEY }}
           passphrase: ${{ secrets.GPGSIGN_PASSPHRASE }}
+          fingerprint: CC64B1DB67ABBEECAB24B6455FC346329753F4B0
       - name: goreleaser
         uses: https://github.com/goreleaser/goreleaser-action@v4
         with:
