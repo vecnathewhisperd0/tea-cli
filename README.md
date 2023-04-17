@@ -104,7 +104,7 @@ Make sure you have a current go version installed (1.13 or newer).
   cd tea
   make
   ```
-  Note that GNU Make (gmake on OpenBSD) is required.
+  Note that GNU Make (gmake on OpenBSD) and Go (golang/The Go Programming Language) are required.
 
 - For a quick installation without `git` & `make`, set $version and exec:
   ```sh
