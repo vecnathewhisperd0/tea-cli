@@ -65,7 +65,6 @@ func CreatePull(ctx *context.TeaContext, base, head string, allowMaintainerEdits
 		Milestone: opts.Milestone,
 		Deadline:  opts.Deadline,
 	})
-
 	if err != nil {
 		return fmt.Errorf("could not create PR from %s to %s:%s: %s", head, ctx.Owner, base, err)
 	}
