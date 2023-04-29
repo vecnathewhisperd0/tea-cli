@@ -140,10 +140,17 @@ func GetHeadSpec(owner, branch, baseOwner string) string {
 
 // GetDefaultPRTitle transforms a string like a branchname to a readable text
 func GetDefaultPRTitle(header string) string {
+	// Extract the part after the last colon in the input string
+	colonIndex := strings.LastIndex(header, ":")
+	if colonIndex != -1 {
+		header = header[colonIndex+1:]
+	}
+
 	title := noSpace.ReplaceAllString(header, "")
 	title = spaceRegex.ReplaceAllString(title, " ")
 	title = strings.TrimSpace(title)
 	title = strings.Title(strings.ToLower(title))
 	title = consecutive.ReplaceAllString(title, " ")
+
 	return title
 }
