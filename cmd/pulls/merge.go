@@ -44,16 +44,14 @@ var CmdPullsMerge = cli.Command{
 		ctx := context.InitCommand(cmd)
 		ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
-		var idx int64
-		var err error
-		if ctx.Args().Len() == 1 {
-			idx, err = utils.ArgToIndex(ctx.Args().First())
-			if err != nil {
-				return err
-			}
-		} else {
+		if ctx.Args().Len() != 1 {
 			// If no PR index is provided, try interactive mode
 			return interact.MergePull(ctx)
+		}
+
+		idx, err := utils.ArgToIndex(ctx.Args().First())
+		if err != nil {
+			return err
 		}
 
 		return task.PullMerge(ctx.Login, ctx.Owner, ctx.Repo, idx, gitea.MergePullRequestOption{
