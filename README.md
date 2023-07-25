@@ -94,7 +94,7 @@ There are different ways to get `tea`:
 
 4. Docker (thirdparty): [tgerczei/tea](https://hub.docker.com/r/tgerczei/tea)
 
-5. asdf (thirdparty): [mvaldes14/asdf-tea](https://github.com/mvlades14/asdf-tea)
+5. asdf (thirdparty): [mvaldes14/asdf-tea](https://github.com/mvaldes14/asdf-tea)
 
 ## Compilation
 
