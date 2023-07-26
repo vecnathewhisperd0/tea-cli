@@ -12,6 +12,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// CmdDocs generates markdown for tea
 var CmdDocs = cli.Command{
 	Name: "docs",
 	Hidden: true,
