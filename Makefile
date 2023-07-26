@@ -91,7 +91,7 @@ docs:
 
 .PHONY: docs-check
 docs-check:
-	@DIFF=$$(diff docs/CLI.md <($(GO) run . docs)); \
+	@DIFF=$$($(GO) run . docs | diff docs/CLI.md -); \
 	if [ -n "$$DIFF" ]; then \
 		echo "Please run 'make docs' and commit the result:"; \
 		echo "$$DIFF"; \
