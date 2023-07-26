@@ -85,6 +85,19 @@ fmt-check:
 		exit 1; \
 	fi;
 
+.PHONY: docs
+docs:
+	$(GO) run . docs --out docs/CLI.md
+
+.PHONY: docs-check
+docs-check:
+	@DIFF=$$(diff docs/CLI.md <($(GO) run . docs)); \
+	if [ -n "$$DIFF" ]; then \
+		echo "Please run 'make docs' and commit the result:"; \
+		echo "$$DIFF"; \
+		exit 1; \
+	fi;
+
 .PHONY: test
 test:
 	$(GO) test -tags='sqlite sqlite_unlock_notify' $(PACKAGES)
