@@ -14,19 +14,18 @@ import (
 
 // CmdDocs generates markdown for tea
 var CmdDocs = cli.Command{
-	Name: "docs",
-	Hidden: true,
+	Name:        "docs",
+	Hidden:      true,
 	Description: "Generate CLI docs",
-	Action: runDocs,
+	Action:      runDocs,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name: "out",
-			Usage: "Path to output docs to, otherwise prints to stdout",
+			Name:    "out",
+			Usage:   "Path to output docs to, otherwise prints to stdout",
 			Aliases: []string{"o"},
 		},
 	},
 }
-
 
 func runDocs(ctx *cli.Context) error {
 	md, err := ctx.App.ToMarkdown()
