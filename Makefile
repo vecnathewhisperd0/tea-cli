@@ -120,7 +120,7 @@ release: release-dirs install-release-tools release-os release-compress release-
 
 .PHONY: release-dirs
 release-dirs:
-	mkdir -p $(DIST)/binaries $(DIST)/release
+	mkdir -p $(DIST)/release
 
 .PHONY: release-os
 release-os:
