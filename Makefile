@@ -35,9 +35,9 @@ SOURCES ?= $(shell find . -name "*.go" -type f)
 
 # OS specific vars.
 ifeq ($(OS), Windows_NT)
-	EXECUTABLE := tea.exe
+	BINEXT := .exe
 else
-	EXECUTABLE := tea
+	BINEXT =
 	ifneq ($(shell uname -s), OpenBSD)
 		override BUILDMODE := -buildmode=pie
 	endif
@@ -49,7 +49,7 @@ all: build
 .PHONY: clean
 clean:
 	$(GO) clean -i ./...
-	rm -rf $(EXECUTABLE) $(DIST)
+	rm -rf tea$(BINEXT) $(DIST)
 
 .PHONY: fmt
 fmt:
@@ -61,7 +61,7 @@ vet:
 	$(GO) vet $(PACKAGES)
 	# Custom vet
 	$(GO) build code.gitea.io/gitea-vet
-	$(GO) vet -vettool=gitea-vet $(PACKAGES)
+	$(GO) vet -vettool=gitea-vet$(BINEXT) $(PACKAGES)
 
 .PHONY: lint
 lint: install-lint-tools
@@ -102,13 +102,13 @@ check: test
 
 .PHONY: install
 install: $(SOURCES)
-	@echo "installing to $(shell $(GO) env GOPATH)/bin/$(EXECUTABLE)"
+	@echo "installing to $(shell $(GO) env GOPATH)/bin/tea$(BINEXT)"
 	$(GO) install -v $(BUILDMODE) $(GOFLAGS) 
 
 .PHONY: build
-build: $(EXECUTABLE)
+build: tea$(BINEXT)
 
-$(EXECUTABLE): $(SOURCES)
+tea$(BINEXT): $(SOURCES)
 	$(GO) build $(BUILDMODE) $(GOFLAGS) -o $@
 
 .PHONY: build-image
