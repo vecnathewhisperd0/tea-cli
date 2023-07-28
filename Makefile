@@ -39,7 +39,7 @@ ifeq ($(OS), Windows_NT)
 	VET_TOOL := gitea-vet.exe
 else
 	EXECUTABLE := tea
-	VET_TOOL := gitea_vet
+	VET_TOOL := gitea-vet
 	ifneq ($(shell uname -s), OpenBSD)
 		override BUILDMODE := -buildmode=pie
 	endif
