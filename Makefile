@@ -65,15 +65,15 @@ vet:
 
 .PHONY: lint
 lint: install-lint-tools
-	revive -config .revive.toml ./... || exit 1
+	$(GO) run revive@latest -config .revive.toml ./... || exit 1
 
 .PHONY: misspell-check
 misspell-check: install-lint-tools
-	misspell -error -i unknwon,destory $(GOFILES)
+	$(GO) run misspell@latest -error -i unknwon,destory $(GOFILES)
 
 .PHONY: misspell
 misspell: install-lint-tools
-	misspell -w -i unknwon $(GOFILES)
+	$(GO) run misspell@latest -w -i unknwon $(GOFILES)
 
 .PHONY: fmt-check
 fmt-check:
@@ -103,7 +103,7 @@ check: test
 .PHONY: install
 install: $(SOURCES)
 	@echo "installing to $(shell $(GO) env GOPATH)/bin/$(EXECUTABLE)"
-	$(GO) install -v $(BUILDMODE) $(GOFLAGS) 
+	$(GO) install -v $(BUILDMODE) $(GOFLAGS)
 
 .PHONY: build
 build: $(EXECUTABLE)
