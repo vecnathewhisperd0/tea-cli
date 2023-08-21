@@ -71,11 +71,11 @@ lint: install-lint-tools
 
 .PHONY: misspell-check
 misspell-check: install-lint-tools
-	$(GO) run github.com/client9/misspell@latest -error -i unknwon,destory $(GOFILES)
+	$(GO) run github.com/client9/misspell/cmd/misspell@latest -error -i unknwon,destory $(GOFILES)
 
 .PHONY: misspell
 misspell: install-lint-tools
-	$(GO) run github.com/client9/misspell@latest -w -i unknwon $(GOFILES)
+	$(GO) run github.com/client9/misspell/cmd/misspell@latest -w -i unknwon $(GOFILES)
 
 .PHONY: fmt-check
 fmt-check:
