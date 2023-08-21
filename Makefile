@@ -65,7 +65,7 @@ vet:
 
 .PHONY: lint
 lint: install-lint-tools
-	$(GO) run revive@latest -config .revive.toml ./... || exit 1
+	$(GO) run github.com/mgechev/revive@latest -config .revive.toml ./... || exit 1
 
 .PHONY: misspell-check
 misspell-check: install-lint-tools
@@ -73,7 +73,7 @@ misspell-check: install-lint-tools
 
 .PHONY: misspell
 misspell: install-lint-tools
-	$(GO) run misspell@latest -w -i unknwon $(GOFILES)
+	$(GO) run github.com/client9/misspell@latest -w -i unknwon $(GOFILES)
 
 .PHONY: fmt-check
 fmt-check:
@@ -124,11 +124,11 @@ release-dirs:
 
 .PHONY: release-os
 release-os:
-	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
+	CGO_ENABLED=0 $(GO) run github.com/mitchellh/gox@latest -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
 release-compress: install-release-tools
-	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "compressing $${file}" && gxz -k -9 $${file}; done;
+	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "compressing $${file}" && $(GO) run github.com/ulikunitz/xz/cmd/gxz@latest -k -9 $${file}; done;
 
 .PHONY: release-check
 release-check: install-release-tools
