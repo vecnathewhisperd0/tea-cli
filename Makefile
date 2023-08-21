@@ -5,7 +5,7 @@ export CGO_ENABLED=0
 GO ?= go
 SHASUM ?= shasum -a 256
 
-export PATH := $(shell $(GO) env GOPATH)/bin:$(PATH)
+export PATH := $($(GO) env GOPATH)/bin:$(PATH)
 
 GOFILES := $(shell find . -name "*.go" -type f ! -path "*/bindata.go")
 GOFMT ?= gofmt -s
