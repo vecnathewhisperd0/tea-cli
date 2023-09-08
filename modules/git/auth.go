@@ -6,6 +6,7 @@ package git
 import (
 	"fmt"
 	"net/url"
+	"os"
 
 	"code.gitea.io/tea/modules/utils"
 
@@ -51,7 +52,7 @@ func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer
 	if err != nil {
 		return nil, err
 	}
-	sshKey, err := io.ReadFile(keyFile)
+	sshKey, err := os.ReadFile(keyFile)
 	if err != nil {
 		return nil, fmt.Errorf("can not read ssh key '%s'", keyFile)
 	}
