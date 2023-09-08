@@ -5,8 +5,8 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -83,7 +83,7 @@ func loadConfig() (err error) {
 		ymlPath := GetConfigPath()
 		exist, _ := utils.FileExist(ymlPath)
 		if exist {
-			bs, err := ioutil.ReadFile(ymlPath)
+			bs, err := os.ReadFile(ymlPath)
 			if err != nil {
 				err = fmt.Errorf("Failed to read config file: %s", ymlPath)
 			}
@@ -104,5 +104,5 @@ func saveConfig() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(ymlPath, bs, 0o660)
+	return os.WriteFile(ymlPath, bs, 0o660)
 }

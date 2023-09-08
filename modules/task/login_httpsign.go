@@ -4,7 +4,7 @@
 package task
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -63,7 +63,7 @@ func getLocalKeys() []string {
 	// parse each local key with present privkey & compare fingerprints to online keys
 	for _, pubkeyPath := range localPubkeyPaths {
 		var pubkeyFile []byte
-		pubkeyFile, err = ioutil.ReadFile(pubkeyPath)
+		pubkeyFile, err = os.ReadFile(pubkeyPath)
 		if err != nil {
 			continue
 		}

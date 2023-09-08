@@ -5,7 +5,7 @@ package task
 
 import (
 	"encoding/base64"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -39,7 +39,7 @@ func findSSHKey(client *gitea.Client) (string, error) {
 	// parse each local key with present privkey & compare fingerprints to online keys
 	for _, pubkeyPath := range localPubkeyPaths {
 		var pubkeyFile []byte
-		pubkeyFile, err = ioutil.ReadFile(pubkeyPath)
+		pubkeyFile, err = os.ReadFile(pubkeyPath)
 		if err != nil {
 			continue
 		}

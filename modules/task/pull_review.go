@@ -5,7 +5,6 @@ package task
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -52,7 +51,7 @@ func SavePullDiff(ctx *context.TeaContext, idx int64) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	writer, err := ioutil.TempFile(os.TempDir(), fmt.Sprintf("pull-%d-review-*.diff", idx))
+	writer, err := os.CreateTemp(os.TempDir(), fmt.Sprintf("pull-%d-review-*.diff", idx))
 	if err != nil {
 		return "", err
 	}
