@@ -19,7 +19,7 @@ require (
 	github.com/urfave/cli/v2 v2.16.3
 	golang.org/x/crypto v0.13.0
 	golang.org/x/term v0.12.0
-	gopkg.in/yaml.v2 v2.2.4
+	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
