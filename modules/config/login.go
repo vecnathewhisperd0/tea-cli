@@ -4,6 +4,7 @@
 package config
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -13,10 +14,12 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/utils"
 	"github.com/AlecAivazis/survey/v2"
+	"golang.org/x/oauth2"
 )
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
@@ -38,6 +41,9 @@ type Login struct {
 	User string `yaml:"user"`
 	// Created is auto created unix timestamp
 	Created int64 `yaml:"created"`
+	// OAuth refresh token
+	OAuthRefreshToken string `yaml:"oauth_refresh_token"`
+	TokenExpiry       int64  `yaml:"expiry"`
 }
 
 // GetLogins return all login available by config
@@ -97,9 +103,37 @@ func GetLoginByName(name string) *Login {
 
 	for _, l := range config.Logins {
 		if strings.ToLower(l.Name) == strings.ToLower(name) {
+			// TODO: error handling
+			OAuthRefreshIfNecessary(&l)
 			return &l
 		}
 	}
+	return nil
+}
+
+func OAuthRefreshIfNecessary(login *Login) error {
+	c := oauth2.Config{
+		ClientID: "e90ee53c-94e2-48ac-9358-a874fb9e0662",
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  login.URL + "/login/oauth/authorize",
+			TokenURL: login.URL + "/login/oauth/access_token",
+		},
+	}
+
+	if login.TokenExpiry == 0 || time.Unix(login.TokenExpiry, 0).After(time.Now()) {
+		return nil
+	}
+	fmt.Fprintln(os.Stderr, "refreshing OAuth token...")
+	token, err := c.TokenSource(context.Background(), &oauth2.Token{RefreshToken: login.OAuthRefreshToken}).Token()
+	if err != nil {
+		return err
+	}
+	login.Token = token.AccessToken
+	login.OAuthRefreshToken = token.RefreshToken
+	login.TokenExpiry = token.Expiry.Unix()
+	// update storage
+	DeleteLogin(login.Name)
+	AddLogin(login)
 	return nil
 }
 

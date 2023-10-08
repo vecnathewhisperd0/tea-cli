@@ -4,11 +4,18 @@
 package interact
 
 import (
+	"context"
 	"fmt"
-	"regexp"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 
 	"code.gitea.io/tea/modules/task"
+	"golang.org/x/oauth2"
 
 	"github.com/AlecAivazis/survey/v2"
 )
@@ -37,109 +44,57 @@ func CreateLogin() error {
 		return err
 	}
 
-	promptI = &survey.Input{Message: "Name of new Login [" + name + "]: "}
-	if err := survey.AskOne(promptI, &name); err != nil {
-		return err
-	}
-
-	loginMethod, err := promptSelect("Login with: ", []string{"token", "ssh-key/certificate"}, "", "")
+	oauthToken, err := getToken(giteaURL)
 	if err != nil {
 		return err
 	}
 
-	switch loginMethod {
-	default: // token
-		var hasToken bool
-		promptYN := &survey.Confirm{
-			Message: "Do you have an access token?",
-			Default: false,
-		}
-		if err = survey.AskOne(promptYN, &hasToken); err != nil {
-			return err
-		}
+	token = oauthToken.AccessToken
 
-		if hasToken {
-			promptI = &survey.Input{Message: "Token: "}
-			if err := survey.AskOne(promptI, &token, survey.WithValidator(survey.Required)); err != nil {
-				return err
-			}
-		} else {
-			promptI = &survey.Input{Message: "Username: "}
-			if err = survey.AskOne(promptI, &user, survey.WithValidator(survey.Required)); err != nil {
-				return err
-			}
+	return task.CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint, oauthToken.RefreshToken, insecure, sshAgent, versionCheck, oauthToken.Expiry)
+}
 
-			promptPW := &survey.Password{Message: "Password: "}
-			if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
-				return err
-			}
-		}
-	case "ssh-key/certificate":
-		promptI = &survey.Input{Message: "SSH Key/Certificate Path (leave empty for auto-discovery in ~/.ssh and ssh-agent):"}
-		if err := survey.AskOne(promptI, &sshKey); err != nil {
-			return err
-		}
-
-		if sshKey == "" {
-			sshKey, err = promptSelect("Select ssh-key: ", task.ListSSHPubkey(), "", "")
-			if err != nil {
-				return err
-			}
-
-			// ssh certificate
-			if strings.Contains(sshKey, "principals") {
-				sshCertPrincipal = regexp.MustCompile(`.*?principals: (.*?)[,|\s]`).FindStringSubmatch(sshKey)[1]
-				if strings.Contains(sshKey, "(ssh-agent)") {
-					sshAgent = true
-					sshKey = ""
-				} else {
-					sshKey = regexp.MustCompile(`\((.*?)\)$`).FindStringSubmatch(sshKey)[1]
-					sshKey = strings.TrimSuffix(sshKey, "-cert.pub")
-				}
-			} else {
-				sshKeyFingerprint = regexp.MustCompile(`(SHA256:.*?)\s`).FindStringSubmatch(sshKey)[1]
-				if strings.Contains(sshKey, "(ssh-agent)") {
-					sshAgent = true
-					sshKey = ""
-				} else {
-					sshKey = regexp.MustCompile(`\((.*?)\)$`).FindStringSubmatch(sshKey)[1]
-					sshKey = strings.TrimSuffix(sshKey, ".pub")
-				}
-			}
+func getToken(giteaURL string) (*oauth2.Token, error) {
+	c := oauth2.Config{
+		ClientID: "e90ee53c-94e2-48ac-9358-a874fb9e0662",
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  giteaURL + "/login/oauth/authorize",
+			TokenURL: giteaURL + "/login/oauth/access_token",
+		},
+	}
+	state := oauth2.GenerateVerifier()
+	queries := make(chan url.Values)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		queries <- r.URL.Query()
+		w.Write([]byte("okay"))
+	})
+	server := httptest.NewServer(handler)
+	c.RedirectURL = server.URL
+	defer server.Close()
+	verifier := oauth2.GenerateVerifier()
+	authCodeURL := c.AuthCodeURL(state, oauth2.S256ChallengeOption(verifier))
+	fmt.Fprintf(os.Stderr, "Please complete authentication in your browser...\n%s\n", authCodeURL)
+	var open string
+	switch runtime.GOOS {
+	case "windows":
+		open = "start"
+	case "darwin":
+		open = "open"
+	default:
+		open = "xdg-open"
+	}
+	// TODO: wait for server to start before opening browser
+	if _, err := exec.LookPath(open); err == nil {
+		err = exec.Command(open, authCodeURL).Run()
+		if err != nil {
+			return nil, err
 		}
 	}
-
-	var optSettings bool
-	promptYN := &survey.Confirm{
-		Message: "Set Optional settings: ",
-		Default: false,
+	query := <-queries
+	server.Close()
+	if query.Get("state") != state {
+		return nil, fmt.Errorf("state mismatch")
 	}
-	if err = survey.AskOne(promptYN, &optSettings); err != nil {
-		return err
-	}
-	if optSettings {
-		promptI = &survey.Input{Message: "SSH Key Path (leave empty for auto-discovery):"}
-		if err := survey.AskOne(promptI, &sshKey); err != nil {
-			return err
-		}
-
-		promptYN = &survey.Confirm{
-			Message: "Allow Insecure connections: ",
-			Default: false,
-		}
-		if err = survey.AskOne(promptYN, &insecure); err != nil {
-			return err
-		}
-
-		promptYN = &survey.Confirm{
-			Message: "Check version of Gitea instance: ",
-			Default: true,
-		}
-		if err = survey.AskOne(promptYN, &versionCheck); err != nil {
-			return err
-		}
-
-	}
-
-	return task.CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint, insecure, sshAgent, versionCheck)
+	code := query.Get("code")
+	return c.Exchange(context.Background(), code, oauth2.VerifierOption(verifier))
 }

@@ -4,6 +4,8 @@
 package login
 
 import (
+	"time"
+
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
 
@@ -99,7 +101,9 @@ func runLoginAdd(ctx *cli.Context) error {
 		ctx.String("url"),
 		ctx.String("ssh-agent-principal"),
 		ctx.String("ssh-agent-key"),
+		"",
 		ctx.Bool("insecure"),
 		sshAgent,
-		!ctx.Bool("no-version-check"))
+		!ctx.Bool("no-version-check"),
+		time.Time{})
 }
