@@ -6,6 +6,7 @@ package task
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"time"
 
 	"code.gitea.io/tea/modules/config"
@@ -14,8 +15,28 @@ import (
 	"code.gitea.io/sdk/gitea"
 )
 
+// SetupHelper add tea helper to config global
+func SetupHelper(login config.Login) error {
+	// Remove all helpers
+	exec.Command("git", "config", "--global", "--unset-all", fmt.Sprintf("credential.%s.helper", login.URL)).Run()
+
+	//
+	_, err := exec.Command("git", "config", "--global", fmt.Sprintf("credential.%s.helper", login.URL), "").Output()
+	if err != nil {
+		return err
+	}
+
+	// Add tea helper
+	_, err = exec.Command("git", "config", "--global", "--add", fmt.Sprintf("credential.%s.helper", login.URL), "!tea login helper").Output()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreateLogin create a login to be stored in config
-func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint string, insecure, sshAgent, versionCheck bool) error {
+func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint string, insecure, sshAgent, versionCheck, addHelper bool) error {
 	// checks ...
 	// ... if we have a url
 	if len(giteaURL) == 0 {
@@ -104,6 +125,11 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, 
 	}
 
 	fmt.Printf("Login as %s on %s successful. Added this login as %s\n", login.User, login.URL, login.Name)
+	if addHelper {
+		if err = SetupHelper(login); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
