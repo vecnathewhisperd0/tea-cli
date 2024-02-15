@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"code.gitea.io/tea/modules/config"
@@ -36,7 +37,7 @@ func SetupHelper(login config.Login) error {
 }
 
 // CreateLogin create a login to be stored in config
-func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint string, insecure, sshAgent, versionCheck, addHelper bool) error {
+func CreateLogin(name, token, user, passwd, otp, scopes, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint string, insecure, sshAgent, versionCheck, addHelper bool) error {
 	// checks ...
 	// ... if we have a url
 	if len(giteaURL) == 0 {
@@ -89,7 +90,7 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, 
 	}
 
 	if len(token) == 0 && sshCertPrincipal == "" && !sshAgent && sshKey == "" {
-		if login.Token, err = generateToken(login, user, passwd); err != nil {
+		if login.Token, err = generateToken(login, user, passwd, otp, scopes); err != nil {
 			return err
 		}
 	}
@@ -135,8 +136,12 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, 
 }
 
 // generateToken creates a new token when given BasicAuth credentials
-func generateToken(login config.Login, user, pass string) (string, error) {
-	client := login.Client(gitea.SetBasicAuth(user, pass))
+func generateToken(login config.Login, user, pass, otp, scopes string) (string, error) {
+	opts := []gitea.ClientOption{gitea.SetBasicAuth(user, pass)}
+	if otp != "" {
+		opts = append(opts, gitea.SetOTP(otp))
+	}
+	client := login.Client(opts...)
 
 	tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{
 		ListOptions: gitea.ListOptions{Page: -1},
@@ -155,7 +160,15 @@ func generateToken(login config.Login, user, pass string) (string, error) {
 		}
 	}
 
-	t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
+	var tokenScopes []gitea.AccessTokenScope
+	for _, scope := range strings.Split(scopes, ",") {
+		tokenScopes = append(tokenScopes, gitea.AccessTokenScope(strings.TrimSpace(scope)))
+	}
+
+	t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{
+		Name:   tokenName,
+		Scopes: tokenScopes,
+	})
 	return t.Token, err
 }
 
