@@ -18,10 +18,10 @@ import (
 
 // SetupHelper add tea helper to config global
 func SetupHelper(login config.Login) error {
-	// Remove all helpers
+	// Remove old helper
 	exec.Command("git", "config", "--global", "--unset-all", fmt.Sprintf("credential.%s.helper", login.URL)).Run()
 
-	//
+	// force command line to use tea
 	_, err := exec.Command("git", "config", "--global", fmt.Sprintf("credential.%s.helper", login.URL), "").Output()
 	if err != nil {
 		return err
