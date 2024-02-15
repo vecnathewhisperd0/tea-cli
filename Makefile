@@ -1,7 +1,4 @@
 DIST := dist
-export GO111MODULE=on
-export CGO_ENABLED=0
-
 GO ?= go
 SHASUM ?= shasum -a 256
 
@@ -17,7 +14,7 @@ else
 	ifneq ($(DRONE_BRANCH),)
 		VERSION ?= $(subst release/v,,$(DRONE_BRANCH))
 	else
-		VERSION ?= master
+		VERSION ?= main
 	endif
 	TEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 endif
@@ -36,11 +33,10 @@ SOURCES ?= $(shell find . -name "*.go" -type f)
 # OS specific vars.
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := tea.exe
+	VET_TOOL := gitea-vet.exe
 else
 	EXECUTABLE := tea
-	ifneq ($(shell uname -s), OpenBSD)
-		override BUILDMODE := -buildmode=pie
-	endif
+	VET_TOOL := gitea-vet
 endif
 
 .PHONY: all
@@ -61,19 +57,19 @@ vet:
 	$(GO) vet $(PACKAGES)
 	# Custom vet
 	$(GO) build code.gitea.io/gitea-vet
-	$(GO) vet -vettool=gitea-vet $(PACKAGES)
+	$(GO) vet -vettool=$(VET_TOOL) $(PACKAGES)
 
 .PHONY: lint
 lint: install-lint-tools
-	revive -config .revive.toml ./... || exit 1
+	$(GO) run github.com/mgechev/revive@v1.3.2 -config .revive.toml ./... || exit 1
 
 .PHONY: misspell-check
 misspell-check: install-lint-tools
-	misspell -error -i unknwon,destory $(GOFILES)
+	$(GO) run github.com/client9/misspell/cmd/misspell@latest -error -i unknwon,destory $(GOFILES)
 
 .PHONY: misspell
 misspell: install-lint-tools
-	misspell -w -i unknwon $(GOFILES)
+	$(GO) run github.com/client9/misspell/cmd/misspell@latest -w -i unknwon $(GOFILES)
 
 .PHONY: fmt-check
 fmt-check:
@@ -82,6 +78,19 @@ fmt-check:
 	if [ -n "$$diff" ]; then \
 		echo "Please run 'make fmt' and commit the result:"; \
 		echo "$${diff}"; \
+		exit 1; \
+	fi;
+
+.PHONY: docs
+docs:
+	$(GO) run . docs --out docs/CLI.md
+
+.PHONY: docs-check
+docs-check:
+	@DIFF=$$($(GO) run . docs | diff docs/CLI.md -); \
+	if [ -n "$$DIFF" ]; then \
+		echo "Please run 'make docs' and commit the result:"; \
+		echo "$$DIFF"; \
 		exit 1; \
 	fi;
 
@@ -103,7 +112,7 @@ check: test
 .PHONY: install
 install: $(SOURCES)
 	@echo "installing to $(shell $(GO) env GOPATH)/bin/$(EXECUTABLE)"
-	$(GO) install -v $(BUILDMODE) $(GOFLAGS) 
+	$(GO) install -v $(BUILDMODE) $(GOFLAGS)
 
 .PHONY: build
 build: $(EXECUTABLE)
@@ -115,37 +124,9 @@ $(EXECUTABLE): $(SOURCES)
 build-image:
 	docker build --build-arg VERSION=$(TEA_VERSION) -t gitea/tea:$(TEA_VERSION_TAG) .
 
-.PHONY: release
-release: release-dirs install-release-tools release-os release-compress release-check
-
-.PHONY: release-dirs
-release-dirs:
-	mkdir -p $(DIST)/binaries $(DIST)/release
-
-.PHONY: release-os
-release-os:
-	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
-
-.PHONY: release-compress
-release-compress: install-release-tools
-	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "compressing $${file}" && gxz -k -9 $${file}; done;
-
-.PHONY: release-check
-release-check: install-release-tools
-	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "checksumming $${file}" && $(SHASUM) `echo $${file} | sed 's/^..//'` > $${file}.sha256; done;
-
-### tools
-install-release-tools:
-	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) install github.com/mitchellh/gox@latest; \
-	fi
-	@hash gxz > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) install github.com/ulikunitz/xz/cmd/gxz@latest; \
-	fi
-
 install-lint-tools:
 	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) install github.com/mgechev/revive@latest; \
+		$(GO) install github.com/mgechev/revive@v1.3.2; \
 	fi
 	@hash misspell > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		$(GO) install github.com/client9/misspell/cmd/misspell@latest; \

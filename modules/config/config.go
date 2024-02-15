@@ -1,20 +1,19 @@
 // Copyright 2020 The Gitea Authors. All rights reserved.
-// Use of this source code is governed by a MIT-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
 
 package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"sync"
 
 	"code.gitea.io/tea/modules/utils"
 
 	"github.com/adrg/xdg"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // FlagDefaults defines all flags that can be overridden with a default value
@@ -84,7 +83,7 @@ func loadConfig() (err error) {
 		ymlPath := GetConfigPath()
 		exist, _ := utils.FileExist(ymlPath)
 		if exist {
-			bs, err := ioutil.ReadFile(ymlPath)
+			bs, err := os.ReadFile(ymlPath)
 			if err != nil {
 				err = fmt.Errorf("Failed to read config file: %s", ymlPath)
 			}
@@ -105,5 +104,5 @@ func saveConfig() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(ymlPath, bs, 0o660)
+	return os.WriteFile(ymlPath, bs, 0o660)
 }

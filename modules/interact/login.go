@@ -1,6 +1,5 @@
 // Copyright 2020 The Gitea Authors. All rights reserved.
-// Use of this source code is governed by a MIT-style
-// license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
 
 package interact
 
@@ -9,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/task"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -17,8 +17,8 @@ import (
 // CreateLogin create an login interactive
 func CreateLogin() error {
 	var (
-		name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint string
-		insecure, sshAgent, versionCheck                                                 bool
+		name, token, user, passwd, otp, scopes, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint string
+		insecure, sshAgent, versionCheck                                                              bool
 	)
 
 	versionCheck = true
@@ -72,6 +72,19 @@ func CreateLogin() error {
 
 			promptPW := &survey.Password{Message: "Password: "}
 			if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
+				return err
+			}
+
+			var tokenScopes []string
+			promptS := &survey.MultiSelect{Message: "Token Scopes:", Options: tokenScopeOpts}
+			if err := survey.AskOne(promptS, &tokenScopes, survey.WithValidator(survey.Required)); err != nil {
+				return err
+			}
+			scopes = strings.Join(tokenScopes, ",")
+
+			// Ask for OTP last so it's less likely to timeout
+			promptO := &survey.Input{Message: "OTP (if applicable)"}
+			if err := survey.AskOne(promptO, &otp); err != nil {
 				return err
 			}
 		}
@@ -142,5 +155,40 @@ func CreateLogin() error {
 
 	}
 
-	return task.CreateLogin(name, token, user, passwd, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint, insecure, sshAgent, versionCheck)
+	return task.CreateLogin(name, token, user, passwd, otp, scopes, sshKey, giteaURL, sshCertPrincipal, sshKeyFingerprint, insecure, sshAgent, versionCheck)
+}
+
+var tokenScopeOpts = []string{
+	string(gitea.AccessTokenScopeAll),
+	string(gitea.AccessTokenScopeRepo),
+	string(gitea.AccessTokenScopeRepoStatus),
+	string(gitea.AccessTokenScopePublicRepo),
+	string(gitea.AccessTokenScopeAdminOrg),
+	string(gitea.AccessTokenScopeWriteOrg),
+	string(gitea.AccessTokenScopeReadOrg),
+	string(gitea.AccessTokenScopeAdminPublicKey),
+	string(gitea.AccessTokenScopeWritePublicKey),
+	string(gitea.AccessTokenScopeReadPublicKey),
+	string(gitea.AccessTokenScopeAdminRepoHook),
+	string(gitea.AccessTokenScopeWriteRepoHook),
+	string(gitea.AccessTokenScopeReadRepoHook),
+	string(gitea.AccessTokenScopeAdminOrgHook),
+	string(gitea.AccessTokenScopeAdminUserHook),
+	string(gitea.AccessTokenScopeNotification),
+	string(gitea.AccessTokenScopeUser),
+	string(gitea.AccessTokenScopeReadUser),
+	string(gitea.AccessTokenScopeUserEmail),
+	string(gitea.AccessTokenScopeUserFollow),
+	string(gitea.AccessTokenScopeDeleteRepo),
+	string(gitea.AccessTokenScopePackage),
+	string(gitea.AccessTokenScopeWritePackage),
+	string(gitea.AccessTokenScopeReadPackage),
+	string(gitea.AccessTokenScopeDeletePackage),
+	string(gitea.AccessTokenScopeAdminGPGKey),
+	string(gitea.AccessTokenScopeWriteGPGKey),
+	string(gitea.AccessTokenScopeReadGPGKey),
+	string(gitea.AccessTokenScopeAdminApplication),
+	string(gitea.AccessTokenScopeWriteApplication),
+	string(gitea.AccessTokenScopeReadApplication),
+	string(gitea.AccessTokenScopeSudo),
 }
