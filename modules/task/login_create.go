@@ -17,23 +17,32 @@ import (
 )
 
 // SetupHelper add tea helper to config global
-func SetupHelper(login config.Login) error {
-	// Remove old helper
-	exec.Command("git", "config", "--global", "--unset-all", fmt.Sprintf("credential.%s.helper", login.URL)).Run()
-
-	// force command line to use tea
-	_, err := exec.Command("git", "config", "--global", fmt.Sprintf("credential.%s.helper", login.URL), "").Output()
-	if err != nil {
-		return err
+func SetupHelper(login config.Login) (bool, error) {
+	// Check that the URL is not blank
+	if login.URL == "" {
+		return false, fmt.Errorf("Invalid gitea url")
 	}
+
+	// get all helper if present in global config
+	out, err := exec.Command("git", "config", "--global", "--get-all", fmt.Sprintf("credential.%s.helper", login.URL)).Output()
+	if err == nil {
+		for _, line := range strings.Split(string(out), "\n") {
+			if line[len(line)-16:] == "tea login helper" {
+				return false, nil
+			}
+		}
+	}
+
+	// get tea binary path
+	binPath, _ := os.Executable()
 
 	// Add tea helper
-	_, err = exec.Command("git", "config", "--global", "--add", fmt.Sprintf("credential.%s.helper", login.URL), "!tea login helper").Output()
+	_, err = exec.Command("git", "config", "--global", "--add", fmt.Sprintf("credential.%s.helper", login.URL), fmt.Sprintf("!%s login helper", binPath)).Output()
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	return true, nil
 }
 
 // CreateLogin create a login to be stored in config
@@ -127,7 +136,7 @@ func CreateLogin(name, token, user, passwd, otp, scopes, sshKey, giteaURL, sshCe
 
 	fmt.Printf("Login as %s on %s successful. Added this login as %s\n", login.User, login.URL, login.Name)
 	if addHelper {
-		if err = SetupHelper(login); err != nil {
+		if _, err := SetupHelper(login); err != nil {
 			return err
 		}
 	}

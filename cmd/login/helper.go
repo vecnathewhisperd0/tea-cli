@@ -40,13 +40,15 @@ var CmdLoginHelper = cli.Command{
 				if err != nil {
 					return err
 				}
-				for loginIndex := range logins {
-					login := logins[loginIndex]
-					err = task.SetupHelper(login)
+				for _, login := range logins {
+					added, err := task.SetupHelper(login)
 					if err != nil {
 						return err
+					} else if added {
+						fmt.Printf("Added \"%s\"\n", login.Name)
+					} else {
+						fmt.Printf("\"%s\" has already been added!\n", login.Name)
 					}
-					fmt.Printf("Added %s\n", login.Name)
 				}
 				return nil
 			},
