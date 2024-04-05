@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
@@ -125,6 +126,12 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		c.RepoSlug = repoFlag
 	}
 
+	// override config user with env variable
+	envLogin := GetLoginByEnvVar()
+	if envLogin != nil {
+		c.Login = envLogin
+	}
+
 	// override login from flag, or use default login if repo based detection failed
 	if len(loginFlag) != 0 {
 		c.Login = config.GetLoginByName(loginFlag)
@@ -230,4 +237,42 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 	}
 
 	return repo, nil, "", errNotAGiteaRepo
+}
+
+func GetLoginByEnvVar() *config.Login {
+	var token string
+
+	giteaToken := os.Getenv("GITEA_TOKEN")
+	githubToken := os.Getenv("GH_TOKEN")
+	giteaInstanceUrl := os.Getenv("GITEA_INSTANCE_URL")
+
+	// if no tokens are set, or no instance url for gitea fail fast
+	if len(giteaInstanceUrl) == 0 || (len(giteaToken) == 0 && len(githubToken) == 0) {
+		return nil
+	}
+
+	token = giteaToken
+	if len(giteaToken) == 0 {
+		token = githubToken
+	}
+
+	serverURL, err := utils.ValidateAuthenticationMethod(giteaInstanceUrl, token, "", "", false, "", "")
+	if err != nil {
+		fmt.Errorf("%v", err)
+	}
+
+	login := &config.Login{
+		Name:              "TEMP_GITEA_AUTH",
+		URL:               serverURL.String(),
+		Token:             token,
+		Insecure:          true, // TODO revalidate decision
+		SSHKey:            "",
+		SSHCertPrincipal:  "",
+		SSHKeyFingerprint: "",
+		SSHAgent:          false,
+		Created:           time.Now().Unix(),
+		VersionCheck:      false,
+	}
+
+	return login
 }
