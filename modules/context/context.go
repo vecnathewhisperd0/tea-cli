@@ -258,7 +258,7 @@ func GetLoginByEnvVar() *config.Login {
 
 	serverURL, err := utils.ValidateAuthenticationMethod(giteaInstanceUrl, token, "", "", false, "", "")
 	if err != nil {
-		fmt.Errorf("%v", err)
+		_ = fmt.Errorf("%v", err)
 	}
 
 	login := &config.Login{
