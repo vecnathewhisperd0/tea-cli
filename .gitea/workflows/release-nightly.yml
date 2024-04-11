@@ -12,18 +12,17 @@ jobs:
         with:
           fetch-depth: 0
       - run: git fetch --force --tags
-      - name: setup go
-        uses: https://github.com/actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version: '>=1.20.1'
       - name: import gpg
         id: import_gpg
-        uses: https://github.com/crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPGSIGN_KEY }}
           passphrase: ${{ secrets.GPGSIGN_PASSPHRASE }}
       - name: goreleaser
-        uses: https://github.com/goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v5
         with:
             distribution: goreleaser-pro
             version: latest
@@ -37,10 +36,9 @@ jobs:
           S3_BUCKET: ${{ secrets.AWS_BUCKET }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GPGSIGN_PASSPHRASE: ${{ secrets.GPGSIGN_PASSPHRASE }}
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   release-image:
     runs-on: ubuntu-latest
-    container:
-      image: catthehacker/ubuntu:act-latest
     env:
       DOCKER_ORG: gitea
       DOCKER_LATEST: nightly
