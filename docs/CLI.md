@@ -153,11 +153,6 @@ List, create and update issues
 
 **--until, -u**="": Filter by activity before this date
 
-## branches, branch, b
-
-Consult branches
-
-
 ### list, ls
 
 List issues of the repository
@@ -273,6 +268,66 @@ Change state of one ore more issues to 'closed'
 **--login, -l**="": Use a different Gitea Login. Optional
 
 **--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+## branches, branch, b
+
+List, protect or unprotect branches
+
+**--comments**: Whether to display comments (will prompt if not provided & run interactively)
+
+**--fields value, -f**="": Comma-separated list of fields to print. Available values:
+                  name,protected,user-can-merge,user-can-push,protection
+                  (default: "name,protected,user-can-merge,user-can-push")
+
+**--page, -p**="": specify page, default is 1
+
+**--limit, --lm**="": specify limit of items per page
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+### list, ls
+
+**--fields value, -f**="": Comma-separated list of fields to print. Available values:
+                  name,protected,user-can-merge,user-can-push,protection
+                  (default: "name,protected,user-can-merge,user-can-push")
+
+**--page, -p**="": specify page, default is 1
+
+**--limit, --lm**="": specify limit of items per page
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+### protect, P
+
+Protect one or more branches against push/pull
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+### unprotect, U
+
+Unprotect one or more branches against push/pull
+
+**--login, -l**="": Use a different Gitea Login. Optional
 
 **--remote, -R**="": Discover Gitea login from remote. Optional
 
