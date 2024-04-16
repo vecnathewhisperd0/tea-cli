@@ -153,6 +153,11 @@ List, create and update issues
 
 **--until, -u**="": Filter by activity before this date
 
+## branches, branch, b
+
+Consult branches
+
+
 ### list, ls
 
 List issues of the repository
