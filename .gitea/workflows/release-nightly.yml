@@ -12,21 +12,20 @@ jobs:
         with:
           fetch-depth: 0
       - run: git fetch --force --tags
-      - name: setup go
-        uses: https://github.com/actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '>=1.20.1'
+          go-version-file: "go.mod"
       - name: import gpg
         id: import_gpg
-        uses: https://github.com/crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPGSIGN_KEY }}
           passphrase: ${{ secrets.GPGSIGN_PASSPHRASE }}
       - name: goreleaser
-        uses: https://github.com/goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v6
         with:
             distribution: goreleaser-pro
-            version: latest
+            version: "~> v1"
             args: release --nightly
         env:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
@@ -37,16 +36,15 @@ jobs:
           S3_BUCKET: ${{ secrets.AWS_BUCKET }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GPGSIGN_PASSPHRASE: ${{ secrets.GPGSIGN_PASSPHRASE }}
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   release-image:
     runs-on: ubuntu-latest
-    container:
-      image: catthehacker/ubuntu:act-latest
     env:
       DOCKER_ORG: gitea
       DOCKER_LATEST: nightly
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # all history for all branches and tags
 
@@ -63,7 +61,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         env:
           ACTIONS_RUNTIME_TOKEN: '' # See https://gitea.com/gitea/act_runner/issues/119
         with:
