@@ -789,6 +789,60 @@ Edit one or more releases
 
 **--title, -t**="": Change Title
 
+### assets, asset, a
+
+Manage release assets
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+#### list, ls
+
+List Release Attachments
+
+**--limit, --lm**="": specify limit of items per page
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--page, -p**="": specify page, default is 1
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+#### create, c
+
+Create one or more release attachments
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+#### delete, rm
+
+Delete one or more release attachments
+
+**--confirm, -y**: Confirm deletion (required)
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
 ## times, time, t
 
 Operate on tracked times of a repository's issues & pulls
@@ -1118,6 +1172,102 @@ Migrate a repository
 **--template**: Make the repository a template
 
 **--wiki**: Copy the wiki
+
+### delete, rm
+
+Delete an existing repository
+
+**--force, -f**: Force the deletion and don't ask for confirmation
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--name, -**="": name of the repo
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--owner, -O**="": owner of the repo
+
+## branches, branch, b
+
+Consult branches
+
+**--comments**: Whether to display comments (will prompt if not provided & run interactively)
+
+**--fields, -f**="": Comma-separated list of fields to print. Available values:
+			name,protected,user-can-merge,user-can-push,protection
+		 (default: name,protected,user-can-merge,user-can-push)
+
+**--limit, --lm**="": specify limit of items per page
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--page, -p**="": specify page, default is 1
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+### list, ls
+
+List branches of the repository
+
+**--fields, -f**="": Comma-separated list of fields to print. Available values:
+			name,protected,user-can-merge,user-can-push,protection
+		 (default: name,protected,user-can-merge,user-can-push)
+
+**--limit, --lm**="": specify limit of items per page
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--page, -p**="": specify page, default is 1
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+### protect, P
+
+Protect branches
+
+**--fields, -f**="": Comma-separated list of fields to print. Available values:
+			name,protected,user-can-merge,user-can-push,protection
+		 (default: name,protected,user-can-merge,user-can-push)
+
+**--limit, --lm**="": specify limit of items per page
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--page, -p**="": specify page, default is 1
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
+
+### unprotect, U
+
+Unprotect branches
+
+**--fields, -f**="": Comma-separated list of fields to print. Available values:
+			name,protected,user-can-merge,user-can-push,protection
+		 (default: name,protected,user-can-merge,user-can-push)
+
+**--limit, --lm**="": specify limit of items per page
+
+**--login, -l**="": Use a different Gitea Login. Optional
+
+**--output, -o**="": Output format. (simple, table, csv, tsv, yaml, json)
+
+**--page, -p**="": specify page, default is 1
+
+**--remote, -R**="": Discover Gitea login from remote. Optional
+
+**--repo, -r**="": Override local repository path or gitea repository slug to interact with. Optional
 
 ## comment, c
 
