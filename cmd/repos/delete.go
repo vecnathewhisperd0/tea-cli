@@ -58,29 +58,29 @@ func runRepoDelete(cmd *cli.Context) error {
 		owner = ctx.Login.User
 	}
 
-	repo_name := ctx.String("name")
+	repoName := ctx.String("name")
 
-	repo_slug := fmt.Sprintf("%s/%s", owner, repo_name)
+	repoSlug := fmt.Sprintf("%s/%s", owner, repoName)
 
 	if !ctx.Bool("force") {
-		var entered_repo_slug string
+		var enteredRepoSlug string
 		promptRepoName := &survey.Input{
-			Message: fmt.Sprintf("Confirm the deletion of the repository '%s' by typing its name: ", repo_slug),
+			Message: fmt.Sprintf("Confirm the deletion of the repository '%s' by typing its name: ", repoSlug),
 		}
-		if err := survey.AskOne(promptRepoName, &entered_repo_slug, survey.WithValidator(survey.Required)); err != nil {
+		if err := survey.AskOne(promptRepoName, &enteredRepoSlug, survey.WithValidator(survey.Required)); err != nil {
 			return err
 		}
 
-		if entered_repo_slug != repo_slug {
-			return fmt.Errorf("Entered wrong repository name '%s', expected '%s'", entered_repo_slug, repo_slug)
+		if enteredRepoSlug != repoSlug {
+			return fmt.Errorf("Entered wrong repository name '%s', expected '%s'", enteredRepoSlug, repoSlug)
 		}
 	}
 
-	_, err := client.DeleteRepo(owner, repo_name)
+	_, err := client.DeleteRepo(owner, repoName)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Successfully deleted %s/%s\n", owner, repo_name)
+	fmt.Printf("Successfully deleted %s/%s\n", owner, repoName)
 	return nil
 }
