@@ -40,6 +40,8 @@ func MergePull(ctx *context.TeaContext) error {
 
 // getPullIndex interactively determines the PR index
 func getPullIndex(ctx *context.TeaContext, branch string) (int64, error) {
+	// FIXME: pagination to loop over all PRs. Currently only the first page is shown
+	//        note: for repos with many PRs, this may cause latency
 	prs, _, err := ctx.Login.Client().ListRepoPullRequests(ctx.Owner, ctx.Repo, gitea.ListPullRequestsOptions{
 		State: gitea.StateOpen,
 	})
