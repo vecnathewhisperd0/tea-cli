@@ -9,8 +9,8 @@ import (
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 
-	"github.com/urfave/cli/v2"
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdRepoRm represents a sub command of repos to delete an existing repo
